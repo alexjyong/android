@@ -12,9 +12,3 @@ val WindowInsets.Companion.zero: WindowInsets
     @Composable
     @NonRestartableComposable
     get() = WindowInsets(left = 0, right = 0, top = 0, bottom = 0)
-
-val BottomSheetInsets: WindowInsets
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    @NonRestartableComposable
-    get() = BottomSheetDefaults.windowInsets.exclude(WindowInsets.navigationBars)

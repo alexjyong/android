@@ -128,8 +128,7 @@ fun AttributionScreen(navController: NavController) {
             sheetState = licenceSheetState,
             onDismissRequest = {
                 licenceSheetOpen = false
-            },
-            windowInsets = BottomSheetInsets
+            }
         ) {
             Column(
                 modifier = Modifier

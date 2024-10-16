@@ -341,8 +341,7 @@ fun ChannelScreen(
             sheetState = channelInfoSheetState,
             onDismissRequest = {
                 channelInfoSheetShown = false
-            },
-            windowInsets = BottomSheetInsets
+            }
         ) {
             ChannelInfoSheet(
                 channelId = channelId,
@@ -363,8 +362,7 @@ fun ChannelScreen(
             sheetState = messageContextSheetState,
             onDismissRequest = {
                 messageContextSheetShown = false
-            },
-            windowInsets = BottomSheetInsets
+            }
         ) {
             MessageContextSheet(
                 messageId = messageContextSheetTarget,
@@ -390,8 +388,7 @@ fun ChannelScreen(
             sheetState = reactSheetState,
             onDismissRequest = {
                 reactSheetShown = false
-            },
-            windowInsets = BottomSheetInsets
+            }
         ) {
             ReactSheet(reactSheetTarget) {
                 if (it == null) return@ReactSheet

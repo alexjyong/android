@@ -179,8 +179,7 @@ fun ChannelSideDrawer(
             sheetState = channelContextSheetState,
             onDismissRequest = {
                 channelContextSheetTarget = null
-            },
-            windowInsets = BottomSheetInsets
+            }
         ) {
             ChannelContextSheet(
                 channelId = channelContextSheetTarget!!,

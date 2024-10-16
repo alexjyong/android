@@ -240,8 +240,7 @@ fun AppearanceSettingsScreen(
             sheetState = sheetState,
             onDismissRequest = {
                 viewModel.overridePickerSheetVisible = false
-            },
-            windowInsets = BottomSheetInsets
+            }
         ) {
             ColourPickerSheet(
                 initialValue = viewModel.selectedOverrideInitialValue ?: 0,

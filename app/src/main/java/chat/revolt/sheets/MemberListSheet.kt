@@ -235,8 +235,7 @@ fun MemberListSheet(
             sheetState = userContextSheetState,
             onDismissRequest = {
                 showUserInfoSheet = false
-            },
-            windowInsets = BottomSheetInsets
+            }
         ) {
             UserInfoSheet(
                 userId = userInfoSheetTarget,
@@ -256,8 +255,7 @@ fun MemberListSheet(
             sheetState = memberContextSheetState,
             onDismissRequest = {
                 showMemberContextSheet = false
-            },
-            windowInsets = BottomSheetInsets
+            }
         ) {
             if (serverId != null) {
                 ServerMemberContextSheet(

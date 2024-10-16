@@ -12,7 +12,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -24,7 +23,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,8 +49,6 @@ import chat.revolt.components.chat.Message
 import chat.revolt.components.generic.SheetButton
 import chat.revolt.components.generic.SheetEnd
 import chat.revolt.internals.Platform
-import chat.revolt.internals.extensions.BottomSheetInsets
-import chat.revolt.ui.theme.ClearRippleTheme
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,8 +85,7 @@ fun MessageContextSheet(
             sheetState = shareSheetState,
             onDismissRequest = {
                 showShareSheet = false
-            },
-            windowInsets = BottomSheetInsets
+            }
         ) {
             Column(
                 modifier = Modifier
@@ -252,8 +247,7 @@ fun MessageContextSheet(
             sheetState = reactSheetState,
             onDismissRequest = {
                 showReactSheet = false
-            },
-            windowInsets = BottomSheetInsets
+            }
         ) {
             ReactSheet(messageId) {
                 if (it == null) return@ReactSheet
@@ -316,20 +310,18 @@ fun MessageContextSheet(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
     ) {
-        CompositionLocalProvider(value = LocalRippleTheme provides ClearRippleTheme) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 4.dp),
-            ) {
-                Message(
-                    message = message.copy(
-                        tail = false,
-                        masquerade = null
-                    )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 4.dp),
+        ) {
+            Message(
+                message = message.copy(
+                    tail = false,
+                    masquerade = null
                 )
+            )
 
-                HorizontalDivider()
-            }
+            HorizontalDivider()
         }
 
         SheetButton(

@@ -127,7 +127,7 @@ fun AttachmentManager(
         ModalBottomSheet(
             onDismissRequest = {
                 showPreviewSheet = false
-            }, sheetState = sheetState, windowInsets = BottomSheetInsets
+            }, sheetState = sheetState
         ) {
             previewingAttachment?.let {
                 FilePreviewSheet(args = it, canRemove = canRemove, onRemove = {

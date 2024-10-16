@@ -5,7 +5,6 @@ import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.ripple.RippleAlpha
-import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -158,19 +157,6 @@ fun getDefaultTheme(): Theme {
         systemSupportsDynamicColors() -> Theme.M3Dynamic
         else -> Theme.Revolt
     }
-}
-
-object ClearRippleTheme : RippleTheme {
-    @Composable
-    override fun defaultColor(): Color = Color.Transparent
-
-    @Composable
-    override fun rippleAlpha() = RippleAlpha(
-        draggedAlpha = 0.0f,
-        focusedAlpha = 0.0f,
-        hoveredAlpha = 0.0f,
-        pressedAlpha = 0.0f,
-    )
 }
 
 fun isThemeDark(theme: Theme, systemIsDark: Boolean): Boolean {
