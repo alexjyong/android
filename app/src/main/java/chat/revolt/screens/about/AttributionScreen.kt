@@ -44,7 +44,6 @@ import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.components.generic.SheetEnd
 import chat.revolt.components.screens.settings.AttributionItem
-import chat.revolt.internals.extensions.BottomSheetInsets
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray

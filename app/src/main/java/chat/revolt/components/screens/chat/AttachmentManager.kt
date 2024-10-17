@@ -50,7 +50,6 @@ import chat.revolt.R
 import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.SheetEnd
-import chat.revolt.internals.extensions.BottomSheetInsets
 import kotlinx.coroutines.launch
 import java.io.File
 

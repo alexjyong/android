@@ -61,7 +61,6 @@ import chat.revolt.components.chat.DisconnectedNotice
 import chat.revolt.components.screens.chat.drawer.ChannelSideDrawer
 import chat.revolt.components.screens.voice.VoiceChannelOverlay
 import chat.revolt.internals.Changelogs
-import chat.revolt.internals.extensions.BottomSheetInsets
 import chat.revolt.internals.extensions.zero
 import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.chat.dialogs.safety.ReportMessageDialog

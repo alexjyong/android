@@ -95,7 +95,6 @@ import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.presenceFromStatus
 import chat.revolt.components.screens.chat.ChannelIcon
-import chat.revolt.internals.extensions.BottomSheetInsets
 import chat.revolt.screens.chat.ChatRouterDestination
 import chat.revolt.sheets.ChannelContextSheet
 import kotlinx.coroutines.launch

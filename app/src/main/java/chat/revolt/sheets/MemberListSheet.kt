@@ -48,7 +48,6 @@ import chat.revolt.components.generic.Presence
 import chat.revolt.components.generic.SheetEnd
 import chat.revolt.components.generic.SheetHeaderPadding
 import chat.revolt.components.generic.presenceFromStatus
-import chat.revolt.internals.extensions.BottomSheetInsets
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.distinctUntilChanged

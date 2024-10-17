@@ -122,7 +122,6 @@ import chat.revolt.components.screens.chat.ReplyManager
 import chat.revolt.components.screens.chat.TypingIndicator
 import chat.revolt.components.skeletons.MessageSkeleton
 import chat.revolt.components.skeletons.MessageSkeletonVariant
-import chat.revolt.internals.extensions.BottomSheetInsets
 import chat.revolt.internals.extensions.rememberChannelPermissions
 import chat.revolt.internals.extensions.zero
 import chat.revolt.sheets.ChannelInfoSheet
