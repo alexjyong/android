@@ -98,6 +98,7 @@ fun UserInfoSheet(
                 )
             }
         )
+        Spacer(Modifier.height(20.dp))
         return
     }
 
