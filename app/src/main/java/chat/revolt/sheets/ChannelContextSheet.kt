@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.components.generic.SheetButton
-import chat.revolt.components.generic.SheetEnd
+
 import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
 
@@ -96,5 +96,5 @@ fun ChannelContextSheet(channelId: String, onHideSheet: suspend () -> Unit) {
         }
     )
 
-    SheetEnd()
+
 }

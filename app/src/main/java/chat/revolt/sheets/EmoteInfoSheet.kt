@@ -38,7 +38,6 @@ import chat.revolt.api.schemas.Emoji
 import chat.revolt.api.schemas.Server
 import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.generic.SheetButton
-import chat.revolt.components.generic.SheetEnd
 import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
 
@@ -127,5 +126,5 @@ fun EmoteInfoSheet(id: String, onDismiss: () -> Unit) {
         }
     )
 
-    SheetEnd()
+
 }

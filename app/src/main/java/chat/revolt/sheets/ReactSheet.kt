@@ -3,7 +3,6 @@ package chat.revolt.sheets
 import androidx.compose.runtime.Composable
 import chat.revolt.api.RevoltAPI
 import chat.revolt.components.emoji.EmojiPicker
-import chat.revolt.components.generic.SheetEnd
 
 @Composable
 fun ReactSheet(messageId: String, onSelect: (String?) -> Unit) {
@@ -17,5 +16,5 @@ fun ReactSheet(messageId: String, onSelect: (String?) -> Unit) {
     EmojiPicker {
         onSelect(it.removeSurrounding(":"))
     }
-    SheetEnd()
+
 }

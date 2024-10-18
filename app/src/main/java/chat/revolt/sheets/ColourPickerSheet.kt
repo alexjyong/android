@@ -55,7 +55,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
-import chat.revolt.components.generic.SheetEnd
 import chat.revolt.internals.TailwindColourScheme
 
 enum class ColourPickerMode {
@@ -623,5 +622,5 @@ fun ColumnScope.ColourPickerSheet(
         }
     }
 
-    SheetEnd()
+
 }

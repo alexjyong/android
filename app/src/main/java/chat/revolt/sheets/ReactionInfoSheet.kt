@@ -53,7 +53,6 @@ import chat.revolt.api.schemas.User
 import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.components.chat.MemberListItem
 import chat.revolt.components.generic.RemoteImage
-import chat.revolt.components.generic.SheetEnd
 import chat.revolt.internals.text.MessageProcessor
 import chat.revolt.persistence.KVStorage
 import kotlinx.coroutines.launch
@@ -325,7 +324,7 @@ fun ReactionInfoSheet(messageId: String, emoji: String, onDismiss: () -> Unit) {
         }
 
         item("bottom") {
-            SheetEnd()
+
         }
     }
 }

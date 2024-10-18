@@ -28,7 +28,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.components.generic.SheetButton
-import chat.revolt.components.generic.SheetEnd
 import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
 
@@ -134,5 +133,5 @@ fun LinkInfoSheet(url: String, onDismiss: () -> Unit) {
         }
     )
 
-    SheetEnd()
+
 }

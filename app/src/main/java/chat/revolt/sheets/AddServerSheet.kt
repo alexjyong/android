@@ -31,7 +31,6 @@ import chat.revolt.activities.InviteActivity
 import chat.revolt.api.REVOLT_APP
 import chat.revolt.components.generic.FormTextField
 import chat.revolt.components.generic.SheetButton
-import chat.revolt.components.generic.SheetEnd
 import chat.revolt.components.generic.SheetHeaderPadding
 
 @Composable
@@ -98,7 +97,7 @@ fun AddServerSheet() {
         )
     }
 
-    SheetEnd()
+
 }
 
 @Composable

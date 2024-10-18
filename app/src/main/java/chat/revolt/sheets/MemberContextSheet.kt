@@ -20,7 +20,6 @@ import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.channel.removeMember
 import chat.revolt.components.generic.SheetButton
-import chat.revolt.components.generic.SheetEnd
 import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
 
@@ -100,7 +99,7 @@ fun ColumnScope.GroupDMMemberContextSheet(
         }
     )
 
-    SheetEnd()
+
 }
 
 @Composable
@@ -150,5 +149,5 @@ fun ColumnScope.ServerMemberContextSheet(
         }
     )
 
-    SheetEnd()
+
 }

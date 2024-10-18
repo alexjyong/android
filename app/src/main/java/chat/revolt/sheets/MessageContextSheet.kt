@@ -47,7 +47,6 @@ import chat.revolt.api.routes.channel.react
 import chat.revolt.callbacks.UiCallbacks
 import chat.revolt.components.chat.Message
 import chat.revolt.components.generic.SheetButton
-import chat.revolt.components.generic.SheetEnd
 import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
 
@@ -236,7 +235,7 @@ fun MessageContextSheet(
                 )
             }
 
-            SheetEnd()
+
         }
     }
 
@@ -475,6 +474,6 @@ fun MessageContextSheet(
             )
         }
 
-        SheetEnd()
+
     }
 }

@@ -35,7 +35,6 @@ import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.server.leaveOrDeleteServer
 import chat.revolt.components.generic.SheetButton
-import chat.revolt.components.generic.SheetEnd
 import chat.revolt.components.markdown.RichMarkdown
 import chat.revolt.components.screens.settings.ServerOverview
 import chat.revolt.internals.Platform
@@ -252,5 +251,5 @@ fun ServerContextSheet(
         )
     }
 
-    SheetEnd()
+
 }

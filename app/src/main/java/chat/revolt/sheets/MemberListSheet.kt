@@ -45,7 +45,6 @@ import chat.revolt.api.schemas.User
 import chat.revolt.components.chat.MemberListItem
 import chat.revolt.components.generic.CountableListHeader
 import chat.revolt.components.generic.Presence
-import chat.revolt.components.generic.SheetEnd
 import chat.revolt.components.generic.SheetHeaderPadding
 import chat.revolt.components.generic.presenceFromStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -282,7 +281,7 @@ fun MemberListSheet(
                     }
                 )
             }
-            SheetEnd()
+
         }
     }
 
@@ -295,7 +294,7 @@ fun MemberListSheet(
             ) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
-            SheetEnd()
+
             return@Column
         }
 
@@ -365,5 +364,5 @@ fun MemberListSheet(
             }
         }
     }
-    SheetEnd()
+
 }

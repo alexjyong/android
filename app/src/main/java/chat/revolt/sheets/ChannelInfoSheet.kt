@@ -39,7 +39,6 @@ import chat.revolt.api.schemas.ChannelType
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
 import chat.revolt.components.generic.SheetButton
-import chat.revolt.components.generic.SheetEnd
 import chat.revolt.components.screens.chat.ChannelSheetHeader
 import chat.revolt.internals.extensions.rememberChannelPermissions
 import chat.revolt.screens.chat.dialogs.InviteDialog
@@ -232,5 +231,5 @@ fun ChannelInfoSheet(channelId: String, onHideSheet: suspend () -> Unit) {
         )
     }
 
-    SheetEnd()
+
 }
