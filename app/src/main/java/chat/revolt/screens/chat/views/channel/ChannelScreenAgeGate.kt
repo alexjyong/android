@@ -103,7 +103,7 @@ fun ChannelScreenAgeGate(
 
             // Born before oldest person condition
             // Update from https://en.wikipedia.org/wiki/List_of_oldest_living_people
-            val minYob = 1907
+            val minYob = 1908
             if (year < minYob) {
                 dobPickerError =
                     context.getString(R.string.channel_age_gate_dob_invalid_unlikely, minYob)
