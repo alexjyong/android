@@ -1,5 +1,6 @@
 package chat.revolt.components.chat
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -12,7 +13,9 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -28,8 +31,13 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.channel.fetchSingleMessage
 import chat.revolt.api.schemas.User
+import chat.revolt.api.settings.Experiments
 import chat.revolt.components.generic.UserAvatar
+import chat.revolt.components.markdown.jbm.JBM
+import chat.revolt.components.markdown.jbm.JBMRenderer
+import chat.revolt.components.markdown.jbm.LocalJBMarkdownTreeState
 
+@OptIn(JBM::class)
 @Composable
 fun InReplyTo(
     channelId: String,
@@ -49,9 +57,15 @@ fun InReplyTo(
     val usernameColor =
         message?.let { authorColour(it) } ?: Brush.solidColor(contentColor)
 
+    val serverId = remember(channelId) { RevoltAPI.channelCache[channelId]?.server }
+
     LaunchedEffect(messageId) {
         if (messageId !in RevoltAPI.messageCache) {
-            RevoltAPI.messageCache[messageId] = fetchSingleMessage(channelId, messageId)
+            try {
+                RevoltAPI.messageCache[messageId] = fetchSingleMessage(channelId, messageId)
+            } catch (e: Exception) {
+                Log.e("InReplyTo", "Failed to fetch message $messageId", e)
+            }
         }
     }
 
@@ -108,22 +122,34 @@ fun InReplyTo(
                 if (message.content.isNullOrBlank()) {
                     Text(
                         text = stringResource(id = R.string.reply_message_empty_has_attachments),
-                        // TODO: inter has italics now, import and use them
-                        fontStyle = FontStyle.Italic, // inter doesn't have italics...
                         fontSize = 12.sp,
-                        fontFamily = FontFamily.Default, // ...so we use the default font
                         color = contentColor.copy(alpha = 0.7f),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                 } else {
-                    Text(
-                        text = message.content,
-                        fontSize = 12.sp,
-                        color = contentColor.copy(alpha = 0.7f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    if (Experiments.useKotlinBasedMarkdownRenderer.isEnabled) {
+                        CompositionLocalProvider(
+                            LocalJBMarkdownTreeState provides LocalJBMarkdownTreeState.current.copy(
+                                embedded = true,
+                                singleLine = true,
+                                currentServer = serverId,
+                                linksClickable = false
+                            ),
+                            LocalContentColor provides contentColor.copy(alpha = 0.7f),
+                            LocalTextStyle provides LocalTextStyle.current.copy(fontSize = 12.sp)
+                        ) {
+                            JBMRenderer(message.content)
+                        }
+                    } else {
+                        Text(
+                            text = message.content,
+                            fontSize = 12.sp,
+                            color = contentColor.copy(alpha = 0.7f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
             } else {
                 Text(

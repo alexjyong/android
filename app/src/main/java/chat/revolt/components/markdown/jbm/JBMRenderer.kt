@@ -56,6 +56,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -104,6 +105,7 @@ data class JBMarkdownTreeState(
     val linksClickable: Boolean = true,
     val currentServer: String? = null,
     val embedded: Boolean = false,
+    val singleLine: Boolean = false,
     val colors: JBMColors = JBMColors(
         clickable = Color(0xFFFF00FF),
         clickableBackground = Color(0x2000FF00)
@@ -456,6 +458,8 @@ private fun JBMText(node: ASTNode, modifier: Modifier) {
     Text(
         text = annotatedText,
         onTextLayout = { layoutResult = it },
+        maxLines = if (mdState.singleLine) 1 else Int.MAX_VALUE,
+        overflow = if (mdState.singleLine) TextOverflow.Ellipsis else TextOverflow.Clip,
         modifier = modifier.pointerInput(onClick, onLongClick) {
             detectTapGesturesConditionalConsume(
                 onTap = { pos ->
@@ -771,6 +775,8 @@ private fun JBMBlock(node: ASTNode, modifier: Modifier, nestingCounter: Int = 0)
                         append("[Unknown block type ${node.type.name}]")
                     }
                 },
+                maxLines = if (state.singleLine) 1 else Int.MAX_VALUE,
+                overflow = if (state.singleLine) TextOverflow.Ellipsis else TextOverflow.Clip,
                 modifier = modifier
             )
         }
