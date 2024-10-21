@@ -1,7 +1,11 @@
 package chat.revolt.components.markdown.jbm
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.util.Log
+import android.widget.Toast
+import androidx.browser.customtabs.CustomTabColorSchemeParams
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -9,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -25,17 +30,21 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -50,8 +59,13 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import chat.revolt.R
+import chat.revolt.activities.InviteActivity
+import chat.revolt.api.schemas.isInviteUri
 import chat.revolt.api.settings.LoadedSettings
+import chat.revolt.callbacks.Action
+import chat.revolt.callbacks.ActionChannel
 import chat.revolt.components.markdown.Annotations
 import chat.revolt.components.utils.detectTapGesturesConditionalConsume
 import chat.revolt.ui.theme.FragmentMono
@@ -62,12 +76,26 @@ import dev.snipme.highlights.model.CodeHighlight
 import dev.snipme.highlights.model.ColorHighlight
 import dev.snipme.highlights.model.SyntaxLanguage
 import dev.snipme.highlights.model.SyntaxThemes
+import kotlinx.coroutines.launch
 import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.ast.getTextInNode
 import org.intellij.markdown.flavours.gfm.GFMElementTypes
 import org.intellij.markdown.flavours.gfm.GFMTokenTypes
+
+enum class JBMAnnotations(val tag: String, val clickable: Boolean) {
+    URL("URL", true),
+    UserMention("UserMention", true),
+    ChannelMention("ChannelMention", true),
+    CustomEmote("CustomEmote", true),
+    Timestamp("Timestamp", false)
+}
+
+data class JBMColors(
+    val clickable: Color,
+    val clickableBackground: Color,
+)
 
 data class JBMarkdownTreeState(
     val sourceText: String = "",
@@ -76,6 +104,10 @@ data class JBMarkdownTreeState(
     val linksClickable: Boolean = true,
     val currentServer: String? = null,
     val embedded: Boolean = false,
+    val colors: JBMColors = JBMColors(
+        clickable = Color(0xFFFF00FF),
+        clickableBackground = Color(0x2000FF00)
+    )
 )
 
 val LocalJBMarkdownTreeState =
@@ -92,7 +124,11 @@ fun JBMRenderer(content: String, modifier: Modifier = Modifier) {
 
     CompositionLocalProvider(
         LocalJBMarkdownTreeState provides LocalJBMarkdownTreeState.current.copy(
-            sourceText = content
+            sourceText = content,
+            colors = JBMColors(
+                clickable = MaterialTheme.colorScheme.primary,
+                clickableBackground = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+            )
         )
     ) {
         if (LocalJBMarkdownTreeState.current.embedded) {
@@ -214,11 +250,53 @@ private fun annotateText(
                 }
 
                 MarkdownElementTypes.PARAGRAPH,
-                MarkdownElementTypes.HTML_BLOCK,
-                MarkdownTokenTypes.ATX_CONTENT -> {
+                MarkdownElementTypes.HTML_BLOCK -> {
                     for (child in node.children) {
                         append(annotateText(state, child))
                     }
+                }
+
+                MarkdownTokenTypes.ATX_CONTENT -> {
+                    // Drop WHITE_SPACE children at the start
+                    for (child in node.children.dropWhile { it.type == MarkdownTokenTypes.WHITE_SPACE }) {
+                        append(annotateText(state, child))
+                    }
+                }
+
+                MarkdownElementTypes.INLINE_LINK -> {
+                    val linkTextChild =
+                        node.children.firstOrNull { it.type == MarkdownElementTypes.LINK_TEXT }
+                    val linkDestinationChild =
+                        node.children.firstOrNull { it.type == MarkdownElementTypes.LINK_DESTINATION }
+                            ?: node.children.firstOrNull { it.type == MarkdownElementTypes.AUTOLINK }
+
+                    pushStringAnnotation(
+                        tag = JBMAnnotations.URL.tag,
+                        annotation = linkDestinationChild?.getTextInNode(sourceText).toString()
+                            .removeSurrounding("<", ">")
+                    )
+                    pushStyle(SpanStyle(color = state.colors.clickable))
+                    linkTextChild?.children
+                        ?.drop(1) // l-bracket
+                        ?.dropLast(1) // r-bracket
+                        ?.forEach {
+                            append(annotateText(state, it))
+                        }
+                    pop()
+                    pop()
+                }
+
+                GFMTokenTypes.GFM_AUTOLINK,
+                MarkdownTokenTypes.AUTOLINK -> {
+                    pushStringAnnotation(
+                        tag = JBMAnnotations.URL.tag,
+                        annotation = node.getTextInNode(sourceText).toString()
+                            .removeSurrounding("<", ">")
+                    )
+                    pushStyle(SpanStyle(color = state.colors.clickable))
+                    append(node.getTextInNode(sourceText))
+                    pop()
+                    pop()
                 }
 
                 // re-render types
@@ -238,14 +316,27 @@ private fun annotateText(
                 MarkdownTokenTypes.WHITE_SPACE,
                 MarkdownTokenTypes.COLON,
                 MarkdownTokenTypes.EMPH,
-                GFMTokenTypes.TILDE -> {
+                GFMTokenTypes.TILDE,
+                GFMTokenTypes.DOLLAR -> {
+                    append(node.getTextInNode(sourceText))
+                }
+
+                MarkdownElementTypes.SHORT_REFERENCE_LINK,
+                MarkdownElementTypes.LINK_DEFINITION,
+                MarkdownElementTypes.FULL_REFERENCE_LINK -> {
                     append(node.getTextInNode(sourceText))
                 }
 
                 else -> {
-                    append("[${node.type.name}]{\n")
-                    append(node.getTextInNode(sourceText))
-                    append("\n}")
+                    withStyle(SpanStyle(color = Color.Cyan)) {
+                        append("[${node.type.name}]{\n")
+                    }
+                    for (child in node.children) {
+                        append(annotateText(state, child))
+                    }
+                    withStyle(SpanStyle(color = Color.Cyan)) {
+                        append("\n}")
+                    }
                 }
             }
         }
@@ -266,9 +357,15 @@ private fun JBMText(node: ASTNode, modifier: Modifier) {
     val mdState = LocalJBMarkdownTreeState.current
     val annotatedText = remember(node) { annotateText(mdState, node) }
     val colours = MaterialTheme.colorScheme
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     val shouldConsumeTap = handler@{ offset: Int ->
-        Annotations.entries.filter { it.clickable }.map { it.tag }.forEach { tag ->
+        if (!mdState.linksClickable) {
+            return@handler false
+        }
+
+        JBMAnnotations.entries.filter { it.clickable }.map { it.tag }.forEach { tag ->
             if (annotatedText.getStringAnnotations(
                     tag = tag,
                     start = offset,
@@ -284,12 +381,76 @@ private fun JBMText(node: ASTNode, modifier: Modifier) {
 
     val onClick = handler@{ offset: Int ->
         if (mdState.linksClickable) {
+            JBMAnnotations.entries.filter { it.clickable }.map { it.tag }.forEach { tag ->
+                val annotations = annotatedText.getStringAnnotations(
+                    tag = tag,
+                    start = offset,
+                    end = offset
+                )
+                annotations.forEach { annotation ->
+                    val item = annotation.item
+                    when (tag) {
+                        JBMAnnotations.URL.tag -> {
+                            try {
+                                val uri = item.toUri()
+                                if (uri.isInviteUri()) {
+                                    scope.launch {
+                                        Intent(context, InviteActivity::class.java).apply {
+                                            data = uri
+                                            context.startActivity(this)
+                                        }
+                                    }
+                                    return@handler true
+                                }
+                            } catch (e: Exception) {
+                                // no-op
+                            }
+
+                            val customTab = CustomTabsIntent.Builder()
+                                .setShowTitle(true)
+                                .setDefaultColorSchemeParams(
+                                    CustomTabColorSchemeParams.Builder()
+                                        .setToolbarColor(colours.surfaceContainer.toArgb())
+                                        .build()
+                                )
+                                .build()
+
+                            try {
+                                customTab.launchUrl(context, item.toUri())
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.link_type_no_intent),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                            return@handler true
+                        }
+                    }
+                }
+            }
         }
+
+        return@handler false
     }
 
     val onLongClick = handler@{ offset: Int ->
         if (mdState.linksClickable) {
+            annotatedText.getStringAnnotations(
+                tag = Annotations.URL.tag,
+                start = offset,
+                end = offset
+            ).firstOrNull()?.let { annotation ->
+                scope.launch {
+                    ActionChannel.send(Action.LinkInfo(annotation.item))
+                }
+
+                return@handler true
+            }
         }
+
+        return@handler false
     }
 
     Text(
@@ -495,12 +656,15 @@ private fun JBMCodeBlockContent(node: ASTNode, modifier: Modifier) {
 }
 
 @Composable
-private fun JBMBlock(node: ASTNode, modifier: Modifier) {
+private fun JBMBlock(node: ASTNode, modifier: Modifier, nestingCounter: Int = 0) {
     val state = LocalJBMarkdownTreeState.current
+    val colorScheme = MaterialTheme.colorScheme
 
     when (node.type) {
         MarkdownElementTypes.PARAGRAPH,
-        MarkdownElementTypes.HTML_BLOCK -> {
+        MarkdownElementTypes.HTML_BLOCK,
+        MarkdownElementTypes.LINK_DEFINITION,
+        MarkdownTokenTypes.WHITE_SPACE -> {
             CompositionLocalProvider(
                 LocalTextStyle provides LocalTextStyle.current.copy(
                     fontSize = LocalTextStyle.current.fontSize * state.fontSizeMultiplier
@@ -555,6 +719,49 @@ private fun JBMBlock(node: ASTNode, modifier: Modifier) {
 
         MarkdownElementTypes.CODE_FENCE -> {
             JBMCodeBlockContent(node, modifier)
+        }
+
+        MarkdownElementTypes.BLOCK_QUOTE -> {
+            if (LocalJBMarkdownTreeState.current.embedded) {
+                node.children.getOrNull(0)?.let {
+                    JBMBlock(it, modifier)
+                }
+            } else {
+                Column(
+                    Modifier
+                        .clip(MaterialTheme.shapes.medium)
+                        .fillMaxWidth()
+                        .drawBehind {
+                            drawRect(colorScheme.surfaceContainer.copy(alpha = 0.5f))
+                            drawLine(
+                                colorScheme.primary,
+                                Offset.Zero,
+                                Offset(0f, size.height),
+                                strokeWidth = 16f
+                            )
+                        }
+                        .padding(8.dp)
+                        .padding(start = 4.dp)
+                ) {
+                    if (nestingCounter < 5) {
+                        node.children.map {
+                            JBMBlock(it, modifier, nestingCounter = nestingCounter + 1)
+                        }
+                    }
+                }
+            }
+        }
+
+        MarkdownTokenTypes.BLOCK_QUOTE -> {
+            if (LocalJBMarkdownTreeState.current.embedded) {
+                node.children.getOrNull(0)?.let {
+                    JBMBlock(it, modifier)
+                }
+            } else {
+                node.children.map {
+                    JBMBlock(it, modifier)
+                }
+            }
         }
 
         else -> {
