@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
@@ -43,6 +44,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -63,10 +65,14 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import chat.revolt.R
 import chat.revolt.activities.InviteActivity
+import chat.revolt.api.REVOLT_FILES
+import chat.revolt.api.RevoltAPI
+import chat.revolt.api.routes.custom.fetchEmoji
 import chat.revolt.api.schemas.isInviteUri
 import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
+import chat.revolt.components.generic.RemoteImage
 import chat.revolt.components.markdown.Annotations
 import chat.revolt.components.utils.detectTapGesturesConditionalConsume
 import chat.revolt.ui.theme.FragmentMono
@@ -90,7 +96,15 @@ enum class JBMAnnotations(val tag: String, val clickable: Boolean) {
     UserMention("UserMention", true),
     ChannelMention("ChannelMention", true),
     CustomEmote("CustomEmote", true),
-    Timestamp("Timestamp", false)
+    Timestamp("Timestamp", false),
+    Checkbox("Checkbox", false)
+}
+
+object JBMRegularExpressions {
+    val Mention = Regex("<@([0-9A-Z]{26})>")
+    val Channel = Regex("<#([0-9A-Z]{26})>")
+    val CustomEmote = Regex(":([0-9A-Z]{26}):")
+    val Timestamp = Regex("<t:([0-9]+?)(:[tTDfFR])?>")
 }
 
 data class JBMColors(
@@ -244,9 +258,9 @@ private fun annotateText(
 
                 GFMTokenTypes.CHECK_BOX -> {
                     if (node.getTextInNode(sourceText).trim() == "[ ]") {
-                        appendInlineContent("checkbox", "❌")
+                        appendInlineContent(JBMAnnotations.Checkbox.tag, "❌")
                     } else {
-                        appendInlineContent("checkbox", "✅")
+                        appendInlineContent(JBMAnnotations.Checkbox.tag, "✅")
                     }
                     append(" ")
                 }
@@ -450,6 +464,47 @@ private fun JBMText(node: ASTNode, modifier: Modifier) {
 
                 return@handler true
             }
+
+            annotatedText.getStringAnnotations(
+                tag = Annotations.UserMention.tag,
+                start = offset,
+                end = offset
+            ).firstOrNull()?.let { annotation ->
+                scope.launch {
+                    ActionChannel.send(
+                        Action.OpenUserSheet(
+                            annotation.item,
+                            mdState.currentServer
+                        )
+                    )
+                }
+
+                return@handler true
+            }
+
+            annotatedText.getStringAnnotations(
+                tag = Annotations.ChannelMention.tag,
+                start = offset,
+                end = offset
+            ).firstOrNull()?.let { annotation ->
+                scope.launch {
+                    ActionChannel.send(Action.SwitchChannel(annotation.item))
+                }
+
+                return@handler true
+            }
+
+            annotatedText.getStringAnnotations(
+                tag = Annotations.CustomEmote.tag,
+                start = offset,
+                end = offset
+            ).firstOrNull()?.let { annotation ->
+                scope.launch {
+                    ActionChannel.send(Action.EmoteInfo(annotation.item))
+                }
+
+                return@handler true
+            }
         }
 
         return@handler false
@@ -483,7 +538,7 @@ private fun JBMText(node: ASTNode, modifier: Modifier) {
             )
         },
         inlineContent = mapOf(
-            "checkbox" to InlineTextContent(
+            JBMAnnotations.Checkbox.tag to InlineTextContent(
                 placeholder = Placeholder(
                     width = LocalTextStyle.current.fontSize * 1.5,
                     height = LocalTextStyle.current.fontSize * 1.5,
@@ -518,7 +573,37 @@ private fun JBMText(node: ASTNode, modifier: Modifier) {
                         }
                     }
                 }
-            )
+            ),
+            JBMAnnotations.CustomEmote.tag to InlineTextContent(
+                placeholder = Placeholder(
+                    width = LocalTextStyle.current.fontSize * 1.5,
+                    height = LocalTextStyle.current.fontSize * 1.5,
+                    placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+                ),
+            ) { id ->
+                val emote = RevoltAPI.emojiCache[id]
+                if (emote == null) {
+                    scope.launch {
+                        try {
+                            RevoltAPI.emojiCache[id] = fetchEmoji(id)
+                        } catch (e: Exception) {
+                            // no-op
+                        }
+                    }
+                    return@InlineTextContent
+                } else {
+                    with(LocalDensity.current) {
+                        RemoteImage(
+                            url = "$REVOLT_FILES/emojis/${id}/emoji.gif",
+                            description = emote.name,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .width((LocalTextStyle.current.fontSize * 1.5).toDp())
+                                .height((LocalTextStyle.current.fontSize * 1.5).toDp())
+                        )
+                    }
+                }
+            }
         )
     )
 }
