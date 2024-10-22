@@ -38,6 +38,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import chat.revolt.R
+import chat.revolt.RevoltApplication
 import chat.revolt.api.REVOLT_SUPPORT
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.account.EmailPasswordAssessment
@@ -79,7 +80,14 @@ class LoginViewModel @Inject constructor(
         _error = null
 
         viewModelScope.launch {
-            val response = negotiateAuthentication(_email, _password)
+            val response = try {
+                negotiateAuthentication(_email, _password)
+            } catch (e: Exception) {
+                _error = if (e.message?.startsWith("Unexpected JSON token") == true) {
+                    RevoltApplication.instance.getString(R.string.service_health_alert_body_default)
+                } else e.message ?: "Unknown error"
+                return@launch
+            }
             if (response.error != null) {
                 _error = response.error.type
             } else {

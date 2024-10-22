@@ -35,6 +35,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import chat.revolt.R
+import chat.revolt.RevoltApplication
 import chat.revolt.api.routes.account.RegistrationBody
 import chat.revolt.api.routes.account.register
 import chat.revolt.api.routes.misc.getRootRoute
@@ -53,7 +54,14 @@ class RegisterDetailsScreenViewModel : ViewModel() {
 
     fun initCaptcha(context: Context, onSuccess: () -> Unit) {
         viewModelScope.launch {
-            val root = getRootRoute()
+            val root = try {
+                getRootRoute()
+            } catch (e: Exception) {
+                error = if (e.message?.startsWith("Expected response body of the type") == true) {
+                    RevoltApplication.instance.getString(R.string.service_health_alert_body_default)
+                } else e.message
+                return@launch
+            }
 
             if (!root.features.captcha.enabled) {
                 onSuccess()
