@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.screens.labs.ui.mockups.CallScreenMockup
+import chat.revolt.screens.labs.ui.mockups.NewLoginExperienceMockup
 import chat.revolt.screens.labs.ui.sandbox.CryptographicAgeVerificationSandbox
 import chat.revolt.screens.labs.ui.sandbox.JBMSandbox
 import chat.revolt.screens.labs.ui.sandbox.SettingsDslSandbox
@@ -64,6 +65,9 @@ fun LabsRootScreen(topNav: NavController) {
 
                 composable("mockups/call") {
                     CallScreenMockup()
+                }
+                composable("mockups/newlogin") {
+                    NewLoginExperienceMockup(labsNav)
                 }
 
                 composable("sandboxes/cryptoageverif") {

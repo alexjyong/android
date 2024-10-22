@@ -141,6 +141,15 @@ fun LabsHomeScreen(navController: NavController) {
                             }
                         )
                         HorizontalDivider()
+                        ListItem(
+                            headlineContent = {
+                                Text("New Login Experience")
+                            },
+                            modifier = Modifier.clickable {
+                                navController.navigate("mockups/newlogin")
+                            }
+                        )
+                        HorizontalDivider()
                     }
                 }
 
