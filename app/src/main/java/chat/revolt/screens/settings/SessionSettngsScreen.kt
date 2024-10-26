@@ -29,7 +29,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -224,7 +223,7 @@ fun SessionSettingsScreen(
                                     .fillMaxWidth()
                                     .clip(shape = MaterialTheme.shapes.medium)
                                     .background(
-                                        color = MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp)
+                                        color = MaterialTheme.colorScheme.surfaceContainerHigh
                                     )
                                     .padding(16.dp),
                                 verticalAlignment = Alignment.CenterVertically,

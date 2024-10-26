@@ -11,7 +11,6 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,7 +26,7 @@ fun TimeRift(modifier: Modifier = Modifier, onMessageLoad: () -> Unit) {
     Column(
         modifier = modifier
             .padding(vertical = 10.dp)
-            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .fillMaxWidth()
             .padding(vertical = 20.dp),
         verticalArrangement = Arrangement.Center,

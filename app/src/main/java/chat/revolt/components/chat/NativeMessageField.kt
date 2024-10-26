@@ -202,7 +202,7 @@ fun NativeMessageField(
     }
 
     Column(
-        modifier = modifier.background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
+        modifier = modifier.background(MaterialTheme.colorScheme.surfaceContainer)
     ) {
         AnimatedVisibility(
             visible = autocompleteSuggestions.size > 0,
@@ -339,7 +339,7 @@ fun NativeMessageField(
         }
         Row(
             modifier = modifier
-                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)),
+                .background(MaterialTheme.colorScheme.surfaceContainer),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Spacer(modifier = Modifier.width(8.dp))

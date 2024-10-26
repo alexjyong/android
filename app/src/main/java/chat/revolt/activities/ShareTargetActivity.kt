@@ -426,7 +426,7 @@ fun ShareTargetScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .fillMaxHeight(0.5f)
-                                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceContainer)
                                     .padding(4.dp)
                             ) {
                                 EmojiPicker {

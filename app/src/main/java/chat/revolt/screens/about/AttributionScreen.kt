@@ -25,7 +25,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -188,7 +187,7 @@ fun AttributionScreen(navController: NavController) {
                             modifier = Modifier
                                 .padding(16.dp)
                                 .clip(MaterialTheme.shapes.medium)
-                                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
+                                .background(MaterialTheme.colorScheme.surfaceContainer)
                                 .fillMaxWidth()
                                 .padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)

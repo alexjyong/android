@@ -225,7 +225,7 @@ fun EmojiPicker(
                 Box(
                     modifier = Modifier
                         .clip(MaterialTheme.shapes.small)
-                        .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                         .padding(horizontal = 8.dp, vertical = 4.dp),
                     contentAlignment = Alignment.CenterStart
                 ) {

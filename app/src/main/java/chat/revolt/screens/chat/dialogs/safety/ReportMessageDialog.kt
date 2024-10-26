@@ -118,7 +118,7 @@ fun ReportMessageDialog(onDismiss: () -> Unit, messageId: String) {
                         Box(
                             modifier = Modifier
                                 .clip(MaterialTheme.shapes.medium)
-                                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
+                                .background(MaterialTheme.colorScheme.surfaceContainer)
                                 .verticalScroll(rememberScrollState())
                                 .heightIn(max = 200.dp)
                                 .padding(bottom = 8.dp)

@@ -538,11 +538,7 @@ fun Message(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier
                                         .clip(MaterialTheme.shapes.small)
-                                        .background(
-                                            MaterialTheme.colorScheme.surfaceColorAtElevation(
-                                                2.dp
-                                            )
-                                        )
+                                        .background(MaterialTheme.colorScheme.surfaceContainer)
                                         .clickable(onClick = onAddReaction)
                                         .padding(8.dp)
                                 ) {

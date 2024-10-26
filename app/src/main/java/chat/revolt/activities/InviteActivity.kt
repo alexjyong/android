@@ -26,7 +26,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -201,7 +200,7 @@ fun InviteScreen(
                             modifier = Modifier
                                 .padding(16.dp)
                                 .clip(MaterialTheme.shapes.large)
-                                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
+                                .background(MaterialTheme.colorScheme.surfaceContainer)
                                 .padding(16.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {

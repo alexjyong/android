@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,7 +62,7 @@ fun StatusPicker(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)
-                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainer)
         ) {
             Presence.entries.forEach {
                 StatusButton(
@@ -106,7 +105,7 @@ fun StatusButton(
             .then(
                 if (selected) {
                     Modifier.background(
-                        MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp)
+                        MaterialTheme.colorScheme.surfaceContainerHigh
                     )
                 } else {
                     Modifier

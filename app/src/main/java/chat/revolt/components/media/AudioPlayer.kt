@@ -193,7 +193,7 @@ fun AudioPlayer(url: String, filename: String, contentType: String) {
     Column(
         modifier = Modifier
             .clip(MaterialTheme.shapes.medium)
-            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(8.dp)
     ) {
         Row(

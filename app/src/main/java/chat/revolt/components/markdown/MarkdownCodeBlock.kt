@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,7 +24,7 @@ fun MarkdownCodeBlock(node: AstNode, modifier: Modifier = Modifier) {
                 }
             )
             .clip(MaterialTheme.shapes.medium)
-            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(8.dp)
     ) {
         Text(

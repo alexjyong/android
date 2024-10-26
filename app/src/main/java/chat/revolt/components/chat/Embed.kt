@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +41,7 @@ fun RegularEmbed(
     Row(
         modifier = modifier
             .clip(MaterialTheme.shapes.medium)
-            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .wrapContentWidth(Alignment.Start)
             .height(IntrinsicSize.Min)
     ) {

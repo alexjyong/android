@@ -12,7 +12,6 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,7 +32,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import chat.revolt.R
 import chat.revolt.activities.InviteActivity
@@ -259,7 +257,7 @@ fun annotateText(node: AstNode): AnnotatedString {
                         .copy(
                             fontFamily = FragmentMono,
                             fontSynthesis = FontSynthesis.All,
-                            background = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
+                            background = MaterialTheme.colorScheme.surfaceContainer
                         )
                 )
                 append(node.text ?: "")

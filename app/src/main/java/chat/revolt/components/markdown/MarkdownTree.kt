@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
@@ -104,7 +103,7 @@ fun MarkdownTree(node: AstNode) {
                 modifier = Modifier
                     .padding(top = 4.dp, bottom = 4.dp)
                     .clip(MaterialTheme.shapes.medium)
-                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
                     .fillMaxWidth()
                     .height(IntrinsicSize.Min)
             ) {

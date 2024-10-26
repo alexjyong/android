@@ -63,7 +63,6 @@ import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -755,7 +754,7 @@ fun ChannelScreen(
 
                     Column(
                         modifier = Modifier
-                            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
+                            .background(MaterialTheme.colorScheme.surfaceContainer)
                             .fillMaxWidth(),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -885,7 +884,7 @@ fun ChannelScreen(
                                 Modifier
                                     .imePadding()
                                     .navigationBarsPadding()
-                                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceContainer)
                             )
                         } else {
                             Box(
@@ -917,11 +916,7 @@ fun ChannelScreen(
                                             Column(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
-                                                    .background(
-                                                        MaterialTheme.colorScheme.surfaceColorAtElevation(
-                                                            1.dp
-                                                        )
-                                                    )
+                                                    .background(MaterialTheme.colorScheme.surfaceContainer)
                                                     .padding(4.dp)
                                                     .navigationBarsPadding()
                                             ) {

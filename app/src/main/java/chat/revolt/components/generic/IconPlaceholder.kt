@@ -4,13 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
@@ -22,7 +20,7 @@ fun IconPlaceholder(
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
     ) {
         Text(
             text = name.first().uppercase(),

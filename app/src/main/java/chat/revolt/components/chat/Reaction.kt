@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -48,7 +47,7 @@ fun Reaction(
         targetValue = if (hasOwn) {
             MaterialTheme.colorScheme.primary
         } else {
-            MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
+            MaterialTheme.colorScheme.surfaceContainer
         },
         label = "Reaction background"
     )

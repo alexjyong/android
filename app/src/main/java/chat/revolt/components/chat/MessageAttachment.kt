@@ -18,7 +18,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -44,7 +43,7 @@ fun FileAttachment(attachment: AutumnResource) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainer)
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -97,7 +96,7 @@ fun VideoPlayButton() {
             .width(48.dp)
             .aspectRatio(1f)
             .clip(MaterialTheme.shapes.medium)
-            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
     )
 
     Icon(
@@ -133,7 +132,7 @@ fun VideoAttachment(attachment: AutumnResource) {
                     ),
                 description = attachment.filename ?: "Video"
             )
-            
+
             VideoPlayButton()
         }
     }

@@ -48,7 +48,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -436,7 +435,7 @@ fun ChannelSideDrawer(
                         bottomEnd = CornerSize(0)
                     )
                 )
-                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainer)
                 .weight(1f)
                 .fillMaxHeight()
         ) {
@@ -463,7 +462,7 @@ fun ChannelSideDrawer(
                                     drawRect(
                                         Brush.linearGradient(
                                             listOf(
-                                                surfaceColorAtElevation(1.dp).copy(alpha = 0.8f),
+                                                surfaceContainer.copy(alpha = 0.8f),
                                                 Color.Transparent
                                             ),
                                             Offset.Zero,
