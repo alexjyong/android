@@ -16,6 +16,7 @@ import chat.revolt.api.schemas.Member
 import chat.revolt.api.schemas.User
 import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.presenceFromStatus
+import chat.revolt.internals.extensions.TransparentListItemColours
 
 @Composable
 fun MemberListItem(
@@ -40,6 +41,7 @@ fun MemberListItem(
         ?: Brush.solidColor(LocalContentColor.current)
 
     ListItem(
+        colors = TransparentListItemColours,
         modifier = modifier,
         headlineContent = {
             Text(

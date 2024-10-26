@@ -17,7 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -314,7 +313,7 @@ fun MemberListSheet(
                         CountableListHeader(
                             text = item.category,
                             count = item.count,
-                            backgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
+                            backgroundColor = MaterialTheme.colorScheme.surfaceContainerLow
                         )
                     }
 
