@@ -185,8 +185,9 @@ class ChatRouterViewModel @Inject constructor(
             val savedLastChannel = kvStorage.get("lastChannel/$serverId")
             val channelId =
                 savedLastChannel ?: RevoltAPI.serverCache[serverId]?.channels?.firstOrNull()
+            val channelExists = RevoltAPI.channelCache.containsKey(channelId)
 
-            if (channelId != null) {
+            if (channelId != null && channelExists) {
                 setSaveDestination(ChatRouterDestination.Channel(channelId))
             } else {
                 setSaveDestination(ChatRouterDestination.NoCurrentChannel(serverId))
