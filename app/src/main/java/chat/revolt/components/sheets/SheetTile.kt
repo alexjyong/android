@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -31,7 +30,7 @@ fun SheetTile(
     header: @Composable () -> Unit,
     contentPreview: @Composable () -> Unit,
     clickable: Boolean = true,
-    backgroundBrush: Brush = Brush.solidColor(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)),
+    backgroundBrush: Brush = Brush.solidColor(MaterialTheme.colorScheme.surfaceContainer),
     content: @Composable () -> Unit,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
