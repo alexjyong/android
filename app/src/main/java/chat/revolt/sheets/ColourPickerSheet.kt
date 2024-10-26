@@ -1,5 +1,7 @@
 package chat.revolt.sheets
 
+import android.graphics.RuntimeShader
+import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Canvas
@@ -36,6 +38,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.SliderState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -47,15 +50,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.internals.TailwindColourScheme
+import org.intellij.lang.annotations.Language
 
 enum class ColourPickerMode {
     Sliders,
@@ -81,6 +89,21 @@ private fun Color.asHsv(): Triple<Float, Float, Float> {
     val saturation: Float = if (max == 0f) 0f else delta / max
 
     return Triple(hue, saturation, max)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+private fun DrawScope.drawThumbMargin(
+    color: Color,
+    sliderState: SliderState
+) {
+    // Area around the thumb to mimic material3 track
+    val thumbOutlineXBase =
+        (sliderState.value / sliderState.valueRange.endInclusive) * size.width
+    drawRect(
+        color,
+        topLeft = Offset(thumbOutlineXBase - 8.dp.toPx(), 0f),
+        size = androidx.compose.ui.geometry.Size(16.dp.toPx(), size.height)
+    )
 }
 
 private fun Color.asHexString(): String {
@@ -226,6 +249,21 @@ val palette = listOf(
     TailwindColourScheme.rose[10],
 )
 
+@Language("AGSL")
+const val CheckerboardShader = """
+layout(color) uniform vec4 color1;
+layout(color) uniform vec4 color2;
+uniform float squareSize;
+
+vec4 main(vec2 fragCoord) {
+    // add 4 to make it less boring
+    float x = floor((fragCoord.x + 4) / squareSize);
+    float y = floor((fragCoord.y + 4) / squareSize);
+    
+    return mod(x + y, 2.0) == 0.0 ? color1 : color2;
+}
+"""
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ColumnScope.ColourPickerSheet(
@@ -244,6 +282,20 @@ fun ColumnScope.ColourPickerSheet(
     }
 
     val colorHsv by remember(color) { derivedStateOf { color.asHsv() } }
+
+    val checkerboardShader = with(MaterialTheme.colorScheme) {
+        remember {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                RuntimeShader(CheckerboardShader).apply {
+                    setFloatUniform("squareSize", 8f)
+                    setColorUniform("color1", surface.toArgb())
+                    setColorUniform("color2", surfaceVariant.toArgb())
+                }
+            } else {
+                null
+            }
+        }
+    }
 
     Column(
         Modifier
@@ -322,18 +374,22 @@ fun ColumnScope.ColourPickerSheet(
                                     1f
                                 )
                             ),
-                            track = {
-                                Canvas(
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .height(4.dp)
-                                ) {
-                                    drawRect(
-                                        Brush.horizontalGradient(
-                                            hueTrackColours,
-                                            endX = size.width
+                            track = { state ->
+                                with(MaterialTheme.colorScheme) {
+                                    Canvas(
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .height(16.dp)
+                                    ) {
+                                        drawRoundRect(
+                                            Brush.horizontalGradient(
+                                                hueTrackColours,
+                                                endX = size.width
+                                            ),
+                                            cornerRadius = CornerRadius(999f, 999f)
                                         )
-                                    )
+                                        drawThumbMargin(surfaceContainerLow, state)
+                                    }
                                 }
                             }
                         )
@@ -370,29 +426,33 @@ fun ColumnScope.ColourPickerSheet(
                                     1f
                                 )
                             ),
-                            track = {
-                                Canvas(
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .height(4.dp)
-                                ) {
-                                    drawRect(
-                                        Brush.horizontalGradient(
-                                            listOf(
-                                                Color.hsv(
-                                                    colorHsv.first,
-                                                    0f,
-                                                    1f
+                            track = { state ->
+                                with(MaterialTheme.colorScheme) {
+                                    Canvas(
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .height(16.dp)
+                                    ) {
+                                        drawRoundRect(
+                                            Brush.horizontalGradient(
+                                                listOf(
+                                                    Color.hsv(
+                                                        colorHsv.first,
+                                                        0f,
+                                                        1f
+                                                    ),
+                                                    Color.hsv(
+                                                        colorHsv.first,
+                                                        1f,
+                                                        1f
+                                                    )
                                                 ),
-                                                Color.hsv(
-                                                    colorHsv.first,
-                                                    1f,
-                                                    1f
-                                                )
+                                                endX = size.width
                                             ),
-                                            endX = size.width
+                                            cornerRadius = CornerRadius(999f, 999f)
                                         )
-                                    )
+                                        drawThumbMargin(surfaceContainerLow, state)
+                                    }
                                 }
                             }
                         )
@@ -429,29 +489,33 @@ fun ColumnScope.ColourPickerSheet(
                                     colorHsv.third
                                 )
                             ),
-                            track = {
-                                Canvas(
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .height(4.dp)
-                                ) {
-                                    drawRect(
-                                        Brush.horizontalGradient(
-                                            listOf(
-                                                Color.hsv(
-                                                    colorHsv.first,
-                                                    colorHsv.second,
-                                                    0f
+                            track = { state ->
+                                with(MaterialTheme.colorScheme) {
+                                    Canvas(
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .height(16.dp)
+                                    ) {
+                                        drawRoundRect(
+                                            Brush.horizontalGradient(
+                                                listOf(
+                                                    Color.hsv(
+                                                        colorHsv.first,
+                                                        colorHsv.second,
+                                                        0f
+                                                    ),
+                                                    Color.hsv(
+                                                        colorHsv.first,
+                                                        colorHsv.second,
+                                                        1f
+                                                    )
                                                 ),
-                                                Color.hsv(
-                                                    colorHsv.first,
-                                                    colorHsv.second,
-                                                    1f
-                                                )
+                                                endX = size.width
                                             ),
-                                            endX = size.width
+                                            cornerRadius = CornerRadius(999f, 999f)
                                         )
-                                    )
+                                        drawThumbMargin(surfaceContainerLow, state)
+                                    }
                                 }
                             }
                         )
@@ -481,21 +545,33 @@ fun ColumnScope.ColourPickerSheet(
                             colors = SliderDefaults.colors().copy(
                                 thumbColor = color
                             ),
-                            track = {
-                                Canvas(
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .height(4.dp)
-                                ) {
-                                    drawRect(
-                                        Brush.horizontalGradient(
-                                            listOf(
-                                                color.copy(alpha = 0f),
-                                                color.copy(alpha = 1f)
+                            track = { state ->
+                                with(MaterialTheme.colorScheme) {
+                                    Canvas(
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .height(16.dp)
+                                    ) {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                            checkerboardShader?.let { shader ->
+                                                drawRoundRect(
+                                                    ShaderBrush(shader),
+                                                    cornerRadius = CornerRadius(999f, 999f)
+                                                )
+                                            }
+                                        }
+                                        drawRoundRect(
+                                            Brush.horizontalGradient(
+                                                listOf(
+                                                    color.copy(alpha = 0f),
+                                                    color.copy(alpha = 1f)
+                                                ),
+                                                endX = size.width
                                             ),
-                                            endX = size.width
+                                            cornerRadius = CornerRadius(999f, 999f)
                                         )
-                                    )
+                                        drawThumbMargin(surfaceContainerLow, state)
+                                    }
                                 }
                             }
                         )
