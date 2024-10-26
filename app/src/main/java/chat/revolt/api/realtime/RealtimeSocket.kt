@@ -65,7 +65,8 @@ object RealtimeSocket {
     val database = Database(SqlStorage.driver)
     var socket: WebSocketSession? = null
 
-    private val channelRegistrator = ChannelRegistrator(RevoltApplication.instance)
+    private val channelRegistrator: ChannelRegistrator
+        get() = ChannelRegistrator(RevoltApplication.instance)
 
     private var _disconnectionState = mutableStateOf(DisconnectionState.Reconnecting)
     val disconnectionState: DisconnectionState
