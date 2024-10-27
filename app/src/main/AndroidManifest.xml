@@ -64,10 +64,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <service
-            android:name=".api.realtime.RealtimeService"
-            android:exported="false"
-            android:description="@string/realtime_service_description" />
 
         <activity
             android:name=".activities.MainActivity"
