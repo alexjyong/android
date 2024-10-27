@@ -20,6 +20,9 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
 
+    <string name="hide_password">Hide password</string>
+    <string name="show_password">Show password</string>
+
     <string name="login">Log In</string>
     <string name="signup">Sign Up</string>
     <string name="resend">Resend</string>
@@ -670,6 +673,6 @@
     <string name="notification_channel_group_social">Friends and Social</string>
     <string name="notification_channel_friend_requests">Friend Requests</string>
     <string name="notification_channel_friend_requests_description">Incoming friend requests, as well as accepted requests you\'ve sent.</string>
-    
+
     <string name="realtime_service_description">This service enables the app to receive messages and updates in real-time.</string>
 </resources>

@@ -13,19 +13,27 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.input.TextObfuscationMode
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SecureTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -48,6 +56,7 @@ import chat.revolt.components.generic.AnyLink
 import chat.revolt.components.generic.FormTextField
 import chat.revolt.components.generic.Weblink
 import chat.revolt.persistence.KVStorage
+import chat.revolt.ui.theme.FragmentMono
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -142,6 +151,12 @@ class LoginViewModel @Inject constructor(
 
 @Composable
 fun LoginScreen(navController: NavController, viewModel: LoginViewModel = hiltViewModel()) {
+    val passwordTextFieldState = rememberTextFieldState()
+    LaunchedEffect(passwordTextFieldState.text) {
+        viewModel.setPassword(passwordTextFieldState.text.toString())
+    }
+    val showPassword = remember { mutableStateOf(false) }
+
     val context = LocalContext.current
 
     LaunchedEffect(viewModel.navigateTo) {
@@ -214,11 +229,38 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = hiltVi
                     onChange = viewModel::setEmail,
                     modifier = Modifier.padding(vertical = 25.dp)
                 )
-                FormTextField(
-                    value = viewModel.password,
-                    label = stringResource(R.string.password),
-                    type = KeyboardType.Password,
-                    onChange = viewModel::setPassword
+                SecureTextField(
+                    passwordTextFieldState,
+                    label = { Text(stringResource(R.string.password)) },
+                    textObfuscationMode = if (showPassword.value) {
+                        TextObfuscationMode.Visible
+                    } else {
+                        TextObfuscationMode.RevealLastTyped
+                    },
+                    textStyle = if (showPassword.value) LocalTextStyle.current else LocalTextStyle.current.copy(
+                        fontFamily = FragmentMono
+                    ),
+                    trailingIcon = {
+                        IconButton(onClick = {
+                            showPassword.value = !showPassword.value
+                        }) {
+                            when {
+                                showPassword.value -> {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_eye_off_24dp),
+                                        contentDescription = stringResource(R.string.hide_password)
+                                    )
+                                }
+
+                                else -> {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_eye_24dp),
+                                        contentDescription = stringResource(R.string.show_password)
+                                    )
+                                }
+                            }
+                        }
+                    },
                 )
 
                 AnyLink(
