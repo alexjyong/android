@@ -20,6 +20,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -209,11 +210,13 @@ fun AudioPlayer(url: String, filename: String, contentType: String) {
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = formatTime(currentTime.longValue),
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum")
             )
             if (player.duration >= 0) {
                 Text(
-                    text = " / ${formatTime(player.duration)}"
+                    text = " / ${formatTime(player.duration)}",
+                    style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum")
                 )
             }
         }
