@@ -7,7 +7,7 @@ plugins {
     id 'com.google.dagger.hilt.android'
     id 'com.google.devtools.ksp'
     id 'org.jmailen.kotlinter'
-    id "io.sentry.android.gradle" version "3.4.2"
+    id "io.sentry.android.gradle" version "4.12.0"
     id "app.cash.sqldelight" version "2.0.1"
     id 'kotlin-kapt'
     id 'kotlin-parcelize'
@@ -168,8 +168,19 @@ android {
     }
 }
 
+import io.sentry.android.gradle.instrumentation.logcat.LogcatLevel
+
 sentry {
     autoUploadProguardMapping = buildproperty('sentry.upload_mappings', 'RVX_SENTRY_UPLOAD_MAPPINGS') == 'true'
+
+    tracingInstrumentation {
+        enabled = true
+
+        logcat {
+            enabled = true
+            minLevel = LogcatLevel.WARNING
+        }
+    }
 }
 
 dependencies {
@@ -190,12 +201,12 @@ dependencies {
     implementation "androidx.compose.ui:ui-util"
     implementation "androidx.compose.material3:material3:$material3_version"
     implementation "androidx.compose.material3:material3-window-size-class:$material3_version"
-    implementation "androidx.compose.material:material-icons-core:1.6.8"
+    implementation "androidx.compose.material:material-icons-core:1.7.4"
     implementation "androidx.compose.ui:ui-tooling-preview"
     implementation "androidx.compose.runtime:runtime-livedata"
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.1'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.8.1'
-    implementation 'androidx.activity:activity-compose:1.9.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.6'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6'
+    implementation 'androidx.activity:activity-compose:1.9.3'
 
     // Accompanist - Jetpack Compose Extensions
     implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
@@ -232,17 +243,17 @@ dependencies {
     implementation "com.airbnb.android:lottie-compose:6.0.0"
 
     // Sentry - crash reporting
-    implementation 'io.sentry:sentry-android:6.15.0'
-    implementation 'io.sentry:sentry-compose-android:6.15.0'
+    implementation 'io.sentry:sentry-android:7.16.0'
+    implementation 'io.sentry:sentry-compose-android:7.16.0'
 
     // Other AndroidX libraries - used for various things and never seem to have a consistent version
     implementation 'androidx.documentfile:documentfile:1.0.1'
     implementation "androidx.browser:browser:1.8.0"
-    implementation "androidx.webkit:webkit:1.11.0"
+    implementation "androidx.webkit:webkit:1.12.1"
     implementation "androidx.core:core-splashscreen:1.2.0-alpha02"
 
     // Libraries used for legacy View-based UI
-    implementation "androidx.constraintlayout:constraintlayout:2.2.0-alpha13"
+    implementation "androidx.constraintlayout:constraintlayout:2.2.0-rc01"
     implementation "androidx.appcompat:appcompat:1.7.0"
     implementation 'com.google.android.material:material:1.12.0'
 
@@ -250,7 +261,7 @@ dependencies {
     implementation "com.github.hcaptcha:hcaptcha-android-sdk:3.8.1"
 
     // JDK Desugaring - polyfill for new Java APIs
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.2'
 
     // AndroidX Media3 w/ ExoPlayer
     implementation "androidx.media3:media3-exoplayer:$media3_version"
@@ -276,7 +287,7 @@ dependencies {
     // implementation "io.livekit:livekit-android:$livekit_version"
 
     // Firebase - Cloud Messaging
-    implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
+    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation("com.google.firebase:firebase-messaging")
 
     // Shimmer - loading animations
