@@ -310,7 +310,11 @@ fun ReactionInfoSheet(messageId: String, emoji: String, onDismiss: () -> Unit) {
 
                 LaunchedEffect(reaction) {
                     if (reaction !in RevoltAPI.userCache) {
-                        RevoltAPI.userCache[reaction] = fetchUser(reaction)
+                        try {
+                            RevoltAPI.userCache[reaction] = fetchUser(reaction)
+                        } catch (e: Exception) {
+                            // too bad!
+                        }
                     }
                 }
 

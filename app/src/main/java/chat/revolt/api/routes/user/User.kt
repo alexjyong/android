@@ -122,7 +122,7 @@ suspend fun fetchUser(id: String): User {
 
     try {
         val error = RevoltJson.decodeFromString(RevoltError.serializer(), response)
-        throw Error(error.type)
+        throw Exception(error.type)
     } catch (e: SerializationException) {
         // Not an error
     }
