@@ -96,6 +96,7 @@ fun ReactionInfoSheet(messageId: String, emoji: String, onDismiss: () -> Unit) {
             ScrollableTabRow(
                 selectedTabIndex = selectedReactionIndex,
                 modifier = Modifier.fillMaxWidth(),
+                containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
                 divider = {}
             ) {
                 reactionEmoji?.forEachIndexed { index, emoji ->
