@@ -125,7 +125,9 @@ fun RegularEmbed(
                                 }
                             )
                             .aspectRatio(
-                                (it.width?.toFloat() ?: 0f) / (it.height?.toFloat() ?: 0f)
+                                ((it.width?.toFloat() ?: 0f) / (it.height?.toFloat() ?: 0f)).let {
+                                    if (it.isNaN()) 1f else it
+                                }
                             ),
                         contentScale = ContentScale.Crop,
                         description = null // decorative
