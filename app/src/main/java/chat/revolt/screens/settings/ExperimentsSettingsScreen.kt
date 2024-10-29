@@ -7,6 +7,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -25,6 +26,12 @@ import kotlinx.coroutines.launch
 
 class ExperimentsSettingsScreenViewModel : ViewModel() {
     private val kv = KVStorage(RevoltApplication.instance)
+
+    fun init() {
+        viewModelScope.launch {
+            useKotlinMdRendererChecked.value = Experiments.useKotlinBasedMarkdownRenderer.isEnabled
+        }
+    }
 
     fun disableExperiments(then: () -> Unit = {}) {
         viewModelScope.launch {
@@ -50,6 +57,10 @@ fun ExperimentsSettingsScreen(
     navController: NavController,
     viewModel: ExperimentsSettingsScreenViewModel = viewModel()
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.init()
+    }
+
     SettingsPage(
         navController,
         title = {
