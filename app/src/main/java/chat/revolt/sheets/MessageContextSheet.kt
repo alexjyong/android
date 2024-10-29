@@ -18,11 +18,14 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,6 +33,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -44,10 +48,16 @@ import chat.revolt.api.internals.Roles
 import chat.revolt.api.internals.has
 import chat.revolt.api.routes.channel.deleteMessage
 import chat.revolt.api.routes.channel.react
+import chat.revolt.api.schemas.Message
+import chat.revolt.api.settings.Experiments
+import chat.revolt.api.settings.experiments.SmartReplyImpl
 import chat.revolt.callbacks.UiCallbacks
 import chat.revolt.components.chat.Message
 import chat.revolt.components.generic.SheetButton
 import chat.revolt.internals.Platform
+import com.valentinilk.shimmer.ShimmerBounds
+import com.valentinilk.shimmer.rememberShimmer
+import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,7 +65,8 @@ import kotlinx.coroutines.launch
 fun MessageContextSheet(
     messageId: String,
     onHideSheet: suspend () -> Unit,
-    onReportMessage: () -> Unit
+    onReportMessage: () -> Unit,
+    lastTenMessages: (() -> List<Message>)? = null
 ) {
     val message = RevoltAPI.messageCache[messageId]
     if (message == null) {
@@ -72,6 +83,48 @@ fun MessageContextSheet(
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
     val coroutineScope = rememberCoroutineScope()
+
+    var mlKitSmartReplies by remember { mutableStateOf<List<String>?>(null) }
+    var mlKitSmartRepliesLoading by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        if (Experiments.useMlKitSmartReplyInApp.isEnabled) {
+            mlKitSmartReplies = null
+            mlKitSmartRepliesLoading = true
+            lastTenMessages?.let { fn ->
+                SmartReplyImpl.forMessages(
+                    fn.invoke()
+                ) {
+                    mlKitSmartReplies = if (it.ok) {
+                        it.unwrap()
+                    } else {
+                        null
+                    }
+                    mlKitSmartRepliesLoading = false
+                }
+            }
+        }
+    }
+    var showMlKitSmartReplySheet by remember { mutableStateOf(false) }
+    if (showMlKitSmartReplySheet) {
+        val mlKitSmartReplySheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+        ModalBottomSheet(
+            sheetState = mlKitSmartReplySheetState,
+            onDismissRequest = {
+                showMlKitSmartReplySheet = false
+            }
+        ) {
+            MessageContentMLKitReplySelectSheet(
+                options = mlKitSmartReplies ?: emptyList(),
+                onOptionSelected = {
+                    coroutineScope.launch {
+                        UiCallbacks.replyToMessageWithContent(messageId, it)
+                        onHideSheet()
+                    }
+                },
+            )
+        }
+    }
 
     var showShareSheet by remember { mutableStateOf(false) }
     var showReactSheet by remember { mutableStateOf(false) }
@@ -334,6 +387,30 @@ fun MessageContextSheet(
                 Text(
                     text = stringResource(id = R.string.message_context_sheet_actions_reply),
                 )
+            },
+            trailingContent = {
+                if (Experiments.useMlKitSmartReplyInApp.isEnabled && (mlKitSmartRepliesLoading || (mlKitSmartReplies?.isNotEmpty() == true))) {
+                    IconButton(onClick = {
+                        coroutineScope.launch {
+                            showMlKitSmartReplySheet = true
+                        }
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_creation_24dp),
+                            contentDescription = null,
+                            tint = if (!mlKitSmartRepliesLoading && mlKitSmartReplies != null) {
+                                Color(0xFF977EFF)
+                            } else {
+                                LocalContentColor.current
+                            },
+                            modifier = if (mlKitSmartRepliesLoading) {
+                                Modifier.shimmer(rememberShimmer(ShimmerBounds.View))
+                            } else {
+                                Modifier
+                            }
+                        )
+                    }
+                }
             },
             onClick = {
                 coroutineScope.launch {

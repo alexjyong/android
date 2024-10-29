@@ -134,6 +134,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import java.io.File
 import kotlin.math.max
+import kotlin.math.min
 
 sealed class ChannelScreenItem {
     data class RegularMessage(val message: Message) : ChannelScreenItem()
@@ -372,6 +373,22 @@ fun ChannelScreen(
                     scope.launch {
                         ActionChannel.send(Action.ReportMessage(messageContextSheetTarget))
                     }
+                },
+                lastTenMessages = {
+                    // First we find the message in viewModel.items
+                    val index = viewModel.items.filterIsInstance<ChannelScreenItem.RegularMessage>()
+                        .indexOfFirst { it.message.id == messageContextSheetTarget }
+
+                    Log.d("ChannelScreen", "We have index $index")
+                    Log.d("ChannelScreen", "Items.len ${viewModel.items.size}")
+
+                    // Then we take the last 10 messages before it. We take care to not go out of bounds.
+                    val messages =
+                        viewModel.items.filterIsInstance<ChannelScreenItem.RegularMessage>()
+                            .subList(index, min(index + 5, (viewModel.items.size - 1)))
+                            .map { it.message }
+
+                    messages
                 }
             )
         }

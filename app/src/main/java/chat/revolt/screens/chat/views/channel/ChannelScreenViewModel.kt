@@ -729,6 +729,21 @@ class ChannelScreenViewModel @Inject constructor(
                                 this@ChannelScreenViewModel.draftAttachments.clear()
                                 draftReplyTo.clear()
                             }
+
+                            is UiCallback.ReplyToMessageWithContent -> {
+                                val message = items.find { m ->
+                                    m is ChannelScreenItem.RegularMessage && m.message.id == it.messageId
+                                } as? ChannelScreenItem.RegularMessage ?: return@onEach
+
+                                val shouldMention = kvStorage.getBoolean("mentionOnReply") ?: false
+                                draftReplyTo.add(
+                                    SendMessageReply(
+                                        message.message.id ?: return@onEach,
+                                        shouldMention
+                                    )
+                                )
+                                putDraftContent(it.content)
+                            }
                         }
                     }.catch {
                         Log.e("ChannelScreen", "Failed to receive UI callback", it)

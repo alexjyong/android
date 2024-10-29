@@ -19,6 +19,7 @@ fun SheetButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     supportingContent: @Composable (() -> Unit)? = null,
+    trailingContent: @Composable (() -> Unit)? = null,
     dangerous: Boolean = false
 ) {
     Box(
@@ -52,6 +53,19 @@ fun SheetButton(
             },
             supportingContent = {
                 supportingContent?.run {
+                    CompositionLocalProvider(
+                        value = if (dangerous) {
+                            LocalContentColor provides MaterialTheme.colorScheme.error
+                        } else {
+                            LocalContentColor provides MaterialTheme.colorScheme.onSurface
+                        }
+                    ) {
+                        this()
+                    }
+                }
+            },
+            trailingContent = {
+                trailingContent?.run {
                     CompositionLocalProvider(
                         value = if (dangerous) {
                             LocalContentColor provides MaterialTheme.colorScheme.error

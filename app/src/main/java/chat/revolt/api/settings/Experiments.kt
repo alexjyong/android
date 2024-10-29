@@ -27,6 +27,7 @@ class ExperimentInstance(default: Boolean) {
  */
 object Experiments {
     val useKotlinBasedMarkdownRenderer = ExperimentInstance(false)
+    val useMlKitSmartReplyInApp = ExperimentInstance(false)
 
     suspend fun hydrateWithKv() {
         val kvStorage = KVStorage(RevoltApplication.instance)
@@ -39,6 +40,9 @@ object Experiments {
 
         useKotlinBasedMarkdownRenderer.setEnabled(
             kvStorage.getBoolean("exp/useKotlinBasedMarkdownRenderer") ?: false
+        )
+        useMlKitSmartReplyInApp.setEnabled(
+            kvStorage.getBoolean("exp/useMlKitSmartReplyInApp") ?: false
         )
     }
 }

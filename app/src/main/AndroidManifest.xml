@@ -51,6 +51,10 @@
             android:value="false" />
 
         <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="smart_reply" />
+
+        <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_notification_monochrome" />
         <meta-data
