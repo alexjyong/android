@@ -246,6 +246,29 @@ fun UserInfoSheet(
             }
         }
 
+        if (user.status?.text != null) {
+            item(key = "status") {
+                SheetTile(
+                    header = {
+                        Text(stringResource(R.string.user_info_sheet_category_status))
+                    },
+                    contentPreview = {
+                        Text(
+                            text = user.status.text,
+                            fontSize = 14.sp,
+                            maxLines = 5,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                ) {
+                    Text(
+                        text = user.status.text,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+        }
+
         if (user.bot != null) {
             val resolvedOwner = user.bot.owner?.let { RevoltAPI.userCache[it] }
 

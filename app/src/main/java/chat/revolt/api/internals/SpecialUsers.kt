@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.SolidColor
 import org.intellij.lang.annotations.Language
 import androidx.compose.ui.graphics.Brush as AndroidBrush
 
@@ -48,6 +49,17 @@ object SpecialUsers {
                 end = Offset.Infinite
             )
         ), // jen
+        "01FN54E7AD80NVTXF3VPF789NV" to TeamMemberFlair.Brush(
+            SolidColor(Color(0xfff34848))
+        ), // jack
+        "01FDVES092RQR3YTY4JBGA0VCA" to TeamMemberFlair.Brush(
+            AndroidBrush.verticalGradient(
+                listOf(
+                    Color(0xFFBB4681),
+                    Color(0xFF9CA87F)
+                )
+            )
+        ), // tom
         "01EX2NCWQ0CHS3QJF0FEQS1GR4" to TeamMemberFlair.AGSLShader(
             INSERT_SHADER,
             AndroidBrush.linearGradient(
@@ -59,17 +71,6 @@ object SpecialUsers {
                 end = Offset.Infinite
             )
         ), // insert
-        "01EXAF3KX65608AJ4NG27YG1HM" to TeamMemberFlair.Brush(
-            AndroidBrush.solidColor(Color(0xFFFFC1F1))
-        ), // lea
-        "01FEEFJCKY5C4DMMJYZ20ACWWC" to TeamMemberFlair.Brush(
-            AndroidBrush.linearGradient(
-                listOf(
-                    Color(0xFF0BA39F),
-                    Color(0xFFCD1414)
-                )
-            )
-        ), // sophie
         "01FD58YK5W7QRV5H3D64KTQYX3" to TeamMemberFlair.Brush(
             AndroidBrush.verticalGradient(
                 listOf(
@@ -78,14 +79,6 @@ object SpecialUsers {
                 )
             )
         ), // zomatree
-        "01FDVES092RQR3YTY4JBGA0VCA" to TeamMemberFlair.Brush(
-            AndroidBrush.verticalGradient(
-                listOf(
-                    Color(0xFFBB4681),
-                    Color(0xFF9CA87F)
-                )
-            )
-        ) // tom
     )
 
     fun teamFlairAsBrush(context: Context, id: String): AndroidBrush? {
