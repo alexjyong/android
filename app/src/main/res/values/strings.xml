@@ -250,6 +250,12 @@
     <string name="status_offline">Offline</string>
     <string name="status_invisible">Invisible</string>
     <string name="status_invisible_explainer">You will be able to use Revolt as usual, but you will not appear as online to other people.</string>
+    <string name="status_text_none">What\'s up?</string>
+    <string name="status_text">Status text</string>
+    <string name="status_text_explainer">Your status text will be visible to everyone. Keep it short and sweet.</string>
+    <string name="status_text_placeholder">Tell the world what you\'re up to</string>
+    <string name="status_text_error_too_long">Status text is too long. Try to keep it under %1$d characters.</string>
+    <string name="status_text_error_other">An error occurred while updating your status text. Please try again later.</string>
 
     <string name="no_connection">No connection</string>
     <string name="no_connection_message">You are not connected to the internet. Please check your connection and try again.</string>
