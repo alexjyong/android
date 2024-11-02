@@ -30,7 +30,6 @@ class ExperimentsSettingsScreenViewModel : ViewModel() {
     fun init() {
         viewModelScope.launch {
             useKotlinMdRendererChecked.value = Experiments.useKotlinBasedMarkdownRenderer.isEnabled
-            useMlKitSmartReplyInAppChecked.value = Experiments.useMlKitSmartReplyInApp.isEnabled
         }
     }
 
@@ -43,21 +42,12 @@ class ExperimentsSettingsScreenViewModel : ViewModel() {
     }
 
     val useKotlinMdRendererChecked = mutableStateOf(false)
-    val useMlKitSmartReplyInAppChecked = mutableStateOf(false)
 
     fun setUseKotlinMdRendererChecked(value: Boolean) {
         viewModelScope.launch {
             kv.set("exp/useKotlinBasedMarkdownRenderer", value)
             Experiments.useKotlinBasedMarkdownRenderer.setEnabled(value)
             useKotlinMdRendererChecked.value = value
-        }
-    }
-
-    fun setUseMlKitSmartReplyInAppChecked(value: Boolean) {
-        viewModelScope.launch {
-            kv.set("exp/useMlKitSmartReplyInApp", value)
-            Experiments.useMlKitSmartReplyInApp.setEnabled(value)
-            useMlKitSmartReplyInAppChecked.value = value
         }
     }
 }
@@ -91,22 +81,6 @@ fun ExperimentsSettingsScreen(
                 )
             },
             modifier = Modifier.clickable { viewModel.setUseKotlinMdRendererChecked(!viewModel.useKotlinMdRendererChecked.value) }
-        )
-
-        ListItem(
-            headlineContent = {
-                Text("Smart Reply Suggestions (In-App)")
-            },
-            supportingContent = {
-                Text("Use a machine learning model to suggest replies to messages from the message sheet.")
-            },
-            trailingContent = {
-                Switch(
-                    checked = viewModel.useMlKitSmartReplyInAppChecked.value,
-                    onCheckedChange = viewModel::setUseMlKitSmartReplyInAppChecked
-                )
-            },
-            modifier = Modifier.clickable { viewModel.setUseMlKitSmartReplyInAppChecked(!viewModel.useMlKitSmartReplyInAppChecked.value) }
         )
 
         Subcategory(
