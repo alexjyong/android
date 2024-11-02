@@ -6,6 +6,7 @@ import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RectShape
 import android.net.Uri
 import android.os.Build
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
@@ -16,9 +17,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkOut
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,7 +30,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
@@ -81,6 +80,10 @@ import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.screens.chat.ChannelIcon
 import chat.revolt.internals.Autocomplete
 import kotlinx.coroutines.launch
+
+private fun convertDpToPixel(dp: Float, context: Context): Float {
+    return dp * (context.resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
+}
 
 fun String.applyAutocompleteSuggestion(
     suggestion: AutocompleteSuggestion,
@@ -190,7 +193,7 @@ fun NativeMessageField(
 
     var selection by remember { mutableStateOf(0 to 0) }
     val autocompleteSuggestions = remember { mutableStateListOf<AutocompleteSuggestion>() }
-    val autocompleteSuggestionScrollState = rememberScrollState()
+    val autocompleteSuggestionState = rememberLazyListState()
 
     LaunchedEffect(editMode) {
         if (editMode) {
@@ -210,26 +213,21 @@ fun NativeMessageField(
                     full.width,
                     0
                 )
-            }) + slideInVertically(
-                animationSpec = RevoltTweenInt,
-                initialOffsetY = { -it }
-            ),
+            }),
             exit = shrinkOut(targetSize = { full ->
                 IntSize(
                     full.width,
                     0
                 )
-            }) + slideOutVertically(
-                animationSpec = RevoltTweenInt,
-                targetOffsetY = { it }
-            )
+            })
         ) {
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                state = autocompleteSuggestionState
             ) {
                 items(autocompleteSuggestions.size, key = {
                     when (val item = autocompleteSuggestions[it]) {
@@ -328,8 +326,7 @@ fun NativeMessageField(
                                         )
                                     }
                                 },
-                                modifier = Modifier
-                                    .animateItemPlacement()
+                                modifier = Modifier.animateItem()
                             )
                         }
                     }
@@ -395,7 +392,7 @@ fun NativeMessageField(
                             selection = selStart to selEnd
 
                             scope.launch {
-                                autocompleteSuggestionScrollState.scrollTo(0)
+                                autocompleteSuggestionState.animateScrollToItem(0)
                             }
                             autocompleteSuggestions.clear()
 
@@ -517,6 +514,7 @@ fun NativeMessageField(
                     if (value != it.text.toString()) {
                         it.setText(value)
                         it.setSelection(value.length)
+                        it.invalidate()
                     }
                     it.hint = it.context.getString(placeholderResource, channelName)
                     it.serverId = serverId
@@ -524,6 +522,12 @@ fun NativeMessageField(
                         it.setTextColor(failedValidationColour)
                     } else {
                         it.setTextColor(contentColour)
+                    }
+
+                    if (it.text?.isEmpty() == true) {
+                        it.maxLines = 1
+                    } else {
+                        it.maxLines = 5
                     }
                 },
                 modifier = Modifier
