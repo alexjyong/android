@@ -85,6 +85,61 @@ object BrushCompat {
         )
     }
 
+    @Composable
+    private fun parseRadialGradient(gradient: String): Brush {
+        val stops = mutableListOf<Pair<Float, Color>>()
+
+        val parts = mutableListOf<String>()
+        var startIndex = 0
+        var openParenthesesCount = 0
+
+        // Split the gradient string into individual components
+        for (i in gradient.indices) {
+            when (gradient[i]) {
+                '(' -> openParenthesesCount++
+                ')' -> openParenthesesCount--
+                ',' -> {
+                    if (openParenthesesCount == 0) {
+                        val part = gradient.substring(startIndex, i).trim()
+                        parts.add(part)
+                        startIndex = i + 1
+                    }
+                }
+            }
+        }
+        val lastPart = gradient.substring(startIndex).trim()
+        if (lastPart.isNotEmpty()) {
+            parts.add(lastPart)
+        }
+
+        // Parse color stops
+        parts.drop(1).forEachIndexed { index, part ->
+            val splitPart = part.split(" ")
+            val colorPart = splitPart[0]
+            val color = when {
+                colorPart.startsWith("var(") -> {
+                    parseVarToColour(
+                        colorPart.substringAfter("var(").substringBeforeLast(")")
+                    )
+                }
+
+                else -> parseFunctionColour(colorPart) ?: parseColourName(colorPart)
+            }
+
+            val stop = if (splitPart.size == 2) {
+                splitPart[1].removeSuffix("%").toFloat() / 100f
+            } else {
+                index.toFloat() / (parts.size - 2)
+            }
+
+            stops.add(stop to color)
+        }
+
+        return Brush.radialGradient(
+            colorStops = stops.toTypedArray()
+        )
+    }
+
     fun parseFunctionColour(colourString: String): Color? {
         val cleanedString = colourString.trim()
 
@@ -187,6 +242,16 @@ object BrushCompat {
                         .substringBeforeLast(")")
                 )
             }
+
+            colour.startsWith("radial-gradient(") || colour.startsWith("repeating-radial-gradient(") -> {
+                return parseRadialGradient(
+                    colour
+                        .substringAfter("repeating-")
+                        .substringAfter("radial-gradient(")
+                        .substringBeforeLast(")")
+                )
+            }
+
 
             else -> {
                 return Brush.solidColor(parseColourName(colour))
