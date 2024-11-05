@@ -1,6 +1,7 @@
 #include <android/log.h>
 #include <jni.h>
 #include <string>
+#include <vector>
 #include <cmark.h>
 
 #define STENDAL_ASTNODE_CONSTRUCTOR_SIGNATURE "(ILjava/lang/String;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V"

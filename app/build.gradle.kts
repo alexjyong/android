@@ -29,6 +29,7 @@ val aboutlibrariesVersion = "10.9.1"
 val media3Version = "1.4.1"
 val livekitVersion = "2.2.0"
 val material3Version = "1.4.0-alpha03"
+val androidXTestVersion = "1.6.1"
 
 fun property(fileName: String, propertyName: String, fallbackEnv: String? = null): String? {
     val propsFile = rootProject.file(fileName)
@@ -169,12 +170,12 @@ android {
             buildConfigField(
                 "String",
                 "SENTRY_DSN",
-                buildproperty("sentry.dsn", "RVX_SENTRY_DSN")!!
+                "\"${buildproperty("sentry.dsn", "RVX_SENTRY_DSN")}\""
             )
             buildConfigField(
                 "String",
                 "FLAVOUR_ID",
-                buildproperty("build.flavour_id", "RVX_BUILD_FLAVOUR_ID")!!
+                "\"${buildproperty("build.flavour_id", "RVX_BUILD_FLAVOUR_ID")}\""
             )
         }
     }
@@ -232,9 +233,13 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.6.1")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+    implementation("androidx.profileinstaller:profileinstaller:1.3.1")
 
     // Compose BOM
-    implementation(platform("androidx.compose:compose-bom:$composeBomVersion"))
+    val composeBom = platform("androidx.compose:compose-bom:$composeBomVersion")
+    implementation(composeBom)
+    testImplementation(composeBom)
+    androidTestImplementation(composeBom)
 
     // Jetpack Compose
     implementation("androidx.compose.ui:ui")
@@ -332,6 +337,11 @@ dependencies {
 
     // Shimmer - loading animations
     implementation("com.valentinilk.shimmer:compose-shimmer:1.3.1")
+
+    // Testing
+    androidTestImplementation("androidx.test:runner:$androidXTestVersion")
+    androidTestImplementation("androidx.test:rules:$androidXTestVersion")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 }
 
 sqldelight {
