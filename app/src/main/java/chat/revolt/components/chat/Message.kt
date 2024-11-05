@@ -180,6 +180,8 @@ fun Message(
     canReply: Boolean = false,
     onReply: () -> Unit = {},
     onAddReaction: () -> Unit = {},
+    fromWebhook: Boolean = false,
+    webhookName: String? = null
 ) {
     val author = RevoltAPI.userCache[message.author] ?: return CircularProgressIndicator()
     val context = LocalContext.current
@@ -304,7 +306,7 @@ fun Message(
                         if (message.tail == false) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    text = authorName(message),
+                                    text = webhookName ?: authorName(message),
                                     style = LocalTextStyle.current.copy(
                                         fontWeight = FontWeight.Bold,
                                         brush = authorColour(message)
@@ -328,6 +330,7 @@ fun Message(
                                     bridge = message.masquerade != null && author.bot != null,
                                     platformModeration = author.id == SpecialUsers.PLATFORM_MODERATION_USER,
                                     teamMember = author.id in SpecialUsers.TEAM_MEMBER_FLAIRS.keys,
+                                    webhook = fromWebhook,
                                     colour = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                                     modifier = Modifier.size(16.dp),
                                     precedingIfAny = {

@@ -78,6 +78,7 @@ import chat.revolt.sheets.ReactionInfoSheet
 import chat.revolt.sheets.ServerContextSheet
 import chat.revolt.sheets.StatusSheet
 import chat.revolt.sheets.UserInfoSheet
+import chat.revolt.sheets.WebHookUserSheet
 import com.airbnb.lottie.RenderMode
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -228,6 +229,8 @@ fun ChatRouterScreen(
     var showUserContextSheet by remember { mutableStateOf(false) }
     var userContextSheetTarget by remember { mutableStateOf("") }
     var userContextSheetServer by remember { mutableStateOf<String?>(null) }
+
+    var showWebhookInfoSheet by remember { mutableStateOf(false) }
 
     var showChannelUnavailableAlert by remember { mutableStateOf(false) }
 
@@ -388,6 +391,10 @@ fun ChatRouterScreen(
                     is Action.OpenVoiceChannelOverlay -> {
                         voiceChannelOverlayChannelId = action.channelId
                         voiceChannelOverlay = true
+                    }
+
+                    is Action.OpenWebhookSheet -> {
+                        showWebhookInfoSheet = true
                     }
                 }
             }
@@ -551,6 +558,19 @@ fun ChatRouterScreen(
                     showUserContextSheet = false
                 }
             )
+        }
+    }
+
+    if (showWebhookInfoSheet) {
+        val webhookInfoSheetState = rememberModalBottomSheetState()
+
+        ModalBottomSheet(
+            sheetState = webhookInfoSheetState,
+            onDismissRequest = {
+                showWebhookInfoSheet = false
+            }
+        ) {
+            WebHookUserSheet()
         }
     }
 

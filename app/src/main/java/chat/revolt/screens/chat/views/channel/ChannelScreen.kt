@@ -134,7 +134,6 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import java.io.File
 import kotlin.math.max
-import kotlin.math.min
 
 sealed class ChannelScreenItem {
     data class RegularMessage(val message: Message) : ChannelScreenItem()
@@ -603,14 +602,20 @@ fun ChannelScreen(
                                                 }
                                             },
                                             onAvatarClick = {
-                                                item.message.author?.let { author ->
+                                                if (item.message.webhook != null) {
                                                     scope.launch {
-                                                        ActionChannel.send(
-                                                            Action.OpenUserSheet(
-                                                                author,
-                                                                viewModel.channel?.server
+                                                        ActionChannel.send(Action.OpenWebhookSheet)
+                                                    }
+                                                } else {
+                                                    item.message.author?.let { author ->
+                                                        scope.launch {
+                                                            ActionChannel.send(
+                                                                Action.OpenUserSheet(
+                                                                    author,
+                                                                    viewModel.channel?.server
+                                                                )
                                                             )
-                                                        )
+                                                        }
                                                     }
                                                 }
                                             },
@@ -631,7 +636,9 @@ fun ChannelScreen(
                                                     reactSheetTarget = messageId
                                                     reactSheetShown = true
                                                 }
-                                            }
+                                            },
+                                            fromWebhook = item.message.webhook != null,
+                                            webhookName = item.message.webhook?.name
                                         )
                                     }
 

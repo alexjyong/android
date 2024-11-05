@@ -125,6 +125,7 @@
     <string name="badge_masquerade_alt">From linked channel</string>
     <string name="badge_platform_moderation_alt">Platform moderation</string>
     <string name="badge_team_member_alt">Revolt team member</string>
+    <string name="badge_webhook_alt">Webhook</string>
 
     <string name="unknown">Unknown</string>
 
@@ -352,6 +353,10 @@
     <string name="user_info_sheet_open">Open user info</string>
     <string name="user_info_sheet_user_not_found">Can\'t resolve this user</string>
     <string name="user_info_sheet_user_not_found_description">This user may have been deleted or you may not have permission to view them.</string>
+    <string name="user_info_sheet_webhook">Is it a bird, is it a plane?</string>
+    <string name="user_info_sheet_webhook_description">No, it\'s a webhook!</string>
+    <string name="user_info_sheet_webhook_description_2">Webhooks are automated broadcasts from other services on the internet. They can\'t chat back, but you can still see what they have to say.</string>
+    <string name="user_info_sheet_webhook_learn_more">Learn more</string>
     <string name="user_info_sheet_category_bio">Bio</string>
     <string name="user_info_sheet_bio_empty">This user hasn\'t set a bio yet.</string>
     <string name="user_info_sheet_bio_not_found">This user\'s bio could not be fetched. Please verify you share a server or are friends.</string>

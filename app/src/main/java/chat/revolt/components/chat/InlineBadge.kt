@@ -13,7 +13,8 @@ enum class InlineBadge {
     Bot,
     Bridge,
     PlatformModeration,
-    TeamMember
+    TeamMember,
+    Webhook
 }
 
 @Composable
@@ -50,6 +51,13 @@ fun InlineBadge(
             tint = colour,
             modifier = modifier
         )
+
+        InlineBadge.Webhook -> Icon(
+            painter = painterResource(id = R.drawable.ic_hook_24dp),
+            contentDescription = stringResource(id = R.string.badge_webhook_alt),
+            tint = colour,
+            modifier = modifier
+        )
     }
 }
 
@@ -60,6 +68,7 @@ fun InlineBadges(
     bridge: Boolean = false,
     platformModeration: Boolean = false,
     teamMember: Boolean = false,
+    webhook: Boolean = false,
     colour: Color = Color.Unspecified,
     precedingIfAny: @Composable () -> Unit = {},
     followingIfAny: @Composable () -> Unit = {}
@@ -95,6 +104,13 @@ fun InlineBadges(
         if (teamMember) {
             InlineBadge(
                 badge = InlineBadge.TeamMember,
+                modifier = modifier,
+                colour = colour
+            )
+        }
+        if (webhook) {
+            InlineBadge(
+                badge = InlineBadge.Webhook,
                 modifier = modifier,
                 colour = colour
             )
