@@ -1,12 +1,14 @@
 package chat.revolt.components.chat
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import chat.revolt.R
 
 enum class InlineBadge {
@@ -53,10 +55,10 @@ fun InlineBadge(
         )
 
         InlineBadge.Webhook -> Icon(
-            painter = painterResource(id = R.drawable.ic_hook_24dp),
+            painter = painterResource(id = R.drawable.ic_cloud_24dp),
             contentDescription = stringResource(id = R.string.badge_webhook_alt),
             tint = colour,
-            modifier = modifier
+            modifier = modifier.padding(start = 4.dp)
         )
     }
 }
