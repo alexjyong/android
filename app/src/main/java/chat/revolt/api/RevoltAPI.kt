@@ -5,6 +5,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.compose.runtime.mutableStateMapOf
 import chat.revolt.BuildConfig
+import chat.revolt.RevoltApplication
 import chat.revolt.api.internals.Members
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
@@ -18,6 +19,9 @@ import chat.revolt.api.schemas.User
 import chat.revolt.api.unreads.Unreads
 import chat.revolt.persistence.Database
 import chat.revolt.persistence.SqlStorage
+import com.chuckerteam.chucker.api.ChuckerCollector
+import com.chuckerteam.chucker.api.ChuckerInterceptor
+import com.chuckerteam.chucker.api.RetentionManager
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.DefaultRequest
@@ -103,6 +107,20 @@ val RevoltHttp = HttpClient(OkHttp) {
 
     install(Logging) { level = LogLevel.INFO }
 
+    val chuckerCollector = ChuckerCollector(
+        context = RevoltApplication.instance,
+        showNotification = true,
+        retentionPeriod = RetentionManager.Period.ONE_DAY
+    )
+
+    val chuckerInterceptor = ChuckerInterceptor.Builder(RevoltApplication.instance)
+        .collector(chuckerCollector)
+        .maxContentLength(250_000L)
+        .redactHeaders(RevoltAPI.TOKEN_HEADER_NAME)
+        .alwaysReadResponseBody(true)
+        .createShortcut(false)
+        .build()
+
     engine {
         addInterceptor { chain ->
             val request = chain.request().newBuilder()
@@ -114,6 +132,7 @@ val RevoltHttp = HttpClient(OkHttp) {
                 .build()
             chain.proceed(request)
         }
+        addInterceptor(chuckerInterceptor)
     }
 
     defaultRequest {

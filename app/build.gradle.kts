@@ -338,6 +338,10 @@ dependencies {
     // Shimmer - loading animations
     implementation("com.valentinilk.shimmer:compose-shimmer:1.3.1")
 
+    // Chucker - HTTP inspector
+    debugImplementation("com.github.chuckerteam.chucker:library:4.0.0")
+    releaseImplementation("com.github.chuckerteam.chucker:library-no-op:4.0.0")
+
     // Testing
     androidTestImplementation("androidx.test:runner:$androidXTestVersion")
     androidTestImplementation("androidx.test:rules:$androidXTestVersion")

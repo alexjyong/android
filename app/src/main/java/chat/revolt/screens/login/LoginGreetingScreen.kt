@@ -38,9 +38,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import chat.revolt.BuildConfig
 import chat.revolt.R
 import chat.revolt.api.REVOLT_MARKETING
+import chat.revolt.components.generic.AnyLink
 import chat.revolt.components.generic.Weblink
+import com.chuckerteam.chucker.api.Chucker
 
 @Composable
 fun LoginGreetingScreen(navController: NavController) {
@@ -159,6 +162,16 @@ fun LoginGreetingScreen(navController: NavController) {
                     text = stringResource(R.string.community_guidelines),
                     url = "$REVOLT_MARKETING/aup"
                 )
+                if (BuildConfig.DEBUG) {
+                    AnyLink(
+                        text = "Debug: Chucker",
+                        action = {
+                            Chucker.getLaunchIntent(context).apply {
+                                context.startActivity(this)
+                            }
+                        }
+                    )
+                }
             }
         }
     }
