@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chat.revolt.api.settings.LoadedSettings
 
@@ -81,4 +82,22 @@ fun MessageSkeleton(variant: MessageSkeletonVariant, modifier: Modifier = Modifi
             )
         }
     }
+}
+
+@Preview
+@Composable
+private fun MessageSkeletonOnePreview() {
+    MessageSkeleton(MessageSkeletonVariant.One)
+}
+
+@Preview
+@Composable
+private fun MessageSkeletonTwoPreview() {
+    MessageSkeleton(MessageSkeletonVariant.Two)
+}
+
+@Preview
+@Composable
+private fun MessageSkeletonThreePreview() {
+    MessageSkeleton(MessageSkeletonVariant.Three)
 }
