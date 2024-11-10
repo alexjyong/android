@@ -98,7 +98,7 @@ import chat.revolt.screens.chat.ChatRouterDestination
 import chat.revolt.sheets.ChannelContextSheet
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ChannelSideDrawer(
     currentServer: String?,
@@ -200,7 +200,7 @@ fun ChannelSideDrawer(
                 bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
             )
         ) {
-            item(key = "self") {
+            stickyHeader(key = "self") {
                 UserAvatar(
                     username = RevoltAPI.userCache[RevoltAPI.selfId]?.let {
                         User.resolveDefaultName(
@@ -221,6 +221,7 @@ fun ChannelSideDrawer(
                     },
                     onLongClick = onLongPressAvatar,
                     modifier = Modifier
+                        .background(MaterialTheme.colorScheme.background)
                         .padding(8.dp)
                         .size(48.dp)
                 )
