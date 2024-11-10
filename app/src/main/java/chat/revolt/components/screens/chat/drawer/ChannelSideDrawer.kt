@@ -579,17 +579,17 @@ fun ColumnScope.DirectMessagesChannelListRenderer(
             .fillMaxSize()
             .weight(1f)
     ) {
-        item(key = "home") {
+        item(key = "overview") {
             ChannelItem(
                 channel = Channel(
-                    id = "home",
-                    name = stringResource(R.string.home),
+                    id = "overview",
+                    name = stringResource(R.string.overview_screen_title),
                     channelType = ChannelType.TextChannel
                 ),
-                iconType = ChannelItemIconType.Painter(painterResource(R.drawable.ic_home_24dp)),
-                isCurrent = currentDestination is ChatRouterDestination.Home,
+                iconType = ChannelItemIconType.Painter(painterResource(R.drawable.ic_creation_24dp)),
+                isCurrent = currentDestination is ChatRouterDestination.Overview,
                 onDestinationChanged = {
-                    onDestinationChanged(ChatRouterDestination.Home)
+                    onDestinationChanged(ChatRouterDestination.Overview)
                     scope.launch {
                         drawerState?.close()
                     }

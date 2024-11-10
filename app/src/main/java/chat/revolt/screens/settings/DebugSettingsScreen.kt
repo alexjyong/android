@@ -53,7 +53,6 @@ import chat.revolt.persistence.Database
 import chat.revolt.persistence.KVStorage
 import chat.revolt.persistence.SqlStorage
 import chat.revolt.ui.theme.FragmentMono
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailabilityLight
 import com.google.android.gms.tasks.OnCompleteListener
@@ -66,14 +65,9 @@ import javax.inject.Inject
 class DebugSettingsScreenViewModel @Inject constructor(
     private val kvStorage: KVStorage
 ) : ViewModel() {
-    fun forgetSidebarSparkShown() {
-        viewModelScope.launch {
-            kvStorage.remove("sidebarSpark")
-        }
-    }
-
     fun forgetAllSparks() {
-        this.forgetSidebarSparkShown()
+        // No op because there are no active sparks
+        // psst, notifications will be the next one
     }
 
     fun forgetLatestChangelog() {
@@ -215,11 +209,10 @@ fun DebugSettingsScreen(
                 Row(
                     modifier = Modifier.horizontalScroll(rememberScrollState())
                 ) {
-                    TextButton(onClick = { viewModel.forgetSidebarSparkShown() }) {
-                        Text("Forget sidebar spark")
-                    }
+
+                    Text("There are no active sparks, but you can still try to ")
                     ElevatedButton(onClick = { viewModel.forgetAllSparks() }) {
-                        Text("Forget all sparks")
+                        Text("forget all sparks")
                     }
                 }
 

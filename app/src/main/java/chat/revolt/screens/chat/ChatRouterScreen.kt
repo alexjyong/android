@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.statusBars
@@ -75,8 +74,8 @@ import chat.revolt.screens.chat.dialogs.safety.ReportMessageDialog
 import chat.revolt.screens.chat.dialogs.safety.ReportServerDialog
 import chat.revolt.screens.chat.dialogs.safety.ReportUserDialog
 import chat.revolt.screens.chat.views.FriendsScreen
-import chat.revolt.screens.chat.views.HomeScreen
 import chat.revolt.screens.chat.views.NoCurrentChannelScreen
+import chat.revolt.screens.chat.views.OverviewScreen
 import chat.revolt.screens.chat.views.channel.ChannelScreen
 import chat.revolt.sheets.AddServerSheet
 import chat.revolt.sheets.ChangelogSheet
@@ -87,11 +86,6 @@ import chat.revolt.sheets.ServerContextSheet
 import chat.revolt.sheets.StatusSheet
 import chat.revolt.sheets.UserInfoSheet
 import chat.revolt.sheets.WebHookUserSheet
-import com.airbnb.lottie.RenderMode
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -102,14 +96,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class ChatRouterDestination {
-    data object Home : ChatRouterDestination()
+    data object Overview : ChatRouterDestination()
     data object Friends : ChatRouterDestination()
     data class Channel(val channelId: String) : ChatRouterDestination()
     data class NoCurrentChannel(val serverId: String?) : ChatRouterDestination()
 
     fun asSerialisedString(): String {
         return when (this) {
-            is Home -> "home"
+            is Overview -> "overview"
             is Friends -> "friends"
             is Channel -> "channel/$channelId"
             is NoCurrentChannel -> "no_current_channel/$serverId"
@@ -117,12 +111,13 @@ sealed class ChatRouterDestination {
     }
 
     companion object {
-        val default = Home
-        val defaultForDMList = Home
+        val default = Overview
+        val defaultForDMList = Overview
 
         fun fromString(destination: String): ChatRouterDestination {
             return when {
-                destination == "home" -> Home
+                destination == "home" -> Overview // previous name for overview
+                destination == "overview" -> Overview
                 destination == "friends" -> Friends
                 destination.startsWith("no_current_channel/") -> NoCurrentChannel(
                     destination.removePrefix(
@@ -144,7 +139,6 @@ class ChatRouterViewModel @Inject constructor(
     @ApplicationContext val context: Context
 ) : ViewModel() {
     var currentDestination by mutableStateOf<ChatRouterDestination>(ChatRouterDestination.default)
-    var sidebarSparkDisplayed by mutableStateOf(true)
     var latestChangelogRead by mutableStateOf(true)
     var latestChangelog by mutableStateOf("")
     var latestChangelogBody by mutableStateOf("")
@@ -156,12 +150,6 @@ class ChatRouterViewModel @Inject constructor(
         viewModelScope.launch {
             val current = kvStorage.get("currentDestination")
             setSaveDestination(ChatRouterDestination.fromString(current ?: ""))
-
-            sidebarSparkDisplayed = if (kvStorage.getBoolean("sidebarSpark") == null) {
-                false
-            } else {
-                kvStorage.getBoolean("sidebarSpark")!!
-            }
 
             latestChangelogRead = changelogs.hasSeenCurrent()
             latestChangelog = changelogs.getLatestChangelogCode()
@@ -193,11 +181,6 @@ class ChatRouterViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    suspend fun setSettingsHintDisplayed() {
-        kvStorage.set("sidebarSpark", true)
-        sidebarSparkDisplayed = true
     }
 
     fun setRegisterForNotifications() {
@@ -254,14 +237,6 @@ fun ChatRouterScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val view = LocalView.current
-
-    val showSidebarSpark = remember { mutableStateOf(false) }
-    val sidebarSparkComposition by rememberLottieComposition(
-        LottieCompositionSpec.RawRes(R.raw.open_settings_tutorial)
-    )
-    val sidebarSparkProgress by animateLottieCompositionAsState(
-        composition = sidebarSparkComposition
-    )
 
     var showPlatformModDMHint by remember { mutableStateOf(false) }
 
@@ -338,14 +313,6 @@ fun ChatRouterScreen(
                         context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     keyboard.hideSoftInputFromWindow(view.windowToken, 0)
                 }
-            }
-    }
-
-    LaunchedEffect(viewModel.sidebarSparkDisplayed) {
-        snapshotFlow { viewModel.sidebarSparkDisplayed }
-            .distinctUntilChanged()
-            .collect { displayed ->
-                showSidebarSpark.value = !displayed
             }
     }
 
@@ -464,43 +431,6 @@ fun ChatRouterScreen(
             renderedContents = viewModel.latestChangelogBody,
             onDismiss = {
                 viewModel.latestChangelogRead = true
-            }
-        )
-    }
-
-    if (showSidebarSpark.value) {
-        AlertDialog(
-            onDismissRequest = {},
-            title = {
-                Text(stringResource(id = R.string.spark_sidebar_settings_tutorial))
-            },
-            text = {
-                Column {
-                    LottieAnimation(
-                        composition = sidebarSparkComposition,
-                        progress = { sidebarSparkProgress },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1f),
-                        renderMode = RenderMode.HARDWARE
-                    )
-                    Text(
-                        stringResource(id = R.string.spark_sidebar_settings_tutorial_description_1)
-                    )
-                    Text(
-                        stringResource(id = R.string.spark_sidebar_settings_tutorial_description_2)
-                    )
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    scope.launch {
-                        viewModel.setSettingsHintDisplayed()
-                    }
-                    showSidebarSpark.value = false
-                }) {
-                    Text(stringResource(id = R.string.spark_sidebar_settings_tutorial_acknowledge))
-                }
             }
         )
     }
@@ -912,8 +842,8 @@ fun ChannelNavigator(
 
     Column(Modifier.fillMaxSize()) {
         when (dest) {
-            is ChatRouterDestination.Home -> {
-                HomeScreen(
+            is ChatRouterDestination.Overview -> {
+                OverviewScreen(
                     navController = topNav,
                     useDrawer = useDrawer,
                     onDrawerClicked = toggleDrawer,

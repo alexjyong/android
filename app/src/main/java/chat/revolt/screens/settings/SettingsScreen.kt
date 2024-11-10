@@ -46,7 +46,6 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.components.generic.ListHeader
-import chat.revolt.components.screens.settings.SelfUserOverview
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.runBlocking
@@ -105,8 +104,6 @@ fun SettingsScreen(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
-                SelfUserOverview()
-
                 Column(
                     modifier = Modifier
                         .fillMaxSize()

@@ -95,6 +95,7 @@ fun RawUserOverview(
     Box(
         contentAlignment = Alignment.BottomStart,
         modifier = Modifier
+            .height(128.dp)
             .padding(horizontal = if (internalPadding) 16.dp else 0.dp)
             .clip(MaterialTheme.shapes.large)
             .then(
@@ -111,7 +112,8 @@ fun RawUserOverview(
                 }
             )
     ) {
-        (backgroundUrl ?: profile?.background)?.let { background ->
+        val background = backgroundUrl ?: profile?.background
+        if (background != null) {
             RemoteImage(
                 url = backgroundUrl
                     ?: "$REVOLT_FILES/backgrounds/${if (background is AutumnResource) background.id else null}",
@@ -132,6 +134,13 @@ fun RawUserOverview(
                             )
                         )
                     )
+                    .height(128.dp)
+                    .fillMaxWidth()
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
                     .height(128.dp)
                     .fillMaxWidth()
             )

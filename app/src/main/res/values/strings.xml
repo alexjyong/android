@@ -129,12 +129,25 @@
 
     <string name="unknown">Unknown</string>
 
-    <string name="home">Home</string>
     <string name="menu">Menu</string>
     <string name="logout">Log out</string>
 
     <string name="home_join_jenvolt">Join Jenvolt</string>
     <string name="home_join_jenvolt_description">Jenvolt is the developer-run space for all things Android app and more. Support, feedback go here. Maybe you will get to try out new features! 👀</string>
+
+    <!-- This is the user's personal home page. Does not need to be translated as "You", you can also use "Me" or "Overview" etc. Use your judgement. -->
+    <string name="overview_screen_title">You</string>
+    <string name="overview_screen_error">Couldn\'t load your overview</string>
+    <string name="overview_screen_error_description">Please try again later.</string>
+    <string name="overview_screen_settings">Open Settings</string>
+    <string name="overview_screen_settings_description">Change your look, manage your account, and more</string>
+    <string name="overview_screen_share_profile">Share Profile</string>
+    <string name="overview_screen_share_profile_description">Take a look at your user card and get a special link to share</string>
+    <string name="overview_screen_changelog">Changelog</string>
+    <string name="overview_screen_changelog_description">Revolt never sleeps, take a look to see what\'s been in the works</string>
+    <string name="overview_screen_feedback">Provide Feedback</string>
+    <string name="overview_screen_feedback_description">Got something to say? We\'re all ears</string>
+    <!--Help shape the future of Revolt for Android by providing feedback-->
 
     <string name="friends">Friends</string>
     <string name="friends_incoming_requests">Incoming Requests</string>
@@ -546,11 +559,6 @@
     <string name="emoji_picker_skin_tone_fitzpatrick_6">Dark skin tone</string>
     <string name="emoji_picker_search_results_header">Search results</string>
     <string name="emoji_picker_clear_search">Clear search</string>
-
-    <string name="spark_sidebar_settings_tutorial">The settings are in the sidebar</string>
-    <string name="spark_sidebar_settings_tutorial_description_1">You can open the sidebar by swiping from the left edge of the screen.</string>
-    <string name="spark_sidebar_settings_tutorial_description_2">Then long tap your profile picture to open the settings.</string>
-    <string name="spark_sidebar_settings_tutorial_acknowledge">Got it</string>
 
     <string name="spark_notifications_rationale">Stay in the loop</string>
     <string name="spark_notifications_rationale_description">Enable notifications to be kept up to date with messages and mentions.</string>
