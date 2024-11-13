@@ -84,51 +84,6 @@ android {
             useSupportLibrary = true
         }
 
-        // Please keep this list sorted alphabetically.
-        resourceConfigurations += listOf(
-            "ar",
-            "ast",
-            "b+es+419",
-            "be",
-            "bg",
-            "bn",
-            "ca",
-            "ckb",
-            "cs",
-            "de",
-            "el",
-            "eo",
-            "en",
-            "es",
-            "fa",
-            "fi",
-            "fil",
-            "fr",
-            "gl",
-            "hi",
-            "hr",
-            "hu",
-            "id",
-            "in",
-            "it",
-            "ja",
-            "lt",
-            "mwl",
-            "nb-rNO",
-            "nl",
-            "pl",
-            "pt",
-            "pt-rBR",
-            "ro",
-            "ru",
-            "si",
-            "th",
-            "tr",
-            "uk",
-            "zh-rCN",
-            "zh-rTW"
-        )
-
         externalNativeBuild {
             cmake {
                 cppFlags("")
@@ -196,6 +151,9 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+    androidResources {
+        generateLocaleConfig = true
     }
     namespace = "chat.revolt"
     externalNativeBuild {
