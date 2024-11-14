@@ -177,6 +177,25 @@ fun SettingsScreen(
                     ListItem(
                         headlineContent = {
                             Text(
+                                text = stringResource(id = R.string.settings_language)
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_earth_24dp),
+                                contentDescription = null,
+                            )
+                        },
+                        modifier = Modifier
+                            .testTag("settings_view_language")
+                            .clickable {
+                                navController.navigate("settings/language")
+                            }
+                    )
+
+                    ListItem(
+                        headlineContent = {
+                            Text(
                                 text = stringResource(id = R.string.settings_chat)
                             )
                         },

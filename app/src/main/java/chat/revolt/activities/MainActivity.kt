@@ -9,6 +9,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.EaseInOutExpo
 import androidx.compose.animation.core.FiniteAnimationSpec
@@ -30,7 +31,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.compose.NavHost
@@ -72,6 +72,7 @@ import chat.revolt.screens.settings.ChangelogsSettingsScreen
 import chat.revolt.screens.settings.ChatSettingsScreen
 import chat.revolt.screens.settings.DebugSettingsScreen
 import chat.revolt.screens.settings.ExperimentsSettingsScreen
+import chat.revolt.screens.settings.LanguagePickerSettingsScreen
 import chat.revolt.screens.settings.ProfileSettingsScreen
 import chat.revolt.screens.settings.SessionSettingsScreen
 import chat.revolt.screens.settings.SettingsScreen
@@ -256,7 +257,7 @@ class MainActivityViewModel @Inject constructor(
 }
 
 @AndroidEntryPoint
-class MainActivity : FragmentActivity() {
+class MainActivity : AppCompatActivity() {
     private val viewModel by viewModels<MainActivityViewModel>()
 
     // Fix for SDK >=31, where core-splashscreen accidentally removes dynamic colours
@@ -454,6 +455,7 @@ fun AppEntrypoint(
                 composable("settings/debug") { DebugSettingsScreen(navController) }
                 composable("settings/experiments") { ExperimentsSettingsScreen(navController) }
                 composable("settings/changelogs") { ChangelogsSettingsScreen(navController) }
+                composable("settings/language") { LanguagePickerSettingsScreen(navController) }
 
                 composable("settings/channel/{channelId}") { backStackEntry ->
                     val channelId = backStackEntry.arguments?.getString("channelId") ?: ""

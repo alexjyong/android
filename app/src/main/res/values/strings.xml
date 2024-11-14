@@ -655,6 +655,9 @@
     <string name="settings_changelogs_historical_version_header">Changelog for %1$s</string>
     <string name="settings_changelogs_historical_version_header_placeholder">that version</string>
 
+    <string name="settings_language">Language</string>
+    <string name="settings_language_auto">System default</string>
+
     <string name="channel_settings">Channel Settings</string>
     <string name="channel_settings_header">#%1$s</string>
     <string name="channel_settings_overview">Overview</string>
