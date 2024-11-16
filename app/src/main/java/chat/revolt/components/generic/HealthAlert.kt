@@ -3,7 +3,6 @@ package chat.revolt.components.generic
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -15,7 +14,6 @@ import androidx.core.net.toUri
 import chat.revolt.R
 import chat.revolt.api.schemas.HealthNotice
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HealthAlert(notice: HealthNotice, onDismiss: () -> Unit) {
     val context = LocalContext.current
@@ -32,7 +30,7 @@ fun HealthAlert(notice: HealthNotice, onDismiss: () -> Unit) {
             Text(notice.alert?.text ?: stringResource(R.string.service_health_alert_body_default))
         },
         confirmButton = {
-            notice.alert?.actions?.firstOrNull()?.let { action ->
+            notice.alert?.actions?.map { action ->
                 when (action.type) {
                     "external" -> TextButton(
                         onClick = {
