@@ -35,7 +35,7 @@ fun WebHookUserSheet(modifier: Modifier = Modifier) {
         )
         Text(
             text = stringResource(R.string.user_info_sheet_webhook),
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
