@@ -14,7 +14,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.fadeIn
@@ -65,6 +64,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -162,10 +162,7 @@ private fun pxAsDp(px: Int): Dp {
             ).dp
 }
 
-@OptIn(
-    ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class,
-    ExperimentalAnimationApi::class
-)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ChannelScreen(
     channelId: String,
@@ -173,25 +170,30 @@ fun ChannelScreen(
     useDrawer: Boolean,
     viewModel: ChannelScreenViewModel = hiltViewModel()
 ) {
-    // Setup
-
+    // <editor-fold desc="State and effects">
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.startListening(createUiCallbackListener = true)
+        viewModel.listenToWsEvents()
     }
 
-    // Load/switch channel
+    DisposableEffect(Unit) {
+        val job = scope.launch { viewModel.listenToUiCallbacks() }
 
+        onDispose {
+            job.cancel()
+        }
+    }
+    // </editor-fold>
+    // <editor-fold desc="Load/switch channel">
     val channelPermissions by rememberChannelPermissions(channelId, viewModel.ensuredSelfMember)
 
     LaunchedEffect(channelId) {
         viewModel.switchChannel(channelId)
     }
-
-    // Keyboard height
-
+    // </editor-fold>
+    // <editor-fold desc="Keyboard height handling">
     val imeTarget = WindowInsets.imeAnimationTarget.getBottom(LocalDensity.current)
     val navigationBarsInset = WindowInsets.navigationBars.getBottom(LocalDensity.current)
     val imeCurrentInset = WindowInsets.ime.getBottom(LocalDensity.current)
@@ -211,9 +213,8 @@ fun ChannelScreen(
             imeInTransition = false
         }
     }
-
-    // Attachment handling
-
+    // </editor-fold>
+    // <editor-fold desc="Attachment handling">
     val processFileUri: (Uri, String?) -> Unit = remember {
         { uri, pickerIdentifier ->
             DocumentFile.fromSingleUri(context, uri)?.let { file ->
@@ -278,9 +279,8 @@ fun ChannelScreen(
             }
         }
     }
-
-    // UI elements
-
+    // </editor-fold>
+    // <editor-fold desc="UI elements">
     val lazyListState = rememberLazyListState()
 
     val isScrolledToBottom = remember(lazyListState) {
@@ -328,9 +328,8 @@ fun ChannelScreen(
                 }
             }
     }
-
-    // Sheets
-
+    // </editor-fold>
+    // <editor-fold desc="Sheets">
     var channelInfoSheetShown by remember { mutableStateOf(false) }
     if (channelInfoSheetShown) {
         val channelInfoSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -399,9 +398,8 @@ fun ChannelScreen(
             }
         }
     }
-
-    // Begin UI composition
-
+    // </editor-fold>
+    // <editor-fold desc="Begin UI composition">
     Scaffold(
         contentWindowInsets = WindowInsets(
             left = 0,
@@ -1033,4 +1031,5 @@ fun ChannelScreen(
             }
         }
     }
+    // </editor-fold>
 }

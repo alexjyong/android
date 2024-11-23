@@ -498,258 +498,254 @@ class ChannelScreenViewModel @Inject constructor(
         ackChannel(channel?.id ?: return, messageId)
     }
 
-    suspend fun startListening(createUiCallbackListener: Boolean = true) {
-        viewModelScope.launch {
-            withContext(RevoltAPI.realtimeContext) {
-                flow {
-                    while (true) {
-                        emit(RevoltAPI.wsFrameChannel.receive())
-                    }
-                }.onEach {
-                    when (it) {
-                        is MessageFrame -> {
-                            if (it.channel != channel?.id) return@onEach
-                            // If we already have the message we are just catching up on the WebSocket connection. Skip
-                            if (items.any { m -> (m is ChannelScreenItem.RegularMessage && m.message.id == it.id) || (m is ChannelScreenItem.SystemMessage && m.message.id == it.id) }) return@onEach
-
-                            it.author?.let { userId ->
-                                if (RevoltAPI.userCache[userId] == null) {
-                                    RevoltAPI.userCache[userId] = fetchUser(userId)
-                                }
-                            }
-                            channel?.server?.let { serverId ->
-                                try {
-                                    it.author?.let { userId ->
-                                        fetchMember(serverId, userId)
-                                    }
-                                } catch (e: Exception) {
-                                    Log.e("ChannelScreenViewModel", "Failed to fetch member", e)
-                                }
-                            }
-
-                            if (didInitialChannelFetch) { // this check is so that we don't end up with a message that arrives at the same time as the initial fetch in front of the loading indicator
-                                val newItem = when {
-                                    it.system != null -> ChannelScreenItem.SystemMessage(it)
-                                    else -> ChannelScreenItem.RegularMessage(it)
-                                }
-                                updateItems(listOf(newItem) + items.filter { m ->
-                                    if (m is ChannelScreenItem.ProspectiveMessage) {
-                                        m.message.id != it.nonce
-                                    } else {
-                                        true
-                                    }
-                                })
-                            }
-
-                            it.id?.let { mid -> ackMessage(mid) }
-                        }
-
-                        is MessageDeleteFrame -> {
-                            if (it.channel != channel?.id) return@onEach
-
-                            val newRenderableMessages =
-                                items.filter { m ->
-                                    if (m is ChannelScreenItem.RegularMessage) {
-                                        m.message.id != it.id
-                                    } else {
-                                        true
-                                    }
-                                }
-
-                            updateItems(newRenderableMessages)
-                        }
-
-
-                        is MessageUpdateFrame -> {
-                            if (it.channel != channel?.id) return@onEach
-
-                            val messageFrame =
-                                RevoltJson.decodeFromJsonElement(MessageFrame.serializer(), it.data)
-
-                            val currentMessage = items.find { m ->
-                                m is ChannelScreenItem.RegularMessage && m.message.id == it.id
-                            }
-                            if (currentMessage == null) return@onEach
-
-                            if (messageFrame.author != null) {
-                                addUserIfUnknown(messageFrame.author)
-                            }
-
-                            updateItems(
-                                items.map { m ->
-                                    if (m is ChannelScreenItem.RegularMessage && m.message.id == it.id) {
-                                        ChannelScreenItem.RegularMessage(
-                                            m.message.mergeWithPartial(messageFrame)
-                                        )
-                                    } else {
-                                        m
-                                    }
-                                }
-                            )
-                        }
-
-                        is MessageAppendFrame -> {
-                            if (it.channel != channel?.id) return@onEach
-
-                            val hasMessage = items.any { currentMsg ->
-                                currentMsg is ChannelScreenItem.RegularMessage && currentMsg.message.id == it.id
-                            }
-
-                            if (!hasMessage) return@onEach
-
-                            updateItems(
-                                items.map { currentMsg ->
-                                    if (currentMsg is ChannelScreenItem.RegularMessage && currentMsg.message.id == it.id) {
-                                        RevoltAPI.messageCache[it.id]?.let { m ->
-                                            ChannelScreenItem.RegularMessage(m)
-                                        } ?: return@map currentMsg
-                                    } else {
-                                        currentMsg
-                                    }
-                                }
-                            )
-                        }
-
-                        is MessageReactFrame -> {
-                            if (it.channel_id != channel?.id) return@onEach
-
-                            val hasMessage = items
-                                .filterIsInstance<ChannelScreenItem.RegularMessage>()
-                                .any { msg ->
-                                    msg.message.id == it.id
-                                }
-
-                            if (!hasMessage) return@onEach
-
-                            updateItems(
-                                items.map { currentMsg ->
-                                    if (currentMsg is ChannelScreenItem.RegularMessage && currentMsg.message.id == it.id) {
-                                        RevoltAPI.messageCache[it.id]?.let { m ->
-                                            ChannelScreenItem.RegularMessage(m)
-                                        } ?: return@map currentMsg
-                                    } else {
-                                        currentMsg
-                                    }
-                                }
-                            )
-                        }
-
-                        is MessageUnreactFrame -> {
-                            if (it.channel_id != channel?.id) return@onEach
-
-                            val hasMessage = items
-                                .filterIsInstance<ChannelScreenItem.RegularMessage>()
-                                .any { msg ->
-                                    msg.message.id == it.id
-                                }
-
-                            if (!hasMessage) return@onEach
-
-                            updateItems(
-                                items.map { currentMsg ->
-                                    if (currentMsg is ChannelScreenItem.RegularMessage && currentMsg.message.id == it.id) {
-                                        RevoltAPI.messageCache[it.id]?.let { m ->
-                                            ChannelScreenItem.RegularMessage(m)
-                                        } ?: return@map currentMsg
-                                    } else {
-                                        currentMsg
-                                    }
-                                }
-                            )
-                        }
-
-                        is ChannelStartTypingFrame -> {
-                            if (it.id != channel?.id) return@onEach
-                            if (typingUsers.contains(it.user)) return@onEach
-                            if (it.user == RevoltAPI.selfId) return@onEach
-
-                            addUserIfUnknown(it.user)
-                            typingUsers.add(it.user)
-                        }
-
-                        is ChannelStopTypingFrame -> {
-                            if (it.id != channel?.id) return@onEach
-                            if (!typingUsers.contains(it.user)) return@onEach
-
-                            typingUsers.remove(it.user)
-                        }
-
-                        is ChannelDeleteFrame -> {
-                            if (it.id != channel?.id) return@onEach
-                            // FIXME This is UI logic from the view model. Too bad!
-                            ActionChannel.send(
-                                Action.ChatNavigate(
-                                    ChatRouterDestination.NoCurrentChannel(
-                                        channel?.server ?: return@onEach
-                                    )
-                                )
-                            )
-                        }
-
-                        is RealtimeSocketFrames.Reconnected -> {
-                            Log.d("ChannelScreen", "Reconnected to WS.")
-                            loadMessages(50, ignoreExisting = true)
-                            startListening(createUiCallbackListener = false)
-                        }
-                    }
-                }.catch {
-                    Log.e("ChannelScreen", "Failed to receive WS frame", it)
-                }.launchIn(this)
-            }
-        }
-
-        if (createUiCallbackListener) {
-            viewModelScope.launch {
-                withContext(Dispatchers.Main) {
-                    UiCallbacks.uiCallbackFlow.onEach {
-                        Log.d("ChannelScreen", "Received UI callback: $it")
-
-                        when (it) {
-                            is UiCallback.ReplyToMessage -> {
-                                val message = items.find { m ->
-                                    m is ChannelScreenItem.RegularMessage && m.message.id == it.messageId
-                                } as? ChannelScreenItem.RegularMessage ?: return@onEach
-
-                                val shouldMention = kvStorage.getBoolean("mentionOnReply") ?: false
-                                draftReplyTo.add(
-                                    SendMessageReply(
-                                        message.message.id ?: return@onEach,
-                                        shouldMention
-                                    )
-                                )
-                            }
-
-                            is UiCallback.EditMessage -> {
-                                editingMessage = it.messageId
-                                val message = items.find { m ->
-                                    m is ChannelScreenItem.RegularMessage && m.message.id == it.messageId
-                                } as? ChannelScreenItem.RegularMessage ?: return@onEach
-
-                                putDraftContent(message.message.content ?: "")
-                                this@ChannelScreenViewModel.draftAttachments.clear()
-                                draftReplyTo.clear()
-                            }
-
-                            is UiCallback.ReplyToMessageWithContent -> {
-                                val message = items.find { m ->
-                                    m is ChannelScreenItem.RegularMessage && m.message.id == it.messageId
-                                } as? ChannelScreenItem.RegularMessage ?: return@onEach
-
-                                val shouldMention = kvStorage.getBoolean("mentionOnReply") ?: false
-                                draftReplyTo.add(
-                                    SendMessageReply(
-                                        message.message.id ?: return@onEach,
-                                        shouldMention
-                                    )
-                                )
-                                putDraftContent(it.content)
-                            }
-                        }
-                    }.catch {
-                        Log.e("ChannelScreen", "Failed to receive UI callback", it)
-                    }.launchIn(this)
+    suspend fun listenToWsEvents() {
+        withContext(RevoltAPI.realtimeContext) {
+            flow {
+                while (true) {
+                    emit(RevoltAPI.wsFrameChannel.receive())
                 }
-            }
+            }.onEach {
+                when (it) {
+                    is MessageFrame -> {
+                        if (it.channel != channel?.id) return@onEach
+                        // If we already have the message we are just catching up on the WebSocket connection. Skip
+                        if (items.any { m -> (m is ChannelScreenItem.RegularMessage && m.message.id == it.id) || (m is ChannelScreenItem.SystemMessage && m.message.id == it.id) }) return@onEach
+
+                        it.author?.let { userId ->
+                            if (RevoltAPI.userCache[userId] == null) {
+                                RevoltAPI.userCache[userId] = fetchUser(userId)
+                            }
+                        }
+                        channel?.server?.let { serverId ->
+                            try {
+                                it.author?.let { userId ->
+                                    fetchMember(serverId, userId)
+                                }
+                            } catch (e: Exception) {
+                                Log.e("ChannelScreenViewModel", "Failed to fetch member", e)
+                            }
+                        }
+
+                        if (didInitialChannelFetch) { // this check is so that we don't end up with a message that arrives at the same time as the initial fetch in front of the loading indicator
+                            val newItem = when {
+                                it.system != null -> ChannelScreenItem.SystemMessage(it)
+                                else -> ChannelScreenItem.RegularMessage(it)
+                            }
+                            updateItems(listOf(newItem) + items.filter { m ->
+                                if (m is ChannelScreenItem.ProspectiveMessage) {
+                                    m.message.id != it.nonce
+                                } else {
+                                    true
+                                }
+                            })
+                        }
+
+                        it.id?.let { mid -> ackMessage(mid) }
+                    }
+
+                    is MessageDeleteFrame -> {
+                        if (it.channel != channel?.id) return@onEach
+
+                        val newRenderableMessages =
+                            items.filter { m ->
+                                if (m is ChannelScreenItem.RegularMessage) {
+                                    m.message.id != it.id
+                                } else {
+                                    true
+                                }
+                            }
+
+                        updateItems(newRenderableMessages)
+                    }
+
+
+                    is MessageUpdateFrame -> {
+                        if (it.channel != channel?.id) return@onEach
+
+                        val messageFrame =
+                            RevoltJson.decodeFromJsonElement(MessageFrame.serializer(), it.data)
+
+                        val currentMessage = items.find { m ->
+                            m is ChannelScreenItem.RegularMessage && m.message.id == it.id
+                        }
+                        if (currentMessage == null) return@onEach
+
+                        if (messageFrame.author != null) {
+                            addUserIfUnknown(messageFrame.author)
+                        }
+
+                        updateItems(
+                            items.map { m ->
+                                if (m is ChannelScreenItem.RegularMessage && m.message.id == it.id) {
+                                    ChannelScreenItem.RegularMessage(
+                                        m.message.mergeWithPartial(messageFrame)
+                                    )
+                                } else {
+                                    m
+                                }
+                            }
+                        )
+                    }
+
+                    is MessageAppendFrame -> {
+                        if (it.channel != channel?.id) return@onEach
+
+                        val hasMessage = items.any { currentMsg ->
+                            currentMsg is ChannelScreenItem.RegularMessage && currentMsg.message.id == it.id
+                        }
+
+                        if (!hasMessage) return@onEach
+
+                        updateItems(
+                            items.map { currentMsg ->
+                                if (currentMsg is ChannelScreenItem.RegularMessage && currentMsg.message.id == it.id) {
+                                    RevoltAPI.messageCache[it.id]?.let { m ->
+                                        ChannelScreenItem.RegularMessage(m)
+                                    } ?: return@map currentMsg
+                                } else {
+                                    currentMsg
+                                }
+                            }
+                        )
+                    }
+
+                    is MessageReactFrame -> {
+                        if (it.channel_id != channel?.id) return@onEach
+
+                        val hasMessage = items
+                            .filterIsInstance<ChannelScreenItem.RegularMessage>()
+                            .any { msg ->
+                                msg.message.id == it.id
+                            }
+
+                        if (!hasMessage) return@onEach
+
+                        updateItems(
+                            items.map { currentMsg ->
+                                if (currentMsg is ChannelScreenItem.RegularMessage && currentMsg.message.id == it.id) {
+                                    RevoltAPI.messageCache[it.id]?.let { m ->
+                                        ChannelScreenItem.RegularMessage(m)
+                                    } ?: return@map currentMsg
+                                } else {
+                                    currentMsg
+                                }
+                            }
+                        )
+                    }
+
+                    is MessageUnreactFrame -> {
+                        if (it.channel_id != channel?.id) return@onEach
+
+                        val hasMessage = items
+                            .filterIsInstance<ChannelScreenItem.RegularMessage>()
+                            .any { msg ->
+                                msg.message.id == it.id
+                            }
+
+                        if (!hasMessage) return@onEach
+
+                        updateItems(
+                            items.map { currentMsg ->
+                                if (currentMsg is ChannelScreenItem.RegularMessage && currentMsg.message.id == it.id) {
+                                    RevoltAPI.messageCache[it.id]?.let { m ->
+                                        ChannelScreenItem.RegularMessage(m)
+                                    } ?: return@map currentMsg
+                                } else {
+                                    currentMsg
+                                }
+                            }
+                        )
+                    }
+
+                    is ChannelStartTypingFrame -> {
+                        if (it.id != channel?.id) return@onEach
+                        if (typingUsers.contains(it.user)) return@onEach
+                        if (it.user == RevoltAPI.selfId) return@onEach
+
+                        addUserIfUnknown(it.user)
+                        typingUsers.add(it.user)
+                    }
+
+                    is ChannelStopTypingFrame -> {
+                        if (it.id != channel?.id) return@onEach
+                        if (!typingUsers.contains(it.user)) return@onEach
+
+                        typingUsers.remove(it.user)
+                    }
+
+                    is ChannelDeleteFrame -> {
+                        if (it.id != channel?.id) return@onEach
+                        // FIXME This is UI logic from the view model. Too bad!
+                        ActionChannel.send(
+                            Action.ChatNavigate(
+                                ChatRouterDestination.NoCurrentChannel(
+                                    channel?.server ?: return@onEach
+                                )
+                            )
+                        )
+                    }
+
+                    is RealtimeSocketFrames.Reconnected -> {
+                        Log.d("ChannelScreen", "Reconnected to WS.")
+                        loadMessages(50, ignoreExisting = true)
+                        listenToWsEvents()
+                    }
+                }
+            }.catch {
+                Log.e("ChannelScreen", "Failed to receive WS frame", it)
+            }.launchIn(this)
+        }
+    }
+
+    suspend fun listenToUiCallbacks() {
+        withContext(Dispatchers.Main) {
+            UiCallbacks.uiCallbackFlow.onEach {
+                Log.d("ChannelScreen", "Received UI callback: $it")
+
+                when (it) {
+                    is UiCallback.ReplyToMessage -> {
+                        val message = items.find { m ->
+                            m is ChannelScreenItem.RegularMessage && m.message.id == it.messageId
+                        } as? ChannelScreenItem.RegularMessage ?: return@onEach
+
+                        val shouldMention = kvStorage.getBoolean("mentionOnReply") ?: false
+                        draftReplyTo.add(
+                            SendMessageReply(
+                                message.message.id ?: return@onEach,
+                                shouldMention
+                            )
+                        )
+                    }
+
+                    is UiCallback.EditMessage -> {
+                        editingMessage = it.messageId
+                        val message = items.find { m ->
+                            m is ChannelScreenItem.RegularMessage && m.message.id == it.messageId
+                        } as? ChannelScreenItem.RegularMessage ?: return@onEach
+
+                        putDraftContent(message.message.content ?: "")
+                        this@ChannelScreenViewModel.draftAttachments.clear()
+                        draftReplyTo.clear()
+                    }
+
+                    is UiCallback.ReplyToMessageWithContent -> {
+                        val message = items.find { m ->
+                            m is ChannelScreenItem.RegularMessage && m.message.id == it.messageId
+                        } as? ChannelScreenItem.RegularMessage ?: return@onEach
+
+                        val shouldMention = kvStorage.getBoolean("mentionOnReply") ?: false
+                        draftReplyTo.add(
+                            SendMessageReply(
+                                message.message.id ?: return@onEach,
+                                shouldMention
+                            )
+                        )
+                        putDraftContent(it.content)
+                    }
+                }
+            }.catch {
+                Log.e("ChannelScreen", "Failed to receive UI callback", it)
+            }.launchIn(this)
         }
     }
 
