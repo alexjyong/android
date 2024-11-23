@@ -118,8 +118,12 @@ class MainActivityViewModel @Inject constructor(
     }
 
     private suspend fun canReachRevolt(): Boolean {
-        val res = RevoltHttp.get("/".api())
-        return res.status.value == 200
+        try {
+            val res = RevoltHttp.get("/".api())
+            return res.status.value == 200
+        } catch (e: Exception) {
+            return false
+        }
     }
 
     private suspend fun startWithDestination(destination: String) {
