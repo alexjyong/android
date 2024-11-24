@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -19,26 +18,80 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
 
-val RevoltColorScheme = darkColorScheme(
-    primary = Color(0xffda4e5b),
-    onPrimary = Color(0xffffffff),
-    primaryContainer = Color(0xffda4e5b),
-    onPrimaryContainer = Color(0xffffffff),
-    secondary = Color(0xfff84848),
-    onSecondary = Color(0xffffffff),
-    secondaryContainer = Color(0xfff84848),
-    onSecondaryContainer = Color(0xffffffff),
-    tertiary = Color(0xff3abf7e),
-    onTertiary = Color(0xffffffff),
-    tertiaryContainer = Color(0xff3abf7e),
-    onTertiaryContainer = Color(0xffffffff),
-    background = Color(0xff191919),
-    onBackground = Color(0xffffffff),
-    surfaceVariant = Color(0xff242424),
-    onSurfaceVariant = Color(0xffffffff),
-    surface = Color(0xff191919),
-    onSurface = Color(0xffffffff),
-    surfaceTint = Color(0xFFC0C0C0),
+val LightColorScheme = lightColorScheme(
+    primary = Colour.PrimaryLight,
+    onPrimary = Colour.OnPrimaryLight,
+    primaryContainer = Colour.PrimaryContainerLight,
+    onPrimaryContainer = Colour.OnPrimaryContainerLight,
+    secondary = Colour.SecondaryLight,
+    onSecondary = Colour.OnSecondaryLight,
+    secondaryContainer = Colour.SecondaryContainerLight,
+    onSecondaryContainer = Colour.OnSecondaryContainerLight,
+    tertiary = Colour.TertiaryLight,
+    onTertiary = Colour.OnTertiaryLight,
+    tertiaryContainer = Colour.TertiaryContainerLight,
+    onTertiaryContainer = Colour.OnTertiaryContainerLight,
+    error = Colour.ErrorLight,
+    onError = Colour.OnErrorLight,
+    errorContainer = Colour.ErrorContainerLight,
+    onErrorContainer = Colour.OnErrorContainerLight,
+    background = Colour.BackgroundLight,
+    onBackground = Colour.OnBackgroundLight,
+    surface = Colour.SurfaceLight,
+    onSurface = Colour.OnSurfaceLight,
+    surfaceVariant = Colour.SurfaceVariantLight,
+    onSurfaceVariant = Colour.OnSurfaceVariantLight,
+    outline = Colour.OutlineLight,
+    outlineVariant = Colour.OutlineVariantLight,
+    scrim = Colour.ScrimLight,
+    inverseSurface = Colour.InverseSurfaceLight,
+    inverseOnSurface = Colour.InverseOnSurfaceLight,
+    inversePrimary = Colour.InversePrimaryLight,
+    surfaceDim = Colour.SurfaceDimLight,
+    surfaceBright = Colour.SurfaceBrightLight,
+    surfaceContainerLowest = Colour.SurfaceContainerLowestLight,
+    surfaceContainerLow = Colour.SurfaceContainerLowLight,
+    surfaceContainer = Colour.SurfaceContainerLight,
+    surfaceContainerHigh = Colour.SurfaceContainerHighLight,
+    surfaceContainerHighest = Colour.SurfaceContainerHighestLight,
+)
+
+private val RevoltColorScheme = darkColorScheme(
+    primary = Colour.PrimaryDark,
+    onPrimary = Colour.OnPrimaryDark,
+    primaryContainer = Colour.PrimaryContainerDark,
+    onPrimaryContainer = Colour.OnPrimaryContainerDark,
+    secondary = Colour.SecondaryDark,
+    onSecondary = Colour.OnSecondaryDark,
+    secondaryContainer = Colour.SecondaryContainerDark,
+    onSecondaryContainer = Colour.OnSecondaryContainerDark,
+    tertiary = Colour.TertiaryDark,
+    onTertiary = Colour.OnTertiaryDark,
+    tertiaryContainer = Colour.TertiaryContainerDark,
+    onTertiaryContainer = Colour.OnTertiaryContainerDark,
+    error = Colour.ErrorDark,
+    onError = Colour.OnErrorDark,
+    errorContainer = Colour.ErrorContainerDark,
+    onErrorContainer = Colour.OnErrorContainerDark,
+    background = Colour.BackgroundDark,
+    onBackground = Colour.OnBackgroundDark,
+    surface = Colour.SurfaceDark,
+    onSurface = Colour.OnSurfaceDark,
+    surfaceVariant = Colour.SurfaceVariantDark,
+    onSurfaceVariant = Colour.OnSurfaceVariantDark,
+    outline = Colour.OutlineDark,
+    outlineVariant = Colour.OutlineVariantDark,
+    scrim = Colour.ScrimDark,
+    inverseSurface = Colour.InverseSurfaceDark,
+    inverseOnSurface = Colour.InverseOnSurfaceDark,
+    inversePrimary = Colour.InversePrimaryDark,
+    surfaceDim = Colour.SurfaceDimDark,
+    surfaceBright = Colour.SurfaceBrightDark,
+    surfaceContainerLowest = Colour.SurfaceContainerLowestDark,
+    surfaceContainerLow = Colour.SurfaceContainerLowDark,
+    surfaceContainer = Colour.SurfaceContainerDark,
+    surfaceContainerHigh = Colour.SurfaceContainerHighDark,
+    surfaceContainerHighest = Colour.SurfaceContainerHighestDark,
 )
 
 val AmoledColorScheme = RevoltColorScheme.copy(
@@ -47,29 +100,12 @@ val AmoledColorScheme = RevoltColorScheme.copy(
     surfaceVariant = Color(0xff131313),
     onSurfaceVariant = Color(0xffffffff),
     surface = Color(0xff000000),
-    onSurface = Color(0xffffffff)
-)
-
-val LightColorScheme = lightColorScheme(
-    primary = Color(0xffda4e5b),
-    onPrimary = Color(0xffffffff),
-    primaryContainer = Color(0xffda4e5b),
-    onPrimaryContainer = Color(0xffffffff),
-    secondary = Color(0xfff84848),
-    onSecondary = Color(0xffffffff),
-    secondaryContainer = Color(0xfff84848),
-    onSecondaryContainer = Color(0xffffffff),
-    tertiary = Color(0xff3abf7e),
-    onTertiary = Color(0xffffffff),
-    tertiaryContainer = Color(0xff3abf7e),
-    onTertiaryContainer = Color(0xffffffff),
-    background = Color(0xffffffff),
-    onBackground = Color(0xff000000),
-    surfaceVariant = Color(0xffe0e0e0),
-    onSurfaceVariant = Color(0xff000000),
-    surface = Color(0xffffffff),
-    onSurface = Color(0xff000000),
-    surfaceTint = Color(0xff5658b9)
+    onSurface = Color(0xffffffff),
+    surfaceContainerLowest = Color(0xff000000),
+    surfaceContainerLow = Color(0xff000000),
+    surfaceContainer = Color(0xff000000),
+    surfaceContainerHigh = Color(0xff000000),
+    surfaceContainerHighest = Color(0xff000000),
 )
 
 enum class Theme {
