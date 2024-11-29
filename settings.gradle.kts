@@ -17,6 +17,10 @@ dependencyResolutionManagement {
             name = "snapshot"
             url = uri("https://oss.sonatype.org/content/repositories/snapshots")
         }
+        maven {
+            name = "compose-dev"
+            url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        }
     }
 }
 rootProject.name = "Revolt"
