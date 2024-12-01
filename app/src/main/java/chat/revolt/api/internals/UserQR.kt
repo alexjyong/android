@@ -9,7 +9,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 @Serializable
 data class UserQRContents(
-    val format: String = "rqr\$user\$0",
+    val format: String,
     val avatar: String,
     val displayName: String,
     val username: String,
@@ -24,6 +24,7 @@ object UserQR {
             RevoltCbor.encodeToByteArray(
                 UserQRContents.serializer(),
                 UserQRContents(
+                    format = "rqr\$user\$0",
                     avatar = user.avatar?.id
                         ?: "01JDZRBY95P8AY4CFVX16FFVWS", // Sentinel value for missing avatar
                     displayName = user.displayName

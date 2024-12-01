@@ -46,7 +46,6 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -76,8 +75,6 @@ fun UserCard(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-
-    val textMeasurer = rememberTextMeasurer()
 
     var palette by remember { mutableStateOf<Palette?>(null) }
     LaunchedEffect(user) {
@@ -196,7 +193,7 @@ fun UserCard(
                         ?: Color(0xFFFF005C), shape = MaterialTheme.shapes.medium)
                     .padding(16.dp)
             ) {
-                val (heading, nameLabel, name, usernameLabel, username, tagLabel, tag, joinDateLabel, joinDate, qrLabel, qr, photoLabel, photo, url) = createRefs()
+                val (heading, nameLabel, name, usernameLabel, username, joinDateLabel, joinDate, qrLabel, qr, photoLabel, photo, url) = createRefs()
 
                 Image(
                     painter = painterResource(R.drawable.usercard_heading),
