@@ -2,4 +2,7 @@
     <cache-path
         path="attachments/"
         name="attachments" />
+    <cache-path
+        path="usercards/"
+        name="usercards" />
 </paths>

@@ -2,6 +2,7 @@ package chat.revolt.sheets
 
 import android.text.format.DateUtils
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,10 +16,14 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -51,6 +56,7 @@ import chat.revolt.components.screens.settings.UserButtons
 import chat.revolt.components.sheets.SheetTile
 import kotlinx.datetime.Instant
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserInfoSheet(
     userId: String,
@@ -102,6 +108,17 @@ fun UserInfoSheet(
         return
     }
 
+    var showUserCard by remember { mutableStateOf(false) }
+    if (showUserCard) {
+        val sheetState = rememberModalBottomSheetState(true)
+        ModalBottomSheet(
+            sheetState = sheetState,
+            onDismissRequest = { showUserCard = false }
+        ) {
+            UserCardSheet(user)
+        }
+    }
+
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -109,7 +126,20 @@ fun UserInfoSheet(
         modifier = Modifier.padding(16.dp)
     ) {
         item(key = "overview", span = StaggeredGridItemSpan.FullLine) {
-            RawUserOverview(user, profile, internalPadding = false)
+            Box {
+                RawUserOverview(user, profile, internalPadding = false)
+                SmallFloatingActionButton(
+                    onClick = { showUserCard = true },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 8.dp, end = 8.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_badge_account_horizontal_24dp),
+                        contentDescription = null
+                    )
+                }
+            }
         }
 
         member?.roles?.let {

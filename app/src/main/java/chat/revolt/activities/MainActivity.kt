@@ -202,8 +202,6 @@ class MainActivityViewModel @Inject constructor(
                     return@launch startWithoutDestination()
                 } catch (e: Exception) {
                     Log.e("MainActivity", "Failed to check onboarding state, clearing session", e)
-                    kvStorage.remove("sessionToken")
-                    kvStorage.remove("sessionId")
                     startWithDestination("login/greeting")
                 }
 

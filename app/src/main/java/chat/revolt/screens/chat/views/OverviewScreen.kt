@@ -30,9 +30,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -57,6 +59,7 @@ import chat.revolt.components.generic.NonIdealState
 import chat.revolt.components.screens.settings.UserOverview
 import chat.revolt.components.skeletons.UserOverviewSkeleton
 import chat.revolt.internals.extensions.zero
+import chat.revolt.sheets.UserCardSheet
 import io.sentry.Sentry
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,6 +85,18 @@ fun OverviewScreen(navController: NavController, useDrawer: Boolean, onDrawerCli
                 Sentry.captureException(e)
                 isLoading = false
             }
+        }
+    }
+
+    var showUserCardSheet by rememberSaveable { mutableStateOf(false) }
+
+    if (showUserCardSheet) {
+        val state = rememberModalBottomSheetState()
+        ModalBottomSheet(
+            sheetState = state,
+            onDismissRequest = { showUserCardSheet = false },
+        ) {
+            UserCardSheet(user = user)
         }
     }
 
@@ -189,12 +204,7 @@ fun OverviewScreen(navController: NavController, useDrawer: Boolean, onDrawerCli
                     item(key = "shareProfile") {
                         OverviewScreenLink(
                             onClick = {
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.comingsoon_toast),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                // navController.navigate("userCard")
+                                showUserCardSheet = true
                             },
                             backgroundColour = MaterialTheme.colorScheme.tertiaryContainer,
                             foregroundColour = MaterialTheme.colorScheme.onTertiaryContainer,

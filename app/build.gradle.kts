@@ -251,9 +251,10 @@ dependencies {
     implementation("androidx.browser:browser:1.8.0")
     implementation("androidx.webkit:webkit:1.12.1")
     implementation("androidx.core:core-splashscreen:1.2.0-alpha02")
+    implementation("androidx.palette:palette-ktx:1.0.0")
 
     // Libraries used for legacy View-based UI
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0-rc01")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
 
@@ -272,6 +273,10 @@ dependencies {
     // Compose libraries
     implementation("me.saket.telephoto:zoomable-image:1.0.0-alpha02")
     implementation("me.saket.telephoto:zoomable-image-glide:1.0.0-alpha02")
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0")
+
+    // ZXing - QR Code generation
+    implementation("com.google.zxing:core:3.5.3")
 
     // Persistence
     implementation("app.cash.sqldelight:android-driver:2.0.1")

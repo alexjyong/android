@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -89,6 +90,7 @@ fun UserAvatar(
     rawUrl: String? = null,
     size: Dp = 40.dp,
     presenceSize: Dp = 16.dp,
+    shape: Shape = RoundedCornerShape(LoadedSettings.avatarRadius),
     onLongClick: (() -> Unit)? = null,
     onClick: (() -> Unit)? = null
 ) {
@@ -103,7 +105,7 @@ fun UserAvatar(
                 contentScale = ContentScale.Crop,
                 description = stringResource(id = R.string.avatar_alt, username),
                 modifier = Modifier
-                    .clip(RoundedCornerShape(LoadedSettings.avatarRadius))
+                    .clip(shape)
                     .size(size)
                     .then(
                         if (onLongClick != null || onClick != null) {
@@ -122,7 +124,7 @@ fun UserAvatar(
                 url = "$REVOLT_BASE/users/${userId.ifBlank { "0".repeat(26) }}/default_avatar",
                 description = stringResource(id = R.string.avatar_alt, username),
                 modifier = Modifier
-                    .clip(RoundedCornerShape(LoadedSettings.avatarRadius))
+                    .clip(shape)
                     .size(size)
                     .then(
                         if (onLongClick != null || onClick != null) {

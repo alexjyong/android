@@ -147,7 +147,14 @@
     <string name="overview_screen_changelog_description">Revolt never sleeps, take a look to see what\'s been in the works</string>
     <string name="overview_screen_feedback">Provide Feedback</string>
     <string name="overview_screen_feedback_description">Got something to say? We\'re all ears</string>
-    <!--Help shape the future of Revolt for Android by providing feedback-->
+
+    <string name="user_card_tap_to_copy">Tap to copy</string>
+    <string name="user_card_error_sharing">An error occurred while sharing your user card.</string>
+    <string name="user_card_data_point_display_name">%1$d.Name</string>
+    <string name="user_card_data_point_username">%1$d.Username</string>
+    <string name="user_card_data_point_join_date">%1$d.On Revolt Since</string>
+    <string name="user_card_data_point_qrcode">%1$d.QR Code</string>
+    <string name="user_card_data_point_photo">%1$d.Photo</string>
 
     <string name="friends">Friends</string>
     <string name="friends_incoming_requests">Incoming Requests</string>
