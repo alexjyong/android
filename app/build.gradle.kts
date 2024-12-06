@@ -25,7 +25,6 @@ val navVersion = "2.8.3"
 val hiltVersion = "2.52"
 val glideVersion = "4.16.0"
 val ktorVersion = "3.0.0-beta-2"
-val aboutlibrariesVersion = "10.9.1"
 val media3Version = "1.4.1"
 val livekitVersion = "2.2.0"
 val material3Version = "1.4.0-alpha03"
@@ -240,7 +239,7 @@ dependencies {
     ksp("com.github.bumptech.glide:ksp:$glideVersion")
 
     // AboutLibraries - automated OSS library attribution
-    implementation("com.mikepenz:aboutlibraries-compose:$aboutlibrariesVersion")
+    implementation("com.mikepenz:aboutlibraries-core:11.3.0-rc02")
 
     // Sentry - crash reporting
     implementation("io.sentry:sentry-android:7.16.0")
