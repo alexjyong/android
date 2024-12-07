@@ -14,9 +14,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DismissibleDrawerSheet
@@ -697,6 +700,9 @@ fun ChatRouterScreen(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .windowInsetsPadding(
+                WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)
+            )
     ) {
         AnimatedVisibility(
             visible = RealtimeSocket.disconnectionState != DisconnectionState.Connected
