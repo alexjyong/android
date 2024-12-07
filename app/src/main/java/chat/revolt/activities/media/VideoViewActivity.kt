@@ -8,9 +8,12 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.ViewGroup.MarginLayoutParams
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
@@ -84,6 +87,16 @@ class VideoViewActivity : FragmentActivity() {
             setMediaItem(MediaItem.fromUri(resourceUrl))
             prepare()
             play()
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.xpPlayer) { v, insets ->
+            val systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updateLayoutParams<MarginLayoutParams> {
+                leftMargin = systemBarInsets.left
+                bottomMargin = systemBarInsets.bottom
+                rightMargin = systemBarInsets.right
+            }
+            WindowInsetsCompat.CONSUMED
         }
 
         binding.xpPlayer.player = player
