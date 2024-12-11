@@ -33,9 +33,9 @@ import chat.revolt.api.routes.channel.fetchSingleMessage
 import chat.revolt.api.schemas.User
 import chat.revolt.api.settings.Experiments
 import chat.revolt.components.generic.UserAvatar
-import chat.revolt.components.markdown.jbm.JBM
-import chat.revolt.components.markdown.jbm.JBMRenderer
-import chat.revolt.components.markdown.jbm.LocalJBMarkdownTreeState
+import chat.revolt.markdown.jbm.JBM
+import chat.revolt.markdown.jbm.JBMRenderer
+import chat.revolt.markdown.jbm.LocalJBMarkdownTreeState
 
 @OptIn(JBM::class)
 @Composable

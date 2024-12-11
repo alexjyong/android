@@ -78,9 +78,9 @@ import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.generic.UserAvatarWidthPlaceholder
 import chat.revolt.components.markdown.LocalMarkdownTreeConfig
 import chat.revolt.components.markdown.RichMarkdown
-import chat.revolt.components.markdown.jbm.JBM
-import chat.revolt.components.markdown.jbm.JBMRenderer
-import chat.revolt.components.markdown.jbm.LocalJBMarkdownTreeState
+import chat.revolt.markdown.jbm.JBM
+import chat.revolt.markdown.jbm.JBMRenderer
+import chat.revolt.markdown.jbm.LocalJBMarkdownTreeState
 import chat.revolt.internals.text.Gigamoji
 import kotlinx.coroutines.launch
 import chat.revolt.api.schemas.Message as MessageSchema

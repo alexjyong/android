@@ -19,9 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import chat.revolt.components.markdown.jbm.JBM
-import chat.revolt.components.markdown.jbm.JBMRenderer
-import chat.revolt.components.markdown.jbm.LocalJBMarkdownTreeState
+import chat.revolt.markdown.jbm.JBM
+import chat.revolt.markdown.jbm.JBMRenderer
+import chat.revolt.markdown.jbm.LocalJBMarkdownTreeState
 import chat.revolt.settings.dsl.SettingsPage
 
 @OptIn(JBM::class)

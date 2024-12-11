@@ -1,4 +1,4 @@
-package chat.revolt.components.markdown.jbm
+package chat.revolt.markdown.jbm
 
 import android.content.Intent
 import android.content.res.Configuration
@@ -67,6 +67,7 @@ import chat.revolt.R
 import chat.revolt.activities.InviteActivity
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.isUlid
 import chat.revolt.api.routes.custom.fetchEmoji
 import chat.revolt.api.schemas.isInviteUri
 import chat.revolt.api.settings.LoadedSettings
@@ -175,6 +176,86 @@ private fun annotateText(
                         node.getTextInNode(sourceText)
                     }
                     append(source)
+                }
+
+                RSMElementTypes.USER_MENTION -> {
+                    val contents = node.getTextInNode(sourceText).toString()
+                    val userId = contents.removeSurrounding("<@", ">")
+                    if (userId == contents || !userId.isUlid()) {
+                        // Invalid user mention. Append as if it were regular text.
+                        for (child in node.children) {
+                            append(annotateText(state, child))
+                        }
+                    } else {
+                        // Now we're getting somewhere
+                        pushStringAnnotation(
+                            tag = JBMAnnotations.UserMention.tag,
+                            annotation = userId
+                        )
+                        pushStyle(
+                            SpanStyle(
+                                color = state.colors.clickable,
+                                background = state.colors.clickableBackground
+                            )
+                        )
+                        val member = state.currentServer?.let { serverId ->
+                            RevoltAPI.members.getMember(serverId, userId)
+                        }
+                        val mentionDisplay = member?.nickname?.let { nick -> "@$nick" }
+                            ?: RevoltAPI.userCache[userId]?.username?.let { username -> "@$username" }
+                            ?: "<@$userId>"
+                        append(mentionDisplay)
+                        pop()
+                        pop()
+                    }
+                }
+
+                RSMElementTypes.CHANNEL_MENTION -> {
+                    val contents = node.getTextInNode(sourceText).toString()
+                    val channelId = contents.removeSurrounding("<#", ">")
+                    if (channelId == contents || !channelId.isUlid()) {
+                        // Invalid channel mention. Append as if it were regular text.
+                        for (child in node.children) {
+                            append(annotateText(state, child))
+                        }
+                    } else {
+                        // Now we're getting somewhere
+                        pushStringAnnotation(
+                            tag = JBMAnnotations.ChannelMention.tag,
+                            annotation = channelId
+                        )
+                        pushStyle(
+                            SpanStyle(
+                                color = state.colors.clickable,
+                                background = state.colors.clickableBackground
+                            )
+                        )
+                        val channel = RevoltAPI.channelCache[channelId]
+                        val mentionDisplay = channel?.name?.let { name -> "#$name" }
+                            ?: "<#$channelId>"
+                        append(mentionDisplay)
+                        pop()
+                        pop()
+                    }
+                }
+
+                RSMElementTypes.CUSTOM_EMOTE -> {
+                    val contents = node.getTextInNode(sourceText).toString()
+                    val emoteId = contents.removeSurrounding(":", ":")
+                    if (emoteId == contents || !emoteId.isUlid()) {
+                        // Invalid custom emote. Append as if it were regular text.
+                        for (child in node.children) {
+                            append(annotateText(state, child))
+                        }
+                    } else {
+                        // Now we're getting somewhere
+                        pushStringAnnotation(
+                            tag = JBMAnnotations.CustomEmote.tag,
+                            annotation = emoteId
+                        )
+                        appendInlineContent(JBMAnnotations.CustomEmote.tag, emoteId)
+                        pop()
+                    }
                 }
 
                 MarkdownTokenTypes.ATX_HEADER -> {
@@ -443,6 +524,36 @@ private fun JBMText(node: ASTNode, modifier: Modifier) {
 
                             return@handler true
                         }
+
+                        JBMAnnotations.UserMention.tag -> {
+                            scope.launch {
+                                ActionChannel.send(
+                                    Action.OpenUserSheet(
+                                        item,
+                                        mdState.currentServer
+                                    )
+                                )
+                            }
+                            return@handler true
+                        }
+
+                        JBMAnnotations.ChannelMention.tag -> {
+                            scope.launch {
+                                ActionChannel.send(
+                                    Action.SwitchChannel(item)
+                                )
+                            }
+                            return@handler true
+                        }
+
+                        JBMAnnotations.CustomEmote.tag -> {
+                            scope.launch {
+                                ActionChannel.send(
+                                    Action.EmoteInfo(item)
+                                )
+                            }
+                            return@handler true
+                        }
                     }
                 }
             }
@@ -460,47 +571,6 @@ private fun JBMText(node: ASTNode, modifier: Modifier) {
             ).firstOrNull()?.let { annotation ->
                 scope.launch {
                     ActionChannel.send(Action.LinkInfo(annotation.item))
-                }
-
-                return@handler true
-            }
-
-            annotatedText.getStringAnnotations(
-                tag = Annotations.UserMention.tag,
-                start = offset,
-                end = offset
-            ).firstOrNull()?.let { annotation ->
-                scope.launch {
-                    ActionChannel.send(
-                        Action.OpenUserSheet(
-                            annotation.item,
-                            mdState.currentServer
-                        )
-                    )
-                }
-
-                return@handler true
-            }
-
-            annotatedText.getStringAnnotations(
-                tag = Annotations.ChannelMention.tag,
-                start = offset,
-                end = offset
-            ).firstOrNull()?.let { annotation ->
-                scope.launch {
-                    ActionChannel.send(Action.SwitchChannel(annotation.item))
-                }
-
-                return@handler true
-            }
-
-            annotatedText.getStringAnnotations(
-                tag = Annotations.CustomEmote.tag,
-                start = offset,
-                end = offset
-            ).firstOrNull()?.let { annotation ->
-                scope.launch {
-                    ActionChannel.send(Action.EmoteInfo(annotation.item))
                 }
 
                 return@handler true
