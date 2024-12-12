@@ -877,7 +877,32 @@ private fun JBMBlock(node: ASTNode, modifier: Modifier, nestingCounter: Int = 0)
         }
 
         MarkdownElementTypes.CODE_FENCE -> {
-            JBMCodeBlockContent(node, modifier)
+            if (LocalJBMarkdownTreeState.current.singleLine) {
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(fontFamily = FragmentMono)) {
+                            val codeFenceLanguage =
+                                node.children.firstOrNull { it.type == MarkdownTokenTypes.FENCE_LANG }
+                                    ?.getTextInNode(state.sourceText)?.toString()
+                            val languageName = languageDisplayNamedResource[
+                                languageAliases[codeFenceLanguage]
+                                    ?: SyntaxLanguage.getByName(codeFenceLanguage ?: "")
+                            ]?.let {
+                                stringResource(it)
+                            }
+
+                            append(languageName?.let {
+                                stringResource(R.string.programming_language_snippet, it)
+                            } ?: stringResource(R.string.programming_language_snippet_default))
+                        }
+                    },
+                    maxLines = if (state.singleLine) 1 else Int.MAX_VALUE,
+                    overflow = if (state.singleLine) TextOverflow.Ellipsis else TextOverflow.Clip,
+                    modifier = modifier
+                )
+            } else {
+                JBMCodeBlockContent(node, modifier)
+            }
         }
 
         MarkdownElementTypes.BLOCK_QUOTE -> {

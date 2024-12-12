@@ -308,6 +308,10 @@
     <string name="programming_language_go" translatable="false">Go</string>
     <string name="programming_language_php" translatable="false">PHP</string>
 
+    <!-- Used to describe a snippet of code in a specific programming language -->
+    <string name="programming_language_snippet">[%1$s snippet]</string>
+    <string name="programming_language_snippet_default">[Code snippet]</string>
+
     <string name="server_flag_official">Official Server</string>
     <string name="server_flag_verified">Verified Server</string>
 
