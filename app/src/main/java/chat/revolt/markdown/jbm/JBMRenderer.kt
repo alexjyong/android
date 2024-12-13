@@ -41,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -103,6 +104,8 @@ enum class JBMAnnotations(val tag: String, val clickable: Boolean) {
     Timestamp("Timestamp", false),
     Checkbox("Checkbox", false),
     UserAvatar("UserAvatar", true),
+    JBMBackgroundRoundingStart("JBMBackgroundRoundingStart", false),
+    JBMBackgroundRoundingEnd("JBMBackgroundRoundingEnd", false),
 }
 
 object JBMRegularExpressions {
@@ -208,11 +211,11 @@ private fun annotateText(
                             ?: RevoltAPI.userCache[userId]?.username
                             ?: "<@$userId>"
 
-                        append(" ")
+                        appendInlineContent(JBMAnnotations.JBMBackgroundRoundingStart.tag)
                         appendInlineContent(JBMAnnotations.UserAvatar.tag, userId)
                         append(" ")
                         append(mentionDisplay)
-                        append(" ")
+                        appendInlineContent(JBMAnnotations.JBMBackgroundRoundingEnd.tag)
 
                         pop()
                         pop()
@@ -719,6 +722,74 @@ private fun JBMText(node: ASTNode, modifier: Modifier) {
                                 modifier = Modifier.aspectRatio(1f, true)
                             )
                         }
+                    }
+                }
+            },
+            JBMAnnotations.JBMBackgroundRoundingStart.tag to with(LocalDensity.current) {
+                InlineTextContent(
+                    placeholder = Placeholder(
+                        width = LocalTextStyle.current.fontSize * 0.25,
+                        height = LocalTextStyle.current.fontSize * 1.5,
+                        placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+                    ),
+                ) {
+                    val colour = LocalJBMarkdownTreeState.current.colors.clickableBackground
+                    Canvas(
+                        modifier = Modifier
+                            .width((LocalTextStyle.current.fontSize * 0.25).toDp())
+                            .height((LocalTextStyle.current.fontSize * 1.5).toDp())
+                    ) {
+                        drawPath(
+                            Path().apply {
+                                addRoundRect(
+                                    RoundRect(
+                                        0f,
+                                        0f,
+                                        size.width,
+                                        size.height,
+                                        topLeftCornerRadius = CornerRadius(size.width),
+                                        topRightCornerRadius = CornerRadius(0f),
+                                        bottomLeftCornerRadius = CornerRadius(size.width),
+                                        bottomRightCornerRadius = CornerRadius(0f)
+                                    )
+                                )
+                            },
+                            color = colour
+                        )
+                    }
+                }
+            },
+            JBMAnnotations.JBMBackgroundRoundingEnd.tag to with(LocalDensity.current) {
+                InlineTextContent(
+                    placeholder = Placeholder(
+                        width = LocalTextStyle.current.fontSize * 0.25,
+                        height = LocalTextStyle.current.fontSize * 1.5,
+                        placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+                    ),
+                ) {
+                    val colour = LocalJBMarkdownTreeState.current.colors.clickableBackground
+                    Canvas(
+                        modifier = Modifier
+                            .width((LocalTextStyle.current.fontSize * 0.25).toDp())
+                            .height((LocalTextStyle.current.fontSize * 1.5).toDp())
+                    ) {
+                        drawPath(
+                            Path().apply {
+                                addRoundRect(
+                                    RoundRect(
+                                        0f,
+                                        0f,
+                                        size.width,
+                                        size.height,
+                                        topLeftCornerRadius = CornerRadius(0f),
+                                        topRightCornerRadius = CornerRadius(size.width),
+                                        bottomLeftCornerRadius = CornerRadius(0f),
+                                        bottomRightCornerRadius = CornerRadius(size.width)
+                                    )
+                                )
+                            },
+                            color = colour
+                        )
                     }
                 }
             }
