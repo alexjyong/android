@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -34,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
@@ -74,6 +76,7 @@ import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
 import chat.revolt.components.generic.RemoteImage
+import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.markdown.Annotations
 import chat.revolt.components.utils.detectTapGesturesConditionalConsume
 import chat.revolt.ui.theme.FragmentMono
@@ -98,13 +101,11 @@ enum class JBMAnnotations(val tag: String, val clickable: Boolean) {
     ChannelMention("ChannelMention", true),
     CustomEmote("CustomEmote", true),
     Timestamp("Timestamp", false),
-    Checkbox("Checkbox", false)
+    Checkbox("Checkbox", false),
+    UserAvatar("UserAvatar", true),
 }
 
 object JBMRegularExpressions {
-    val Mention = Regex("<@([0-9A-Z]{26})>")
-    val Channel = Regex("<#([0-9A-Z]{26})>")
-    val CustomEmote = Regex(":([0-9A-Z]{26}):")
     val Timestamp = Regex("<t:([0-9]+?)(:[tTDfFR])?>")
 }
 
@@ -129,6 +130,8 @@ data class JBMarkdownTreeState(
 
 val LocalJBMarkdownTreeState =
     compositionLocalOf(structuralEqualityPolicy()) { JBMarkdownTreeState() }
+
+val avatarPadding = 2.dp
 
 @Composable
 @JBM
@@ -187,7 +190,6 @@ private fun annotateText(
                             append(annotateText(state, child))
                         }
                     } else {
-                        // Now we're getting somewhere
                         pushStringAnnotation(
                             tag = JBMAnnotations.UserMention.tag,
                             annotation = userId
@@ -198,13 +200,20 @@ private fun annotateText(
                                 background = state.colors.clickableBackground
                             )
                         )
+
                         val member = state.currentServer?.let { serverId ->
                             RevoltAPI.members.getMember(serverId, userId)
                         }
-                        val mentionDisplay = member?.nickname?.let { nick -> "@$nick" }
-                            ?: RevoltAPI.userCache[userId]?.username?.let { username -> "@$username" }
+                        val mentionDisplay = member?.nickname
+                            ?: RevoltAPI.userCache[userId]?.username
                             ?: "<@$userId>"
+
+                        append(" ")
+                        appendInlineContent(JBMAnnotations.UserAvatar.tag, userId)
+                        append(" ")
                         append(mentionDisplay)
+                        append(" ")
+
                         pop()
                         pop()
                     }
@@ -219,7 +228,6 @@ private fun annotateText(
                             append(annotateText(state, child))
                         }
                     } else {
-                        // Now we're getting somewhere
                         pushStringAnnotation(
                             tag = JBMAnnotations.ChannelMention.tag,
                             annotation = channelId
@@ -248,7 +256,6 @@ private fun annotateText(
                             append(annotateText(state, child))
                         }
                     } else {
-                        // Now we're getting somewhere
                         pushStringAnnotation(
                             tag = JBMAnnotations.CustomEmote.tag,
                             annotation = emoteId
@@ -671,6 +678,47 @@ private fun JBMText(node: ASTNode, modifier: Modifier) {
                                 .width((LocalTextStyle.current.fontSize * 1.5).toDp())
                                 .height((LocalTextStyle.current.fontSize * 1.5).toDp())
                         )
+                    }
+                }
+            },
+            JBMAnnotations.UserAvatar.tag to with(LocalDensity.current) {
+                val placeholderBaseWidth =
+                    (LocalTextStyle.current.fontSize * 1.5).toPx() - (avatarPadding * 2).toPx()
+                val widthTolerancePx =
+                    2 // Else we get a gap of about 1-2 pixels due to rounding errors
+                val placeholderBaseHeight = (LocalTextStyle.current.fontSize * 1.5).toPx()
+                val heightTolerancePx = 2 // Dito
+
+                InlineTextContent(
+                    placeholder = Placeholder(
+                        width = (placeholderBaseWidth - widthTolerancePx).toSp(),
+                        height = (placeholderBaseHeight - heightTolerancePx).toSp(),
+                        placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+                    ),
+                ) { id ->
+                    val user = RevoltAPI.userCache[id]
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .background(LocalJBMarkdownTreeState.current.colors.clickableBackground)
+                            .padding(vertical = avatarPadding)
+                    ) {
+                        if (user == null) {
+                            UserAvatar(
+                                username = stringResource(R.string.unknown),
+                                userId = id,
+                                size = (LocalTextStyle.current.fontSize * 1.5).toDp() - (avatarPadding * 2),
+                                modifier = Modifier.aspectRatio(1f, true)
+                            )
+                        } else {
+                            UserAvatar(
+                                username = user.username ?: "",
+                                avatar = user.avatar,
+                                userId = user.id ?: "",
+                                size = (LocalTextStyle.current.fontSize * 1.5).toDp() - (avatarPadding * 2),
+                                modifier = Modifier.aspectRatio(1f, true)
+                            )
+                        }
                     }
                 }
             }
