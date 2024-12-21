@@ -91,6 +91,7 @@ fun UserAvatar(
     size: Dp = 40.dp,
     presenceSize: Dp = 16.dp,
     shape: Shape = RoundedCornerShape(LoadedSettings.avatarRadius),
+    allowAnimation: Boolean = false,
     onLongClick: (() -> Unit)? = null,
     onClick: (() -> Unit)? = null
 ) {
@@ -104,6 +105,7 @@ fun UserAvatar(
                 url = rawUrl ?: "$REVOLT_FILES/avatars/${avatar.id}",
                 contentScale = ContentScale.Crop,
                 description = stringResource(id = R.string.avatar_alt, username),
+                allowAnimation = allowAnimation,
                 modifier = Modifier
                     .clip(shape)
                     .size(size)
@@ -123,6 +125,7 @@ fun UserAvatar(
             RemoteImage(
                 url = "$REVOLT_BASE/users/${userId.ifBlank { "0".repeat(26) }}/default_avatar",
                 description = stringResource(id = R.string.avatar_alt, username),
+                allowAnimation = allowAnimation,
                 modifier = Modifier
                     .clip(shape)
                     .size(size)

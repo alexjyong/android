@@ -21,17 +21,18 @@ fun RemoteImage(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
     width: Int = 0,
-    height: Int = 0
+    height: Int = 0,
+    allowAnimation: Boolean = true
 ) {
     val context = LocalContext.current
 
     fun pxAsDp(px: Int): Dp {
         return (
-            px / (
-                context.resources
-                    .displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT
-                )
-            ).dp
+                px / (
+                        context.resources
+                            .displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT
+                        )
+                ).dp
     }
 
     GlideImage(
@@ -41,6 +42,9 @@ fun RemoteImage(
         modifier = modifier
             .width(pxAsDp(width))
             .height(pxAsDp(height)),
-        transition = CrossFade
+        transition = CrossFade,
+        requestBuilderTransform = { rb ->
+            if (!allowAnimation) rb.dontAnimate() else rb
+        }
     )
 }
