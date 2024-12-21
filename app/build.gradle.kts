@@ -301,6 +301,9 @@ dependencies {
     debugImplementation("com.github.chuckerteam.chucker:library:4.0.0")
     releaseImplementation("com.github.chuckerteam.chucker:library-no-op:4.0.0")
 
+    // Square Logcat
+    implementation("com.squareup.logcat:logcat:0.1")
+
     // Testing
     androidTestImplementation("androidx.test:runner:$androidXTestVersion")
     androidTestImplementation("androidx.test:rules:$androidXTestVersion")
