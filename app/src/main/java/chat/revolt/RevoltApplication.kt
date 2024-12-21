@@ -12,9 +12,13 @@ class RevoltApplication : Application() {
         lateinit var instance: RevoltApplication
     }
 
+    override fun onCreate() {
+        super.onCreate()
+        AndroidLogcatLogger.installOnDebuggableApp(this, minPriority = LogPriority.VERBOSE)
+    }
+
     init {
         instance = this
         DynamicColors.applyToActivitiesIfAvailable(this)
-        AndroidLogcatLogger.installOnDebuggableApp(this, minPriority = LogPriority.VERBOSE)
     }
 }
