@@ -33,6 +33,11 @@
     <string name="service_health_alert_actions_default">Learn more</string>
     <string name="service_health_alert_actions_dismiss">Dismiss</string>
 
+    <string name="could_not_log_in_heading">There was a problem logging you in</string>
+    <string name="could_not_log_in_body">You might have logged out from another device, or your internet connection might be down.</string>
+    <string name="could_not_log_in_cta_try_again">Try again</string>
+    <string name="could_not_log_in_cta_logout">Log out</string>
+
     <string name="login_heading">Let\'s log you in</string>
     <string name="password_forgot">Forgot password?</string>
     <string name="resend_verification">Resend a verification email</string>
