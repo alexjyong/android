@@ -101,7 +101,7 @@ fun UserAvatar(
     ) {
         if (avatar != null) {
             RemoteImage(
-                url = rawUrl ?: "$REVOLT_FILES/avatars/${avatar.id}/user.png?max_side=256",
+                url = rawUrl ?: "$REVOLT_FILES/avatars/${avatar.id}",
                 contentScale = ContentScale.Crop,
                 description = stringResource(id = R.string.avatar_alt, username),
                 modifier = Modifier
@@ -164,7 +164,7 @@ fun GroupIcon(
     ) {
         if (icon?.id != null) {
             RemoteImage(
-                url = rawUrl ?: "$REVOLT_FILES/icons/${icon.id}/group.png",
+                url = rawUrl ?: "$REVOLT_FILES/icons/${icon.id}",
                 contentScale = ContentScale.Crop,
                 description = stringResource(id = R.string.avatar_alt, name),
                 modifier = Modifier

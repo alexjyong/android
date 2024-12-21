@@ -105,7 +105,7 @@ fun ReactionInfoSheet(messageId: String, emoji: String, onDismiss: () -> Unit) {
                             if (emoji.isUlid()) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     RemoteImage(
-                                        url = "$REVOLT_FILES/emojis/${emoji}/emoji.gif",
+                                        url = "$REVOLT_FILES/emojis/${emoji}",
                                         description = null,
                                         modifier = Modifier.size(16.dp)
                                     )
@@ -214,7 +214,7 @@ fun ReactionInfoSheet(messageId: String, emoji: String, onDismiss: () -> Unit) {
                         if (current.isUlid()) {
                             val cached = extendedEmojiInfo.find { it.id == current }
                             RemoteImage(
-                                url = "$REVOLT_FILES/emojis/$current/emoji.gif",
+                                url = "$REVOLT_FILES/emojis/$current",
                                 description = cached?.name,
                                 contentScale = ContentScale.Fit,
                                 modifier = Modifier

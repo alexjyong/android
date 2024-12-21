@@ -132,7 +132,7 @@ fun authorAvatarUrl(message: MessageSchema): String? {
     val member = message.author?.let { RevoltAPI.members.getMember(serverId, it) }
         ?: return null
 
-    return member.avatar?.let { "$REVOLT_FILES/avatars/${it.id}?max_side=256" }
+    return member.avatar?.let { "$REVOLT_FILES/avatars/${it.id}" }
 }
 
 fun viewUrlInBrowser(ctx: android.content.Context, url: String) {

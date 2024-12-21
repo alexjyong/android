@@ -43,7 +43,7 @@ fun StackedUserAvatars(users: List<String>, amount: Int = 3, serverId: String?) 
                 userId = userId,
                 username = user?.let { User.resolveDefaultName(it) }
                     ?: stringResource(id = R.string.unknown),
-                rawUrl = maybeMember?.avatar?.let { "$REVOLT_FILES/avatars/${it.id}?max_side=256" },
+                rawUrl = maybeMember?.avatar?.let { "$REVOLT_FILES/avatars/${it.id}" },
                 size = 16.dp,
                 modifier = Modifier
                     .offset(

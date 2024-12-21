@@ -51,7 +51,7 @@ fun ServerOverview(server: Server) {
             )
 
             RemoteImage(
-                url = "$REVOLT_FILES/banners/${it.id}",
+                url = "$REVOLT_FILES/banners/${it.id}/${it.filename}",
                 description = null,
                 modifier = Modifier
                     .height(166.dp)
@@ -80,7 +80,7 @@ fun ServerOverview(server: Server) {
         ) {
             server.icon?.let {
                 RemoteImage(
-                    url = "$REVOLT_FILES/icons/${it.id}/server.png?max_side=256",
+                    url = "$REVOLT_FILES/icons/${it.id}",
                     description = null,
                     modifier = Modifier
                         .clip(CircleShape)

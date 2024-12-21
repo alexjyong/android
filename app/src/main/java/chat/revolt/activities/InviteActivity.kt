@@ -181,7 +181,7 @@ fun InviteScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         GlideImage(
-                            model = "$REVOLT_FILES/banners/${invite?.serverBanner?.id}",
+                            model = "$REVOLT_FILES/banners/${invite?.serverBanner?.id}/${invite?.serverBanner?.filename}",
                             contentScale = ContentScale.Crop,
                             contentDescription = null,
                             modifier = Modifier
@@ -206,7 +206,7 @@ fun InviteScreen(
                         ) {
                             if (invite?.serverIcon != null) {
                                 RemoteImage(
-                                    url = "$REVOLT_FILES/icons/${invite.serverIcon.id}?max_side=256",
+                                    url = "$REVOLT_FILES/icons/${invite.serverIcon.id}/${invite.serverIcon.filename}",
                                     description = viewModel.inviteResult?.value?.serverName
                                         ?: stringResource(id = R.string.unknown),
                                     modifier = Modifier

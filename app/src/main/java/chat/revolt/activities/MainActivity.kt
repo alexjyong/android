@@ -205,7 +205,6 @@ class MainActivityViewModel @Inject constructor(
 
                 try {
                     Log.d("MainActivity", "Onboarding state is complete, logging in")
-                    throw Exception("Test")
                     RevoltAPI.loginAs(token)
                     RevoltAPI.setSessionId(id)
                     startWithDestination("chat")

@@ -74,7 +74,7 @@ fun MemberListItem(
                     ?: user?.id
                     ?: userId,
                 avatar = user?.avatar,
-                rawUrl = member?.avatar?.let { "$REVOLT_FILES/avatars/${it.id}?max_side=256" },
+                rawUrl = member?.avatar?.let { "$REVOLT_FILES/avatars/${it.id}" },
                 userId = userId,
                 presence = presenceFromStatus(
                     user?.status?.presence,

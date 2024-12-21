@@ -74,7 +74,7 @@ fun Reaction(
         CompositionLocalProvider(LocalContentColor provides foreground) {
             if (emoji.isUlid()) {
                 RemoteImage(
-                    url = "$REVOLT_FILES/emojis/${emoji}/emoji.gif",
+                    url = "$REVOLT_FILES/emojis/${emoji}",
                     description = null,
                     modifier = Modifier.size(16.dp)
                 )

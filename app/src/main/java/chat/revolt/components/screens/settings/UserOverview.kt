@@ -116,7 +116,7 @@ fun RawUserOverview(
         if (background != null) {
             RemoteImage(
                 url = backgroundUrl
-                    ?: "$REVOLT_FILES/backgrounds/${if (background is AutumnResource) background.id else null}",
+                    ?: "$REVOLT_FILES/backgrounds/${if (background is AutumnResource) background.id else null}/${if (background is AutumnResource) background.filename else background}",
                 description = null,
                 modifier = Modifier
                     .height(128.dp)

@@ -434,7 +434,7 @@ fun MarkdownText(textNode: AstNode, modifier: Modifier = Modifier) {
                 } else {
                     with(LocalDensity.current) {
                         RemoteImage(
-                            url = "$REVOLT_FILES/emojis/${id}/emoji.gif",
+                            url = "$REVOLT_FILES/emojis/${id}",
                             description = emote.name,
                             contentScale = ContentScale.Fit,
                             modifier = Modifier

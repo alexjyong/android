@@ -255,7 +255,7 @@ fun NativeMessageField(
                                         userId = item.user.id ?: "",
                                         avatar = item.user.avatar,
                                         rawUrl = item.member?.avatar?.id?.let {
-                                            "$REVOLT_FILES/avatars/$it?max_side=64"
+                                            "$REVOLT_FILES/avatars/$it"
                                         },
                                         size = SuggestionChipDefaults.IconSize,
                                     )
@@ -317,7 +317,7 @@ fun NativeMessageField(
                                         )
                                     } else {
                                         RemoteImage(
-                                            url = "$REVOLT_FILES/emojis/${item.custom?.id}/emoji.gif",
+                                            url = "$REVOLT_FILES/emojis/${item.custom?.id}",
                                             description = null,
                                             contentScale = ContentScale.Fit,
                                             modifier = Modifier
