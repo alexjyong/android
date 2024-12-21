@@ -343,6 +343,7 @@ fun ChannelSideDrawer(
                         if (icon != null) {
                             RemoteImage(
                                 url = icon,
+                                allowAnimation = false,
                                 modifier = Modifier
                                     .size(48.dp)
                                     .clip(CircleShape),

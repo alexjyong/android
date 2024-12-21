@@ -207,6 +207,7 @@ fun InviteScreen(
                             if (invite?.serverIcon != null) {
                                 RemoteImage(
                                     url = "$REVOLT_FILES/icons/${invite.serverIcon.id}/${invite.serverIcon.filename}",
+                                    allowAnimation = false,
                                     description = viewModel.inviteResult?.value?.serverName
                                         ?: stringResource(id = R.string.unknown),
                                     modifier = Modifier

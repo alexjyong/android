@@ -71,6 +71,7 @@ fun ChannelSheetHeader(
                     contentScale = ContentScale.Crop,
                     height = 48,
                     width = 48,
+                    allowAnimation = false,
                     modifier = Modifier
                         .size(48.dp)
                 )

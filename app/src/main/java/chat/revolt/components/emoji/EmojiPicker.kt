@@ -405,6 +405,7 @@ fun EmojiPicker(
                         } else {
                             RemoteImage(
                                 url = "$REVOLT_FILES/icons/${server.icon.id}",
+                                allowAnimation = false,
                                 description = server.name,
                                 modifier = Modifier
                                     .clip(CircleShape)

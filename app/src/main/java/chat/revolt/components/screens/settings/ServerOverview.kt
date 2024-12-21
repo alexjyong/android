@@ -82,6 +82,7 @@ fun ServerOverview(server: Server) {
                 RemoteImage(
                     url = "$REVOLT_FILES/icons/${it.id}",
                     description = null,
+                    allowAnimation = false,
                     modifier = Modifier
                         .clip(CircleShape)
                         .height(48.dp)
