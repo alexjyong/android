@@ -357,7 +357,8 @@ private fun annotateText(
                 }
 
                 MarkdownElementTypes.PARAGRAPH,
-                MarkdownElementTypes.HTML_BLOCK -> {
+                MarkdownElementTypes.HTML_BLOCK,
+                MarkdownTokenTypes.HTML_TAG -> {
                     for (child in node.children) {
                         append(annotateText(state, child))
                     }
