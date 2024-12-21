@@ -25,7 +25,7 @@ class ChannelMentionParser : SequentialParser {
                     result.withNode(
                         SequentialParser.Node(
                             start..iterator.index + 1,
-                            RSMElementTypes.USER_MENTION
+                            RSMElementTypes.CHANNEL_MENTION
                         )
                     )
                 }

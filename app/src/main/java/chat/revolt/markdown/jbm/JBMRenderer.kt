@@ -89,6 +89,7 @@ import dev.snipme.highlights.model.ColorHighlight
 import dev.snipme.highlights.model.SyntaxLanguage
 import dev.snipme.highlights.model.SyntaxThemes
 import kotlinx.coroutines.launch
+import logcat.logcat
 import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.ASTNode
@@ -241,10 +242,15 @@ private fun annotateText(
                                 background = state.colors.clickableBackground
                             )
                         )
+
                         val channel = RevoltAPI.channelCache[channelId]
                         val mentionDisplay = channel?.name?.let { name -> "#$name" }
                             ?: "<#$channelId>"
+
+                        appendInlineContent(JBMAnnotations.JBMBackgroundRoundingStart.tag)
                         append(mentionDisplay)
+                        appendInlineContent(JBMAnnotations.JBMBackgroundRoundingEnd.tag)
+
                         pop()
                         pop()
                     }
