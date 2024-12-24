@@ -1,0 +1,16 @@
+{
+  "uniqueId": "me.rsms.inter:inter:0.0.0",
+  "developers": [
+    {
+      "name": "Rasmus Andersson",
+      "organisationUrl": "https://rsms.me/"
+    }
+  ],
+  "artifactVersion": "0.0.0",
+  "description": "Inter is a typeface specially designed for user interfaces with focus on high legibility of small-to-medium sized text on computer screens.",
+  "name": "Inter Font Family",
+  "website": "https://rsms.me/inter/",
+  "licenses": [
+    "OFL"
+  ]
+}

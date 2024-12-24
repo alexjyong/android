@@ -1,3 +1,4 @@
+import com.mikepenz.aboutlibraries.plugin.StrictMode
 import io.sentry.android.gradle.instrumentation.logcat.LogcatLevel
 import java.io.FileInputStream
 import java.util.Properties
@@ -27,7 +28,7 @@ val glideVersion = "4.16.0"
 val ktorVersion = "3.0.0-beta-2"
 val media3Version = "1.5.0"
 val livekitVersion = "2.2.0"
-val material3Version = "1.4.0-alpha03"
+val material3Version = "1.4.0-alpha05"
 val androidXTestVersion = "1.6.1"
 
 fun property(fileName: String, propertyName: String, fallbackEnv: String? = null): String? {
@@ -308,6 +309,14 @@ dependencies {
     androidTestImplementation("androidx.test:runner:$androidXTestVersion")
     androidTestImplementation("androidx.test:rules:$androidXTestVersion")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+}
+
+aboutLibraries {
+    additionalLicenses += listOf("ofl")
+    includePlatform = true
+    strictMode = StrictMode.FAIL
+    allowedLicenses += listOf("Apache-2.0", "OFL", "MIT", "ASDKL", "BSD-2-Clause")
+    configPath = "compliance"
 }
 
 sqldelight {
