@@ -1,5 +1,6 @@
 package chat.revolt.api.routes.microservices.autumn
 
+import chat.revolt.api.HitRateLimitException
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltHttp
@@ -67,7 +68,7 @@ suspend fun uploadToAutumn(
             throw Exception(error.type)
         } catch (e: Exception) {
             if (response.status == HttpStatusCode.TooManyRequests) {
-                throw Exception("Rate limited")
+                throw HitRateLimitException()
             }
             if (response.status == HttpStatusCode.PayloadTooLarge) {
                 throw Exception("File too large")
