@@ -714,5 +714,5 @@
 
     <string name="keyboard_shortcut_messaging">Messaging</string>
     <string name="keyboard_shortcut_messaging_new_line">New Line</string>
-    <string name="keyboard_shortcut_messaging_send_message">Send a Message</string>
+    <string name="keyboard_shortcut_messaging_send_message">Send Message</string>
 </resources>
