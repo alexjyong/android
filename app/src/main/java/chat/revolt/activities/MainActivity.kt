@@ -6,6 +6,10 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
+import android.view.KeyboardShortcutGroup
+import android.view.KeyboardShortcutInfo
+import android.view.Menu
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -325,6 +329,30 @@ class MainActivity : AppCompatActivity() {
                 viewModel::updateNextDestination
             )
         }
+    }
+
+    override fun onProvideKeyboardShortcuts(
+        data: MutableList<KeyboardShortcutGroup>?,
+        menu: Menu?,
+        deviceId: Int
+    ) {
+        val messaging = KeyboardShortcutGroup(
+            getString(R.string.keyboard_shortcut_messaging),
+            listOf(
+                KeyboardShortcutInfo(
+                    getString(R.string.keyboard_shortcut_messaging_new_line),
+                    KeyEvent.KEYCODE_ENTER,
+                    0
+                ),
+                KeyboardShortcutInfo(
+                    getString(R.string.keyboard_shortcut_messaging_send_message),
+                    KeyEvent.KEYCODE_ENTER,
+                    KeyEvent.META_CTRL_ON
+                )
+            )
+        )
+
+        data?.add(messaging)
     }
 
     companion object {

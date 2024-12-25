@@ -711,4 +711,8 @@
     <string name="notification_channel_group_social">Friends and Social</string>
     <string name="notification_channel_friend_requests">Friend Requests</string>
     <string name="notification_channel_friend_requests_description">Incoming friend requests, as well as accepted requests you\'ve sent.</string>
+
+    <string name="keyboard_shortcut_messaging">Messaging</string>
+    <string name="keyboard_shortcut_messaging_new_line">New Line</string>
+    <string name="keyboard_shortcut_messaging_send_message">Send a Message</string>
 </resources>
