@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.util.DisplayMetrics
 import android.util.Log
+import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputMethodManager
@@ -429,6 +430,19 @@ fun NativeMessageField(
                                         )
                                     )
                                 }
+                            }
+                        }
+
+                        override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
+                            return when (keyCode) {
+                                KeyEvent.KEYCODE_ENTER -> {
+                                    if (event.isCtrlPressed && sendButtonVisible) {
+                                        onSendMessage()
+                                        true
+                                    } else super.onKeyUp(keyCode, event)
+                                }
+
+                                else -> super.onKeyUp(keyCode, event)
                             }
                         }
                     }.apply {
