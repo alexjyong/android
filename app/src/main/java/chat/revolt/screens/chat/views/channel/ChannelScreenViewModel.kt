@@ -872,4 +872,20 @@ class ChannelScreenViewModel @Inject constructor(
             items.addAll(groupedItems)
         }
     }
+
+    var showPhysicalKeyboardSpark by mutableStateOf(false)
+    fun usesPhysicalKeyboard() {
+        viewModelScope.launch {
+            if (kvStorage.getBoolean("spark/physicalKeyboard/dismissed") != true) {
+                showPhysicalKeyboardSpark = true
+            }
+        }
+    }
+    
+    fun dismissPhysicalKeyboardSpark() {
+        viewModelScope.launch {
+            kvStorage.set("spark/physicalKeyboard/dismissed", true)
+            showPhysicalKeyboardSpark = false
+        }
+    }
 }

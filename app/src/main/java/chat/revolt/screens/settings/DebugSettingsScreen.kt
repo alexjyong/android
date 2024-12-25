@@ -18,6 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -66,8 +67,13 @@ class DebugSettingsScreenViewModel @Inject constructor(
     private val kvStorage: KVStorage
 ) : ViewModel() {
     fun forgetAllSparks() {
-        // No op because there are no active sparks
-        // psst, notifications will be the next one
+        forgetPhysicalKeyboardSpark()
+    }
+
+    fun forgetPhysicalKeyboardSpark() {
+        viewModelScope.launch {
+            kvStorage.remove("spark/physicalKeyboard/dismissed")
+        }
     }
 
     fun forgetLatestChangelog() {
@@ -209,10 +215,11 @@ fun DebugSettingsScreen(
                 Row(
                     modifier = Modifier.horizontalScroll(rememberScrollState())
                 ) {
-
-                    Text("There are no active sparks, but you can still try to ")
-                    ElevatedButton(onClick = { viewModel.forgetAllSparks() }) {
-                        Text("forget all sparks")
+                    ElevatedButton(onClick = { viewModel.forgetPhysicalKeyboardSpark() }) {
+                        Text("Forget physical keyboard spark")
+                    }
+                    Button(onClick = { viewModel.forgetAllSparks() }) {
+                        Text("Forget all sparks")
                     }
                 }
 

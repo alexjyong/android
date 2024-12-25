@@ -1,6 +1,8 @@
 package chat.revolt.screens.chat.views.channel
 
+import android.app.Activity
 import android.content.ContentValues
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
@@ -20,6 +22,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,12 +47,16 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -63,6 +70,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -84,11 +92,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.documentfile.provider.DocumentFile
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -222,6 +235,12 @@ fun ChannelScreen(
             viewModel.updateSaveKeyboardHeight(imeTarget)
         } else {
             imeInTransition = false
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (context.resources.configuration.keyboard and Configuration.KEYBOARD_QWERTY != 0) {
+            viewModel.usesPhysicalKeyboard()
         }
     }
     // </editor-fold>
@@ -829,6 +848,76 @@ fun ChannelScreen(
                                     painter = painterResource(R.drawable.ic_arrow_down_24dp),
                                     contentDescription = stringResource(R.string.scroll_to_bottom)
                                 )
+                            }
+                        }
+
+                        if (viewModel.showPhysicalKeyboardSpark) {
+                            Card(
+                                modifier = Modifier
+                                    .align(Alignment.TopCenter)
+                                    .padding(8.dp)
+                            ) {
+                                Column(
+                                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                                    modifier = Modifier.padding(16.dp)
+                                ) {
+                                    Text(
+                                        stringResource(R.string.spark_keyboard_shortcuts),
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                    Text(
+                                        buildAnnotatedString {
+                                            val raw =
+                                                stringResource(R.string.spark_keyboard_shortcuts_description)
+                                            val before = raw.substringBefore("%1\$s")
+                                            val after = raw.substringAfter("%1\$s")
+
+                                            append(before)
+                                            appendInlineContent("metaKey", "Meta")
+                                            append(" + /")
+                                            append(after)
+                                        },
+                                        inlineContent = mapOf(
+                                            "metaKey" to InlineTextContent(
+                                                placeholder = Placeholder(
+                                                    width = 1.em,
+                                                    height = 1.em,
+                                                    placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+                                                )
+                                            ) {
+                                                with(LocalDensity.current) {
+                                                    Image(
+                                                        painterResource(R.drawable.ic_meta_key_24dp),
+                                                        contentDescription = null,
+                                                        /*modifier = Modifier.size(1.em.toDp())*/
+                                                    )
+                                                }
+                                            }
+                                        ),
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    ) {
+                                        Button(
+                                            onClick = {
+                                                viewModel.dismissPhysicalKeyboardSpark()
+                                            },
+                                            modifier = Modifier.weight(1f)
+                                        ) {
+                                            Text(stringResource(R.string.spark_keyboard_shortcuts_dismiss))
+                                        }
+                                        TextButton(
+                                            onClick = {
+                                                (context as Activity).requestShowKeyboardShortcuts()
+                                            },
+                                            modifier = Modifier.weight(1f)
+                                        ) {
+                                            Text(stringResource(R.string.spark_keyboard_shortcuts_cta))
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

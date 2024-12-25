@@ -577,6 +577,7 @@
     <string name="spark_keyboard_shortcuts">Using a keyboard?</string>
     <string name="spark_keyboard_shortcuts_description">Revolt has keyboard shortcuts! Press %1$s to see them.</string>
     <string name="spark_keyboard_shortcuts_cta">Open shortcuts</string>
+    <string name="spark_keyboard_shortcuts_dismiss">Alright</string>
 
     <string name="notice_platform_mod_dm_title">Important notice regarding your account</string>
     <string name="notice_platform_mod_dm_description">You have received an important notice regarding your account from our moderation team. Please read it carefully.</string>
