@@ -541,13 +541,6 @@
     <string name="colour_picker_cancel">Cancel</string>
     <string name="colour_picker_apply">Apply</string>
 
-    <string name="file_picker_cannot_attach_file_invalid">This file is invalid and cannot be attached.</string>
-    <string name="file_picker_permission_request_header">We need your permission to access photos and videos</string>
-    <string name="file_picker_permission_request_body">You will be able to attach photos and videos to your messages afterwards.</string>
-    <string name="file_picker_permission_request_cta">Allow access</string>
-    <string name="file_picker_permission_unpartialise_request_header">You have granted partial access to photos and videos</string>
-    <string name="file_picker_permission_unpartialise_request_body">To attach all your photos and videos, we need your permission</string>
-    <string name="file_picker_permission_unpartialise_request_cta">Allow full access</string>
     <string name="file_picker_chip_photo_picker">Select Photos</string>
     <string name="file_picker_chip_documents">Files</string>
     <string name="file_picker_chip_camera">Camera</string>
@@ -580,6 +573,10 @@
     <string name="spark_notifications_rationale_description">Enable notifications to be kept up to date with messages and mentions.</string>
     <string name="spark_notifications_rationale_cta">Enable notifications</string>
     <string name="spark_notifications_rationale_dismiss">Not now</string>
+
+    <string name="spark_keyboard_shortcuts">Using a keyboard?</string>
+    <string name="spark_keyboard_shortcuts_description">Revolt has keyboard shortcuts! Press %1$s to see them.</string>
+    <string name="spark_keyboard_shortcuts_cta">Open shortcuts</string>
 
     <string name="notice_platform_mod_dm_title">Important notice regarding your account</string>
     <string name="notice_platform_mod_dm_description">You have received an important notice regarding your account from our moderation team. Please read it carefully.</string>

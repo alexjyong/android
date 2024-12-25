@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imeAnimationTarget
@@ -50,6 +51,8 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -162,6 +165,8 @@ private fun pxAsDp(px: Int): Dp {
             ).dp
 }
 
+private const val NOT_ENOUGH_SPACE_FOR_PANES_THRESHOLD = 500
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ChannelScreen(
@@ -205,6 +210,12 @@ fun ChannelScreen(
         targetValue = if (viewModel.activePane == ChannelScreenActivePane.None && !imeInTransition) navigationBarsInset else viewModel.keyboardHeight,
         label = "keyboardHeight"
     )
+
+    val notEnoughSpaceForPanes by remember {
+        derivedStateOf {
+            viewModel.keyboardHeight < NOT_ENOUGH_SPACE_FOR_PANES_THRESHOLD
+        }
+    }
 
     LaunchedEffect(imeTarget) {
         if (imeTarget > 0) {
@@ -278,6 +289,70 @@ fun ChannelScreen(
                 processFileUri(uri, null)
             }
         }
+    }
+
+    val openCameraCallback = cb@{
+        // Create a new content URI to store the captured image.
+        val contentResolver =
+            context.contentResolver
+        val contentValues = ContentValues().apply {
+            put(
+                MediaStore.MediaColumns.DISPLAY_NAME,
+                "RVL_${System.currentTimeMillis()}.jpg"
+            )
+            put(
+                MediaStore.MediaColumns.MIME_TYPE,
+                "image/jpeg"
+            )
+            put(
+                MediaStore.MediaColumns.RELATIVE_PATH,
+                Environment.DIRECTORY_PICTURES
+            )
+        }
+
+        try {
+            capturedPhotoUri.value =
+                contentResolver.insert(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    contentValues
+                )
+        } catch (e: Exception) {
+            Toast.makeText(
+                context,
+                context.getString(
+                    R.string.file_picker_chip_camera_failed
+                ),
+                Toast.LENGTH_SHORT
+            ).show()
+
+            return@cb
+        }
+
+        try {
+            capturedPhotoUri.value?.let { uri ->
+                pickCameraLauncher.launch(uri)
+            }
+        } catch (e: Exception) {
+            Toast.makeText(
+                context,
+                context.getString(
+                    R.string.file_picker_chip_camera_none_installed
+                ),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    val openDocumentPickerCallback = {
+        pickFileLauncher.launch(arrayOf("*/*"))
+    }
+
+    val openPhotoPickerCallback = {
+        pickMediaLauncher.launch(
+            PickVisualMediaRequest(
+                mediaType = ActivityResultContracts.PickVisualMedia.ImageAndVideo
+            )
+        )
     }
     // </editor-fold>
     // <editor-fold desc="UI elements">
@@ -869,6 +944,53 @@ fun ChannelScreen(
                                         channelId = channelId,
                                         failedValidation = viewModel.draftContent.length > 2000,
                                     )
+
+                                    DropdownMenu(
+                                        expanded = viewModel.activePane == ChannelScreenActivePane.AttachmentPicker && notEnoughSpaceForPanes,
+                                        onDismissRequest = {
+                                            viewModel.activePane = ChannelScreenActivePane.None
+                                        }
+                                    ) {
+                                        DropdownMenuItem(
+                                            leadingIcon = {
+                                                Icon(
+                                                    painter = painterResource(R.drawable.ic_paperclip_24dp),
+                                                    contentDescription = null // Provided by text below
+                                                )
+                                            },
+                                            text = { Text(stringResource(R.string.file_picker_chip_documents)) },
+                                            onClick = {
+                                                openDocumentPickerCallback()
+                                                viewModel.activePane = ChannelScreenActivePane.None
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            leadingIcon = {
+                                                Icon(
+                                                    painter = painterResource(R.drawable.ic_camera_24dp),
+                                                    contentDescription = null // Provided by text below
+                                                )
+                                            },
+                                            text = { Text(stringResource(R.string.file_picker_chip_camera)) },
+                                            onClick = {
+                                                openCameraCallback()
+                                                viewModel.activePane = ChannelScreenActivePane.None
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            leadingIcon = {
+                                                Icon(
+                                                    painter = painterResource(R.drawable.ic_image_multiple_24dp),
+                                                    contentDescription = null // Provided by text below
+                                                )
+                                            },
+                                            text = { Text(stringResource(R.string.file_picker_chip_photo_picker)) },
+                                            onClick = {
+                                                openPhotoPickerCallback()
+                                                viewModel.activePane = ChannelScreenActivePane.None
+                                            }
+                                        )
+                                    }
                                 }
                             } else {
                                 Box(
@@ -893,137 +1015,126 @@ fun ChannelScreen(
                                     .background(MaterialTheme.colorScheme.surfaceContainer)
                             )
                         } else {
-                            Box(
-                                Modifier
-                                    .heightIn(min = pxAsDp(fallbackKeyboardHeight))
-                            ) {
+                            if (!notEnoughSpaceForPanes) {
                                 Box(
-                                    Modifier.then(
-                                        if (emojiSearchFocused) {
-                                            Modifier.requiredHeight(
-                                                pxAsDp(
-                                                    max(
-                                                        imeCurrentInset * 2,
+                                    Modifier
+                                        .heightIn(min = pxAsDp(fallbackKeyboardHeight))
+                                ) {
+                                    Box(
+                                        Modifier.then(
+                                            if (emojiSearchFocused) {
+                                                Modifier.requiredHeight(
+                                                    pxAsDp(
+                                                        max(
+                                                            imeCurrentInset * 2,
+                                                            fallbackKeyboardHeight
+                                                        )
+                                                    )
+                                                )
+                                            } else {
+                                                Modifier.requiredHeight(
+                                                    pxAsDp(
                                                         fallbackKeyboardHeight
                                                     )
                                                 )
-                                            )
-                                        } else {
-                                            Modifier.requiredHeight(pxAsDp(fallbackKeyboardHeight))
-                                        }
-                                    )
-                                ) {
-                                    when (viewModel.activePane) {
-                                        ChannelScreenActivePane.EmojiPicker -> {
-                                            BackHandler(enabled = viewModel.activePane == ChannelScreenActivePane.EmojiPicker) {
-                                                viewModel.activePane = ChannelScreenActivePane.None
+                                            }
+                                        )
+                                    ) {
+                                        when (viewModel.activePane) {
+                                            ChannelScreenActivePane.EmojiPicker -> {
+                                                BackHandler(enabled = viewModel.activePane == ChannelScreenActivePane.EmojiPicker) {
+                                                    viewModel.activePane =
+                                                        ChannelScreenActivePane.None
+                                                }
+
+                                                Column(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                                                        .padding(4.dp)
+                                                        .navigationBarsPadding()
+                                                ) {
+                                                    EmojiPicker(
+                                                        onEmojiSelected = viewModel::putAtCursorPosition,
+                                                        bottomInset = pxAsDp(
+                                                            max(
+                                                                imeCurrentInset - navigationBarsInset,
+                                                                0
+                                                            )
+                                                        ),
+                                                        onSearchFocus = {
+                                                            emojiSearchFocused = it
+                                                        }
+                                                    )
+                                                }
                                             }
 
-                                            Column(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .background(MaterialTheme.colorScheme.surfaceContainer)
-                                                    .padding(4.dp)
-                                                    .navigationBarsPadding()
-                                            ) {
-                                                EmojiPicker(
-                                                    onEmojiSelected = viewModel::putAtCursorPosition,
-                                                    bottomInset = pxAsDp(
-                                                        max(
-                                                            imeCurrentInset - navigationBarsInset,
-                                                            0
-                                                        )
-                                                    ),
-                                                    onSearchFocus = {
-                                                        emojiSearchFocused = it
-                                                    }
+                                            ChannelScreenActivePane.AttachmentPicker -> {
+                                                BackHandler(enabled = viewModel.activePane == ChannelScreenActivePane.AttachmentPicker) {
+                                                    viewModel.activePane =
+                                                        ChannelScreenActivePane.None
+                                                }
+
+                                                MediaPickerGateway(
+                                                    onOpenPhotoPicker = {
+                                                        openPhotoPickerCallback()
+                                                        viewModel.activePane =
+                                                            ChannelScreenActivePane.None
+                                                    },
+                                                    onOpenDocumentPicker = {
+                                                        openDocumentPickerCallback()
+                                                        viewModel.activePane =
+                                                            ChannelScreenActivePane.None
+                                                    },
+                                                    onOpenCamera = {
+                                                        openCameraCallback()
+                                                        viewModel.activePane =
+                                                            ChannelScreenActivePane.None
+                                                    },
                                                 )
                                             }
-                                        }
 
-                                        ChannelScreenActivePane.AttachmentPicker -> {
-                                            BackHandler(enabled = viewModel.activePane == ChannelScreenActivePane.AttachmentPicker) {
-                                                viewModel.activePane = ChannelScreenActivePane.None
+                                            else -> {
+                                                // Do nothing
                                             }
-
-                                            MediaPickerGateway(
-                                                onOpenPhotoPicker = {
-                                                    pickMediaLauncher.launch(
-                                                        PickVisualMediaRequest(
-                                                            mediaType = ActivityResultContracts.PickVisualMedia.ImageAndVideo
-                                                        )
-                                                    )
-                                                    viewModel.activePane =
-                                                        ChannelScreenActivePane.None
-                                                },
-                                                onOpenDocumentPicker = {
-                                                    pickFileLauncher.launch(arrayOf("*/*"))
-                                                    viewModel.activePane =
-                                                        ChannelScreenActivePane.None
-                                                },
-                                                onOpenCamera = {
-                                                    // Create a new content URI to store the captured image.
-                                                    val contentResolver =
-                                                        context.contentResolver
-                                                    val contentValues = ContentValues().apply {
-                                                        put(
-                                                            MediaStore.MediaColumns.DISPLAY_NAME,
-                                                            "RVL_${System.currentTimeMillis()}.jpg"
-                                                        )
-                                                        put(
-                                                            MediaStore.MediaColumns.MIME_TYPE,
-                                                            "image/jpeg"
-                                                        )
-                                                        put(
-                                                            MediaStore.MediaColumns.RELATIVE_PATH,
-                                                            Environment.DIRECTORY_PICTURES
-                                                        )
-                                                    }
-
-                                                    try {
-                                                        capturedPhotoUri.value =
-                                                            contentResolver.insert(
-                                                                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                                                                contentValues
-                                                            )
-                                                    } catch (e: Exception) {
-                                                        Toast.makeText(
-                                                            context,
-                                                            context.getString(
-                                                                R.string.file_picker_chip_camera_failed
-                                                            ),
-                                                            Toast.LENGTH_SHORT
-                                                        ).show()
-
-                                                        return@MediaPickerGateway
-                                                    }
-
-                                                    try {
-                                                        capturedPhotoUri.value?.let { uri ->
-                                                            pickCameraLauncher.launch(uri)
-                                                        }
-                                                    } catch (e: Exception) {
-                                                        Toast.makeText(
-                                                            context,
-                                                            context.getString(
-                                                                R.string.file_picker_chip_camera_none_installed
-                                                            ),
-                                                            Toast.LENGTH_SHORT
-                                                        ).show()
-                                                    }
-
-                                                    viewModel.activePane =
-                                                        ChannelScreenActivePane.None
-                                                },
-                                            )
-                                        }
-
-                                        else -> {
-                                            // Do nothing
                                         }
                                     }
+                                    Box(Modifier.imePadding())
                                 }
-                                Box(Modifier.imePadding())
+                            } else {
+                                if (viewModel.activePane == ChannelScreenActivePane.EmojiPicker) {
+                                    BackHandler(enabled = viewModel.activePane == ChannelScreenActivePane.EmojiPicker) {
+                                        viewModel.activePane =
+                                            ChannelScreenActivePane.None
+                                    }
+
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(600.dp)
+                                            .background(MaterialTheme.colorScheme.surfaceContainer)
+                                            .padding(4.dp)
+                                            .navigationBarsPadding()
+                                    ) {
+                                        EmojiPicker(
+                                            onEmojiSelected = viewModel::putAtCursorPosition,
+                                            bottomInset = pxAsDp(
+                                                max(
+                                                    imeCurrentInset - navigationBarsInset,
+                                                    0
+                                                )
+                                            ),
+                                            onSearchFocus = {
+                                                emojiSearchFocused = it
+                                            }
+                                        )
+                                    }
+                                }
+                                Box(
+                                    Modifier
+                                        .imePadding()
+                                        .navigationBarsPadding()
+                                )
                             }
                         }
                     }
