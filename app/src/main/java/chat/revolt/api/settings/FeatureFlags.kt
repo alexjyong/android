@@ -30,6 +30,19 @@ sealed class MediaConversationsVariates {
     data class Restricted(val predicate: () -> Boolean) : MediaConversationsVariates()
 }
 
+@FeatureFlag("UserCards")
+sealed class UserCardsVariates {
+    @Treatment(
+        "Enable user cards for all users"
+    )
+    object Enabled : UserCardsVariates()
+
+    @Treatment(
+        "Enable user cards for users that meet certain or all criteria (implementation-specific)"
+    )
+    data class Restricted(val predicate: () -> Boolean) : UserCardsVariates()
+}
+
 object FeatureFlags {
     @FeatureFlag("LabsAccessControl")
     var labsAccessControl by mutableStateOf<LabsAccessControlVariates>(
@@ -54,5 +67,18 @@ object FeatureFlags {
         get() = when (mediaConversations) {
             is MediaConversationsVariates.Enabled -> true
             is MediaConversationsVariates.Restricted -> (mediaConversations as MediaConversationsVariates.Restricted).predicate()
+        }
+
+    @FeatureFlag("UserCards")
+    var userCards by mutableStateOf<UserCardsVariates>(
+        UserCardsVariates.Restricted {
+            RevoltAPI.selfId?.endsWith("Z") == true
+        }
+    )
+
+    val userCardsGranted: Boolean
+        get() = when (userCards) {
+            is UserCardsVariates.Enabled -> true
+            is UserCardsVariates.Restricted -> (userCards as UserCardsVariates.Restricted).predicate()
         }
 }

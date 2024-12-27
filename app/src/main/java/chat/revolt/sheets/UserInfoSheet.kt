@@ -45,6 +45,7 @@ import chat.revolt.api.internals.ULID
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.user.fetchUserProfile
 import chat.revolt.api.schemas.Profile
+import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.components.chat.RoleListEntry
 import chat.revolt.components.chat.UserBadgeList
 import chat.revolt.components.chat.UserBadgeRow
@@ -128,16 +129,18 @@ fun UserInfoSheet(
         item(key = "overview", span = StaggeredGridItemSpan.FullLine) {
             Box {
                 RawUserOverview(user, profile, internalPadding = false)
-                SmallFloatingActionButton(
-                    onClick = { showUserCard = true },
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(top = 8.dp, end = 8.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_badge_account_horizontal_24dp),
-                        contentDescription = null
-                    )
+                if (FeatureFlags.userCardsGranted) {
+                    SmallFloatingActionButton(
+                        onClick = { showUserCard = true },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(top = 8.dp, end = 8.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_badge_account_horizontal_24dp),
+                            contentDescription = null
+                        )
+                    }
                 }
             }
         }
