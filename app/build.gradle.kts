@@ -315,7 +315,7 @@ aboutLibraries {
     additionalLicenses += listOf("ofl")
     includePlatform = true
     strictMode = StrictMode.FAIL
-    allowedLicenses += listOf("Apache-2.0", "OFL", "MIT", "ASDKL", "BSD-2-Clause")
+    allowedLicenses += listOf("Apache-2.0", "OFL", "MIT", "ASDKL", "BSD-2-Clause", "cmark")
     configPath = "compliance"
 }
 
