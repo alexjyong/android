@@ -18,3 +18,4 @@ local.properties
 revoltbuild.properties
 sentry.properties
 /.kotlin/sessions
+app/src/main/assets/embedded

@@ -78,7 +78,11 @@ import { Tabs, TabItem, Steps } from "@astrojs/starlight/components"
 
     </Tabs>
 
-3.  Clone the repository.
+3.  Download [Deno](https://deno.com).
+
+    _Please see the [Deno Runtime Manual](https://docs.deno.com/runtime/getting_started/installation/) for installation guidance._
+
+4.  Clone the repository.
 
     ```sh
     git clone --recursive https://github.com/revoltchat/android.git
@@ -86,16 +90,22 @@ import { Tabs, TabItem, Steps } from "@astrojs/starlight/components"
 
     Specify `--recursive` to ensure that submodules are cloned as well.
 
-4.  Open the project in Android Studio.
+5.  Open the project in Android Studio.
 
-5.  Install the required dependencies.
+6.  Install the required dependencies.
 
     -   Android SDK, latest version
     -   Android NDK, latest version
 
     You can install these from the SDK Manager in Android Studio.
 
-6.  Copy the `revoltbuild.properties.example` file to `revoltbuild.properties` and fill in the required values.
+7.  Download required additional, embedded dependencies using the provided script.
+
+    ```sh
+    deno run -A scripts/download_deps.ts
+    ```
+
+8.  Copy the `revoltbuild.properties.example` file to `revoltbuild.properties` and fill in the required values.
 
     ```sh
     cp revoltbuild.properties.example revoltbuild.properties
@@ -110,7 +120,7 @@ import { Tabs, TabItem, Steps } from "@astrojs/starlight/components"
     | `build.debug.app_name`   | The name of the app in debug builds, arbitrary |
     | `build.flavour_id`       | Leave as `ZZUU`                                |
 
-7.  Copy the `sentry.properties.example` file to `sentry.properties` and fill in the required values.
+9.  Copy the `sentry.properties.example` file to `sentry.properties` and fill in the required values.
 
     ```sh
     cp sentry.properties.example sentry.properties
@@ -127,11 +137,11 @@ import { Tabs, TabItem, Steps } from "@astrojs/starlight/components"
 
     You can get these values from the Sentry dashboard.
 
-8.  Build the project.
+10. Build the project.
 
     You can build the project by clicking on the 'Run' button in Android Studio.  
     If asked, build the `:app` module.
 
-9.  **You're all set!** You can now start contributing to Revolt on Android.
+11. **You're all set!** You can now start contributing to Revolt on Android.
 
 </Steps>
