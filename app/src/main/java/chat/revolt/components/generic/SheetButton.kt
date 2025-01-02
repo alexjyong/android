@@ -20,7 +20,8 @@ fun SheetButton(
     modifier: Modifier = Modifier,
     supportingContent: @Composable (() -> Unit)? = null,
     trailingContent: @Composable (() -> Unit)? = null,
-    dangerous: Boolean = false
+    dangerous: Boolean = false,
+    special: Boolean = false
 ) {
     Box(
         modifier = modifier
@@ -33,6 +34,8 @@ fun SheetButton(
                 CompositionLocalProvider(
                     value = if (dangerous) {
                         LocalContentColor provides MaterialTheme.colorScheme.error
+                    } else if (special) {
+                        LocalContentColor provides MaterialTheme.colorScheme.primary
                     } else {
                         LocalContentColor provides MaterialTheme.colorScheme.onSurface
                     }
@@ -44,6 +47,8 @@ fun SheetButton(
                 CompositionLocalProvider(
                     value = if (dangerous) {
                         LocalContentColor provides MaterialTheme.colorScheme.error
+                    } else if (special) {
+                        LocalContentColor provides MaterialTheme.colorScheme.primary
                     } else {
                         LocalContentColor provides MaterialTheme.colorScheme.onSurface
                     }
@@ -56,6 +61,8 @@ fun SheetButton(
                     CompositionLocalProvider(
                         value = if (dangerous) {
                             LocalContentColor provides MaterialTheme.colorScheme.error
+                        } else if (special) {
+                            LocalContentColor provides MaterialTheme.colorScheme.primary
                         } else {
                             LocalContentColor provides MaterialTheme.colorScheme.onSurface
                         }
@@ -69,6 +76,8 @@ fun SheetButton(
                     CompositionLocalProvider(
                         value = if (dangerous) {
                             LocalContentColor provides MaterialTheme.colorScheme.error
+                        } else if (special) {
+                            LocalContentColor provides MaterialTheme.colorScheme.primary
                         } else {
                             LocalContentColor provides MaterialTheme.colorScheme.onSurface
                         }
