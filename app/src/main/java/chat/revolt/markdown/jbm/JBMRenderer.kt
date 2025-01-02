@@ -1,5 +1,6 @@
 package chat.revolt.markdown.jbm
 
+import FallbackRenderer
 import android.content.Intent
 import android.content.res.Configuration
 import android.util.Log
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -89,7 +91,6 @@ import dev.snipme.highlights.model.ColorHighlight
 import dev.snipme.highlights.model.SyntaxLanguage
 import dev.snipme.highlights.model.SyntaxThemes
 import kotlinx.coroutines.launch
-import logcat.logcat
 import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.ASTNode
@@ -205,18 +206,11 @@ private fun annotateText(
                             )
                         )
 
-                        val member = state.currentServer?.let { serverId ->
-                            RevoltAPI.members.getMember(serverId, userId)
-                        }
-                        val mentionDisplay = member?.nickname
-                            ?: RevoltAPI.userCache[userId]?.username
-                            ?: "<@$userId>"
-
-                        appendInlineContent(JBMAnnotations.JBMBackgroundRoundingStart.tag)
+                        append(" ")
                         appendInlineContent(JBMAnnotations.UserAvatar.tag, userId)
                         append(" ")
-                        append(mentionDisplay)
-                        appendInlineContent(JBMAnnotations.JBMBackgroundRoundingEnd.tag)
+                        append(MentionResolver.resolveUser(userId, state.currentServer))
+                        append(" ")
 
                         pop()
                         pop()
@@ -243,13 +237,7 @@ private fun annotateText(
                             )
                         )
 
-                        val channel = RevoltAPI.channelCache[channelId]
-                        val mentionDisplay = channel?.name?.let { name -> "#$name" }
-                            ?: "<#$channelId>"
-
-                        appendInlineContent(JBMAnnotations.JBMBackgroundRoundingStart.tag)
-                        append(mentionDisplay)
-                        appendInlineContent(JBMAnnotations.JBMBackgroundRoundingEnd.tag)
+                        append(MentionResolver.resolveChannel(channelId))
 
                         pop()
                         pop()
@@ -950,12 +938,17 @@ private fun JBMBlock(node: ASTNode, modifier: Modifier, nestingCounter: Int = 0)
         MarkdownElementTypes.HTML_BLOCK,
         MarkdownElementTypes.LINK_DEFINITION,
         MarkdownTokenTypes.WHITE_SPACE -> {
-            CompositionLocalProvider(
-                LocalTextStyle provides LocalTextStyle.current.copy(
-                    fontSize = LocalTextStyle.current.fontSize * state.fontSizeMultiplier
-                )
-            ) {
-                JBMText(node, modifier)
+            // If the only child is a BLOCK_MATH we render it instead
+            if (node.children.size == 1 && node.children[0].type == GFMElementTypes.BLOCK_MATH) {
+                JBMBlock(node.children[0], modifier)
+            } else {
+                CompositionLocalProvider(
+                    LocalTextStyle provides LocalTextStyle.current.copy(
+                        fontSize = LocalTextStyle.current.fontSize * state.fontSizeMultiplier
+                    )
+                ) {
+                    JBMText(node, modifier)
+                }
             }
         }
 
@@ -1072,6 +1065,41 @@ private fun JBMBlock(node: ASTNode, modifier: Modifier, nestingCounter: Int = 0)
                     JBMBlock(it, modifier)
                 }
             }
+        }
+
+        GFMElementTypes.BLOCK_MATH -> {
+            // No use using Katex in embedded because we don't want to
+            // create WebViews when embedded
+            if (!LocalJBMarkdownTreeState.current.embedded) {
+                val mathContent =
+                    try {
+                        node.getTextInNode(state.sourceText).toString().removeSurrounding("$$")
+                    } catch (e: Exception) {
+                        ""
+                    }
+                KatexRenderer(mathContent, modifier)
+            }
+        }
+
+        GFMElementTypes.TABLE -> {
+            // Dito BLOCK_MATH
+            if (!LocalJBMarkdownTreeState.current.embedded) {
+                val tableContent = try {
+                    node.getTextInNode(state.sourceText).toString()
+                } catch (e: Exception) {
+                    ""
+                }
+
+                FallbackRenderer(tableContent, modifier)
+            }
+        }
+
+        MarkdownTokenTypes.HORIZONTAL_RULE -> {
+            HorizontalDivider(
+                color = colorScheme.onSurface,
+                thickness = 1.dp,
+                modifier = modifier.padding(vertical = 8.dp)
+            )
         }
 
         else -> {
