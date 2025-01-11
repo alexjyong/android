@@ -36,6 +36,7 @@ import chat.revolt.components.generic.UserAvatar
 import chat.revolt.markdown.jbm.JBM
 import chat.revolt.markdown.jbm.JBMRenderer
 import chat.revolt.markdown.jbm.LocalJBMarkdownTreeState
+import java.util.concurrent.CancellationException
 
 @OptIn(JBM::class)
 @Composable
@@ -63,6 +64,8 @@ fun InReplyTo(
         if (messageId !in RevoltAPI.messageCache) {
             try {
                 RevoltAPI.messageCache[messageId] = fetchSingleMessage(channelId, messageId)
+            } catch (e: CancellationException) {
+                // It's fine
             } catch (e: Exception) {
                 Log.e("InReplyTo", "Failed to fetch message $messageId", e)
             }
