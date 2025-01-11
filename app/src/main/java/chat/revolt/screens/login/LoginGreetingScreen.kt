@@ -1,8 +1,10 @@
 package chat.revolt.screens.login
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,10 +21,12 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45,10 +49,12 @@ import chat.revolt.components.generic.AnyLink
 import chat.revolt.components.generic.Weblink
 import com.chuckerteam.chucker.api.Chucker
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LoginGreetingScreen(navController: NavController) {
     val context = LocalContext.current
     var catTaps by remember { mutableIntStateOf(0) }
+    var showBoringButton by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -72,23 +78,27 @@ fun LoginGreetingScreen(navController: NavController) {
                 modifier = Modifier
                     .height(55.dp)
                     .padding(bottom = 10.dp)
-                    .clickable(
+                    .combinedClickable(
                         interactionSource = remember(::MutableInteractionSource),
-                        indication = null
-                    ) {
-                        if (catTaps < 9) {
-                            catTaps++
-                        } else {
-                            Toast
-                                .makeText(
-                                    context,
-                                    "🐈",
-                                    Toast.LENGTH_SHORT
-                                )
-                                .show()
-                            catTaps = 0
+                        indication = null,
+                        onClick = {
+                            if (catTaps < 9) {
+                                catTaps++
+                            } else {
+                                Toast
+                                    .makeText(
+                                        context,
+                                        "🐈",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                    .show()
+                                catTaps = 0
+                            }
+                        },
+                        onLongClick = {
+                            showBoringButton = !showBoringButton
                         }
-                    }
+                    )
             )
 
             Text(
@@ -143,6 +153,27 @@ fun LoginGreetingScreen(navController: NavController) {
                     .testTag("view_signup_page_button")
             ) {
                 Text(text = stringResource(R.string.signup))
+            }
+
+            AnimatedVisibility(showBoringButton) {
+                Spacer(modifier = Modifier.height(10.dp))
+
+                TextButton(
+                    onClick = { navController.navigate("login2/init") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = "Try new login experience", textAlign = TextAlign.Center)
+                        Text(
+                            text = "(beta)",
+                            color = LocalContentColor.current.copy(alpha = 0.5f),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Normal,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(40.dp))
