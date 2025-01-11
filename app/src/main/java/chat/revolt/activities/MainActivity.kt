@@ -282,6 +282,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         DynamicColors.applyToActivityIfAvailable(this)
         DynamicColors.applyToActivitiesIfAvailable(RevoltApplication.instance)
+        @Suppress("DEPRECATION") // We are fixing a bug in the splash screen
         window.statusBarColor = Color.Transparent.toArgb()
     }
 
@@ -290,6 +291,7 @@ class MainActivity : AppCompatActivity() {
         super.onConfigurationChanged(newConfig)
         DynamicColors.applyToActivityIfAvailable(this)
         DynamicColors.applyToActivitiesIfAvailable(RevoltApplication.instance)
+        @Suppress("DEPRECATION") // We are fixing a bug in the splash screen
         window.statusBarColor = Color.Transparent.toArgb()
     }
 
@@ -302,6 +304,7 @@ class MainActivity : AppCompatActivity() {
             options.release = BuildConfig.VERSION_NAME
         }
 
+        @Suppress("DEPRECATION") // We are fixing a bug in the splash screen
         window.statusBarColor = Color.Transparent.toArgb()
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
