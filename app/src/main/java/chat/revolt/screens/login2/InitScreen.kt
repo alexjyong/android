@@ -69,13 +69,13 @@ fun InitScreen(
                 )
                 Spacer(modifier = Modifier.height(64.dp))
                 Text(
-                    "Find your community",
+                    "Find your community", // FIXME hardcoded string
                     style = MaterialTheme.typography.headlineMedium,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    "Revolt is the chat app that’s truly built with you in mind.",
+                    "Revolt is the chat app that’s truly built with you in mind.", // FIXME hardcoded string
                     style = MaterialTheme.typography.bodyLarge,
                     fontSize = 18.sp,
                     textAlign = TextAlign.Center
@@ -93,16 +93,16 @@ fun InitScreen(
                     .widthIn(max = 150.dp)
             ) {
                 Button(
-                    onClick = { navController.navigate("login2/existing/details") },
+                    onClick = {/* navController.navigate("login2/existing/details") */ },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Log In")
+                    Text("Log In") // FIXME hardcoded string
                 }
                 TextButton(
-                    onClick = { navController.navigate("login2/new/details") },
+                    onClick = {/* navController.navigate("login2/new/details") */ },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Sign Up")
+                    Text("Sign Up") // FIXME hardcoded string
                 }
                 Spacer(modifier = Modifier.fillMaxHeight(0.25f))
             }
