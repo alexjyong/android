@@ -54,7 +54,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import chat.revolt.BuildConfig
@@ -304,6 +306,13 @@ fun ChatRouterScreen(
             }
 
             else -> null
+        }
+    }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        if (RealtimeSocket.disconnectionState == DisconnectionState.Disconnected) {
+            RealtimeSocket.updateDisconnectionState(DisconnectionState.Reconnecting)
+            scope.launch { RevoltAPI.connectWS() }
         }
     }
 
