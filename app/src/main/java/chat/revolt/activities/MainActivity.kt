@@ -513,7 +513,7 @@ fun AppEntrypoint(
                     )
                 }
                 
-                composable("login2/init") { InitScreen(navController) }
+                composable("login2/init") { InitScreen(navController, windowSizeClass) }
 
                 composable("chat",
                     enterTransition = {
