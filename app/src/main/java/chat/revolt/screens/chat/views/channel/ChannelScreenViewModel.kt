@@ -132,7 +132,7 @@ class ChannelScreenViewModel @Inject constructor(
 
         viewModelScope.launch {
             ensureSelfHasMember()
-            shouldDenyMessageField()
+            denyMessageFieldIfNeeded()
         }
 
         this.loadMessages(50)
@@ -159,7 +159,7 @@ class ChannelScreenViewModel @Inject constructor(
         }
     }
 
-    private suspend fun shouldDenyMessageField() {
+    private suspend fun denyMessageFieldIfNeeded() {
         if (channel == null) return
 
         val selfUser = RevoltAPI.userCache[RevoltAPI.selfId] ?: return
@@ -881,7 +881,7 @@ class ChannelScreenViewModel @Inject constructor(
             }
         }
     }
-    
+
     fun dismissPhysicalKeyboardSpark() {
         viewModelScope.launch {
             kvStorage.set("spark/physicalKeyboard/dismissed", true)
