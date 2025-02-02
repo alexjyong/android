@@ -10,6 +10,7 @@ import chat.revolt.api.routes.server.ackServer
 import chat.revolt.api.routes.sync.syncUnreads
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.ChannelUnread
+import chat.revolt.api.settings.NotificationSettingsProvider
 
 class Unreads {
     private val hasLoaded = mutableStateOf(false)
@@ -34,13 +35,15 @@ class Unreads {
         hasLoaded.value = true
     }
 
-    fun getForChannel(channelId: String): ChannelUnread? {
+    fun getForChannel(channelId: String, serverId: String?): ChannelUnread? {
         if (!hasLoaded.value) return null
+        if (NotificationSettingsProvider.isChannelMuted(channelId, serverId)) return null
         return channels[channelId]
     }
 
-    fun hasUnread(channelId: String, lastMessageId: String): Boolean {
+    fun hasUnread(channelId: String, lastMessageId: String, serverId: String?): Boolean {
         if (!hasLoaded.value) return false
+        if (NotificationSettingsProvider.isChannelMuted(channelId, serverId)) return false
         return (channels[channelId]?.last_id?.compareTo(lastMessageId) ?: 0) < 0
     }
 
@@ -48,11 +51,15 @@ class Unreads {
         if (!hasLoaded.value) return false
 
         return RevoltAPI.serverCache[serverId]?.channels?.any {
-            val channel = RevoltAPI.channelCache[it] ?: return@any false
-            if (channel.channelType == ChannelType.VoiceChannel) return@any false // TODO remove this when text in voice channels is implemented
-            hasUnread(it, channel.lastMessageID ?: "")
-        }
-            ?: false
+            val channel = RevoltAPI.channelCache[it] ?: return@any false // Channel not found
+            if (channel.channelType == ChannelType.VoiceChannel) return@any false // Channel is voice
+            if (NotificationSettingsProvider.isChannelMuted(
+                    it,
+                    serverId
+                )
+            ) return@any false // Channel is muted
+            hasUnread(it, channel.lastMessageID ?: "", serverId) // Channel has unread
+        } == true // Null guard
     }
 
     suspend fun markAsRead(channelId: String, messageId: String, sync: Boolean = true) {

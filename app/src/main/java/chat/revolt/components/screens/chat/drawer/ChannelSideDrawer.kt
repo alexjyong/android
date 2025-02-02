@@ -87,6 +87,7 @@ import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.ServerFlags
 import chat.revolt.api.schemas.User
 import chat.revolt.api.schemas.has
+import chat.revolt.api.settings.NotificationSettingsProvider
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.generic.GroupIcon
 import chat.revolt.components.generic.IconPlaceholder
@@ -552,7 +553,8 @@ fun ChannelSideDrawer(
                     onDestinationChanged,
                     drawerState,
                     channelListState,
-                    onOpenChannelContextSheet = { channelContextSheetTarget = it }
+                    onOpenChannelContextSheet = { channelContextSheetTarget = it },
+                    serverId = currentServer
                 )
             }
         }
@@ -687,9 +689,12 @@ fun ColumnScope.DirectMessagesChannelListRenderer(
                 },
                 hasUnread = channel.lastMessageID?.let { lastMessageID ->
                     RevoltAPI.unreads.hasUnread(
-                        channel.id!!, lastMessageID
+                        channel.id!!,
+                        lastMessageID,
+                        serverId = null
                     )
                 } ?: false,
+                isMuted = NotificationSettingsProvider.isChannelMuted(channel.id!!, null),
                 onDestinationChanged = { dest ->
                     onDestinationChanged(dest)
                     scope.launch {
@@ -719,6 +724,7 @@ fun ColumnScope.ServerChannelListRenderer(
     drawerState: DrawerState?,
     channelListState: LazyListState,
     onOpenChannelContextSheet: (String) -> Unit,
+    serverId: String
 ) {
     val scope = rememberCoroutineScope()
 
@@ -772,9 +778,15 @@ fun ColumnScope.ServerChannelListRenderer(
                         },
                         hasUnread = channelOrCat.channel.lastMessageID?.let { lastMessageID ->
                             RevoltAPI.unreads.hasUnread(
-                                channelOrCat.channel.id!!, lastMessageID
+                                channelOrCat.channel.id!!,
+                                lastMessageID,
+                                serverId
                             )
                         } ?: false,
+                        isMuted = NotificationSettingsProvider.isChannelMuted(
+                            channelOrCat.channel.id!!,
+                            serverId
+                        ),
                         onOpenChannelContextSheet = onOpenChannelContextSheet
                     )
                 }
@@ -812,6 +824,7 @@ fun ChannelItem(
         channel.channelType ?: ChannelType.TextChannel
     ),
     hasUnread: Boolean = false,
+    isMuted: Boolean = false,
     appendServerName: Boolean = false,
     onDestinationChanged: (ChatRouterDestination) -> Unit,
     onOpenChannelContextSheet: (String) -> Unit
@@ -850,6 +863,13 @@ fun ChannelItem(
                 .then(
                     if (isCurrent) {
                         Modifier.background(MaterialTheme.colorScheme.secondaryContainer)
+                    } else {
+                        Modifier
+                    }
+                )
+                .then(
+                    if (isMuted) {
+                        Modifier.alpha(0.5f)
                     } else {
                         Modifier
                     }
@@ -910,6 +930,7 @@ fun DMOrGroupItem(
     partner: User?,
     isCurrent: Boolean,
     hasUnread: Boolean,
+    isMuted: Boolean = false,
     onDestinationChanged: (ChatRouterDestination) -> Unit,
     onOpenChannelContextSheet: (String) -> Unit
 ) {
@@ -941,6 +962,13 @@ fun DMOrGroupItem(
             )
             .padding(vertical = 16.dp)
             .fillMaxWidth()
+            .then(
+                if (isMuted) {
+                    Modifier.alpha(0.5f)
+                } else {
+                    Modifier
+                }
+            )
     ) {
         Box(
             Modifier

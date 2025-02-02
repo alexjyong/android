@@ -22,6 +22,7 @@ object LoadedSettings {
     var avatarRadius by mutableIntStateOf(50)
     var experimentsEnabled by mutableStateOf(false)
     var specialEmbedSettings by mutableStateOf(SpecialEmbedSettings())
+    var poorlyFormedSettingsKeys by mutableStateOf(emptySet<String>())
 
     fun hydrateWithSettings(settings: SyncedSettings) {
         this.theme = settings.android.theme?.let { Theme.valueOf(it) } ?: getDefaultTheme()
@@ -37,5 +38,6 @@ object LoadedSettings {
         messageReplyStyle = MessageReplyStyle.SwipeFromEnd
         avatarRadius = 50
         specialEmbedSettings = SpecialEmbedSettings()
+        poorlyFormedSettingsKeys = emptySet()
     }
 }

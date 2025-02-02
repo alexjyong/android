@@ -2,10 +2,24 @@ package chat.revolt.api.schemas
 
 import chat.revolt.ui.theme.OverridableColourScheme
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 @Serializable
 data class OrderingSettings(
     val servers: List<String> = emptyList()
+)
+
+
+@Serializable
+data class NotificationSettings(
+    val channel: Map<String, String> = emptyMap(),
+    val server: Map<String, String> = emptyMap()
+)
+
+@Serializable
+data class _NotificationSettingsToParse( // quirk
+    val channel: Map<String, JsonElement?> = emptyMap(),
+    val server: Map<String, JsonElement?> = emptyMap()
 )
 
 @Serializable

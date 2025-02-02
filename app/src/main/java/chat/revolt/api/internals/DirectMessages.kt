@@ -14,21 +14,27 @@ object DirectMessages {
                 ) && it.active == true && it.lastMessageID != null
             }
             .filter {
-                it.id?.let { id -> RevoltAPI.unreads.hasUnread(id, it.lastMessageID!!) } ?: false
+                it.id?.let { id ->
+                    RevoltAPI.unreads.hasUnread(
+                        id,
+                        it.lastMessageID!!,
+                        serverId = null
+                    )
+                } ?: false
             }
     }
 
     fun hasPlatformModerationDM(): Boolean {
         return unreadDMs().any {
             it.channelType == ChannelType.DirectMessage &&
-                it.recipients?.contains(PLATFORM_MODERATION_USER) ?: false
+                    it.recipients?.contains(PLATFORM_MODERATION_USER) ?: false
         }
     }
 
     fun getPlatformModerationDM(): Channel? {
         return unreadDMs().firstOrNull {
             it.channelType == ChannelType.DirectMessage &&
-                it.recipients?.contains(PLATFORM_MODERATION_USER) ?: false
+                    it.recipients?.contains(PLATFORM_MODERATION_USER) ?: false
         }
     }
 }
