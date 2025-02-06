@@ -84,6 +84,7 @@ import chat.revolt.screens.chat.views.OverviewScreen
 import chat.revolt.screens.chat.views.channel.ChannelScreen
 import chat.revolt.sheets.AddServerSheet
 import chat.revolt.sheets.ChangelogSheet
+import chat.revolt.sheets.EarlyAccessSheet
 import chat.revolt.sheets.EmoteInfoSheet
 import chat.revolt.sheets.LinkInfoSheet
 import chat.revolt.sheets.ReactionInfoSheet
@@ -148,6 +149,7 @@ class ChatRouterViewModel @Inject constructor(
     var latestChangelog by mutableStateOf("")
     var latestChangelogBody by mutableStateOf("")
     var showNotificationRationale by mutableStateOf(false)
+    var showEarlyAccessSpark by mutableStateOf(false)
 
     private val changelogs = Changelogs(context, kvStorage)
 
@@ -162,6 +164,11 @@ class ChatRouterViewModel @Inject constructor(
                 changelogs.fetchChangelogByVersionCode(latestChangelog.toLong()).rendered
             if (!latestChangelogRead) {
                 changelogs.markAsSeen()
+            }
+
+            val seenEarlyAccess = kvStorage.get("spark/earlyAccess/dismissed")
+            if (seenEarlyAccess == null) {
+                showEarlyAccessSpark = true
             }
 
             val hasNotificationPermission =
@@ -211,6 +218,13 @@ class ChatRouterViewModel @Inject constructor(
         showNotificationRationale = false
         viewModelScope.launch {
             kvStorage.set("pushNotificationsRejected", true)
+        }
+    }
+
+    fun dismissEarlyAccessSpark() {
+        showEarlyAccessSpark = false
+        viewModelScope.launch {
+            kvStorage.set("spark/earlyAccess/dismissed", true)
         }
     }
 
@@ -704,6 +718,29 @@ fun ChatRouterScreen(
                 }
             }
         )
+    }
+
+    if (viewModel.showEarlyAccessSpark) {
+        val earlyAccessSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+        ModalBottomSheet(
+            sheetState = earlyAccessSheetState,
+            sheetGesturesEnabled = false,
+            dragHandle = {},
+            onDismissRequest = {
+                // Only dismiss using button in sheet
+            }
+        ) {
+            EarlyAccessSheet(
+                onClose = {
+                    scope.launch {
+
+                        earlyAccessSheetState.hide()
+                        viewModel.dismissEarlyAccessSpark()
+                    }
+                }
+            )
+        }
     }
 
     Column(
