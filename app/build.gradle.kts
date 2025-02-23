@@ -305,6 +305,9 @@ dependencies {
     // Square Logcat
     implementation("com.squareup.logcat:logcat:0.1")
 
+    // Librevolt
+    implementation("librevolt:librevolt-jvm:0.1.0")
+
     // Testing
     androidTestImplementation("androidx.test:runner:$androidXTestVersion")
     androidTestImplementation("androidx.test:rules:$androidXTestVersion")
@@ -315,7 +318,16 @@ aboutLibraries {
     additionalLicenses += listOf("ofl")
     includePlatform = true
     strictMode = StrictMode.FAIL
-    allowedLicenses += listOf("Apache-2.0", "OFL", "MIT", "ASDKL", "BSD-2-Clause", "cmark")
+    allowedLicenses += listOf(
+        "Apache-2.0",
+        "OFL",
+        "MIT",
+        "ASDKL",
+        "BSD-2-Clause",
+        "cmark",
+        "EPL-1.0",
+        "BSD-3-Clause"
+    )
     configPath = "compliance"
 }
 

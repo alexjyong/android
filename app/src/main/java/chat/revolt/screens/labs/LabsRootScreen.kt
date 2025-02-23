@@ -14,6 +14,8 @@ import androidx.navigation.compose.rememberNavController
 import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.screens.labs.ui.mockups.CallScreenMockup
 import chat.revolt.screens.labs.ui.mockups.NewLoginExperienceMockup
+import chat.revolt.screens.labs.ui.sandbox.CoreLibSandbox
+import chat.revolt.screens.labs.ui.sandbox.GradientEditorSandbox
 import chat.revolt.screens.labs.ui.sandbox.JBMSandbox
 import chat.revolt.screens.labs.ui.sandbox.SettingsDslSandbox
 
@@ -59,7 +61,7 @@ fun LabsRootScreen(topNav: NavController) {
                 startDestination = "home",
             ) {
                 composable("home") {
-                    LabsHomeScreen(labsNav)
+                    LabsHomeScreen(labsNav, topNav)
                 }
 
                 composable("mockups/call") {
@@ -74,6 +76,12 @@ fun LabsRootScreen(topNav: NavController) {
                 }
                 composable("sandboxes/jbm") {
                     JBMSandbox(labsNav)
+                }
+                composable("sandboxes/gradienteditor") {
+                    GradientEditorSandbox(labsNav)
+                }
+                composable("sandboxes/librevolt") {
+                    CoreLibSandbox(labsNav)
                 }
             }
         }

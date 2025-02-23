@@ -15,9 +15,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -26,11 +30,14 @@ import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.components.generic.ListHeader
 import chat.revolt.components.generic.RadioItem
+import kotlinx.coroutines.launch
 import kotlin.enums.EnumEntries
 
 val SubcategoryContentInsets = PaddingValues(horizontal = 16.dp)
 
 interface SettingsPageScope {
+    fun showSnackbar(message: String)
+
     @Composable
     fun Subcategory(
         title: @Composable () -> Unit,
@@ -84,7 +91,9 @@ fun SettingsPage(
     title: @Composable () -> Unit,
     content: @Composable SettingsPageScope.() -> Unit
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -106,6 +115,9 @@ fun SettingsPage(
                 },
             )
         },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
     ) { pv ->
         Column(
             Modifier
@@ -115,7 +127,13 @@ fun SettingsPage(
                 .verticalScroll(rememberScrollState())
         ) {
             content(
-                object : SettingsPageScope {}
+                object : SettingsPageScope {
+                    override fun showSnackbar(message: String) {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(message)
+                        }
+                    }
+                }
             )
         }
     }

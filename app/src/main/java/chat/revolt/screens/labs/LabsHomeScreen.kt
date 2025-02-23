@@ -11,12 +11,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -30,9 +32,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import chat.revolt.ui.theme.FragmentMono
 
 enum class LabsHomeScreenTab {
     Home,
@@ -42,7 +47,7 @@ enum class LabsHomeScreenTab {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LabsHomeScreen(navController: NavController) {
+fun LabsHomeScreen(navController: NavController, topNav: NavController) {
     val currentTab = rememberSaveable { mutableStateOf(LabsHomeScreenTab.Home) }
 
     Scaffold(
@@ -51,6 +56,16 @@ fun LabsHomeScreen(navController: NavController) {
                 scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
                 title = {
                     Text("Labs")
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        topNav.popBackStack()
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
                 }
             )
         },
@@ -172,6 +187,29 @@ fun LabsHomeScreen(navController: NavController) {
                             },
                             modifier = Modifier.clickable {
                                 navController.navigate("sandboxes/jbm")
+                            }
+                        )
+                        HorizontalDivider()
+                        ListItem(
+                            headlineContent = {
+                                Text("Gradient Editor")
+                            },
+                            modifier = Modifier.clickable {
+                                navController.navigate("sandboxes/gradienteditor")
+                            }
+                        )
+                        HorizontalDivider()
+                        ListItem(
+                            headlineContent = {
+                                Text(buildAnnotatedString {
+                                    pushStyle(SpanStyle(fontFamily = FragmentMono))
+                                    append("librevolt")
+                                    pop()
+                                    append(" Sample")
+                                })
+                            },
+                            modifier = Modifier.clickable {
+                                navController.navigate("sandboxes/librevolt")
                             }
                         )
                         HorizontalDivider()
