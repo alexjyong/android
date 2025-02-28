@@ -22,13 +22,13 @@ plugins {
 val composeBomVersion = "2024.10.01"
 val accompanistVersion = "0.34.0"
 val okhttpVersion = "4.12.0"
-val navVersion = "2.8.3"
+val navVersion = "2.8.7"
 val hiltVersion = "2.52"
 val glideVersion = "4.16.0"
 val ktorVersion = "3.0.0-beta-2"
 val media3Version = "1.5.0"
 val livekitVersion = "2.2.0"
-val material3Version = "1.4.0-alpha05"
+val material3Version = "1.4.0-alpha08"
 val androidXTestVersion = "1.6.1"
 
 fun property(fileName: String, propertyName: String, fallbackEnv: String? = null): String? {
@@ -184,7 +184,7 @@ sentry {
 
 dependencies {
     // Android/Kotlin Core
-    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.core:core-ktx:1.15.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.10")
 
     // Kotlinx - various first-party extensions for Kotlin
@@ -204,12 +204,12 @@ dependencies {
     implementation("androidx.compose.ui:ui-util")
     implementation("androidx.compose.material3:material3:$material3Version")
     implementation("androidx.compose.material3:material3-window-size-class:$material3Version")
-    implementation("androidx.compose.material:material-icons-core:1.7.4")
+    implementation("androidx.compose.material:material-icons-core:1.7.8")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.runtime:runtime-livedata")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
-    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation("androidx.activity:activity-compose:1.10.0")
 
     // Accompanist - Jetpack Compose Extensions
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
@@ -262,7 +262,7 @@ dependencies {
     implementation("com.github.hcaptcha:hcaptcha-android-sdk:3.8.1")
 
     // JDK Desugaring - polyfill for new Java APIs
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.2")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 
     // AndroidX Media3 w/ ExoPlayer
     implementation("androidx.media3:media3-exoplayer:$media3Version")
@@ -280,8 +280,8 @@ dependencies {
 
     // Persistence
     implementation("app.cash.sqldelight:android-driver:2.0.1")
-    implementation("androidx.datastore:datastore:1.1.1")
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("androidx.datastore:datastore:1.1.2")
+    implementation("androidx.datastore:datastore-preferences:1.1.2")
 
     // Markup
     implementation("org.jetbrains:markdown:0.7.3")
@@ -292,7 +292,7 @@ dependencies {
     // implementation "io.livekit:livekit-android:$livekit_version"
 
     // Firebase - Cloud Messaging
-    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
+    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
     implementation("com.google.firebase:firebase-messaging")
 
     // Shimmer - loading animations
