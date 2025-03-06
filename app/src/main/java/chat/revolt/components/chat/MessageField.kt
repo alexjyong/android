@@ -1,17 +1,6 @@
 package chat.revolt.components.chat
 
-import android.content.Context
-import android.content.res.ColorStateList
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.RectShape
 import android.net.Uri
-import android.os.Build
-import android.util.DisplayMetrics
-import android.util.Log
-import android.view.KeyEvent
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputConnection
-import android.view.inputmethod.InputMethodManager
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
@@ -22,23 +11,36 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.content.ReceiveContentListener
+import androidx.compose.foundation.content.consume
+import androidx.compose.foundation.content.contentReceiver
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.SuggestionChipDefaults
@@ -54,22 +56,31 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isAltPressed
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.isMetaPressed
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.inputmethod.EditorInfoCompat
-import androidx.core.view.inputmethod.InputConnectionCompat
-import androidx.core.view.setPadding
-import androidx.core.widget.addTextChangedListener
 import chat.revolt.R
 import chat.revolt.activities.RevoltTweenFloat
 import chat.revolt.activities.RevoltTweenInt
@@ -81,48 +92,23 @@ import chat.revolt.components.generic.UserAvatar
 import chat.revolt.components.screens.chat.ChannelIcon
 import chat.revolt.internals.Autocomplete
 import kotlinx.coroutines.launch
+import logcat.logcat
 
-private fun convertDpToPixel(dp: Float, context: Context): Float {
-    return dp * (context.resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
+fun Pair<Int, Int>.asTextRange(): TextRange {
+    return TextRange(this.first, this.second)
 }
 
-fun String.applyAutocompleteSuggestion(
-    suggestion: AutocompleteSuggestion,
-    cursorPosition: Int
-): String {
-    return when (suggestion) {
-        is AutocompleteSuggestion.User -> {
-            this.replaceRange(
-                cursorPosition - suggestion.query.length - 1,
-                cursorPosition,
-                "@${suggestion.user.username}#${suggestion.user.discriminator} "
-            )
-        }
+private fun CharSequence.isEmptyOrOnlyNewlines(): Boolean {
+    return this.lines().all { it.isEmpty() || it.all { c -> c == '\n' } }
+}
 
-        is AutocompleteSuggestion.Channel -> {
-            if (suggestion.channel.name?.contains(" ", ignoreCase = true) == true) {
-                this.replaceRange(
-                    cursorPosition - suggestion.query.length - 1,
-                    cursorPosition,
-                    "<#${suggestion.channel.id}> "
-                )
-            } else {
-                this.replaceRange(
-                    cursorPosition - suggestion.query.length - 1,
-                    cursorPosition,
-                    "#${suggestion.channel.name} "
-                )
-            }
-        }
+private fun TextFieldState.lastWord(): String? {
+    return this.text.substring(0, this.selection.min)
+        .split(" ").lastOrNull()
+}
 
-        is AutocompleteSuggestion.Emoji -> {
-            this.replaceRange(
-                cursorPosition - suggestion.query.length - 1,
-                cursorPosition,
-                suggestion.shortcode + " "
-            )
-        }
-    }
+private fun CharSequence.lastWordStartsAt(): Int {
+    return this.lastIndexOf(" ")
 }
 
 sealed class AutocompleteSuggestion {
@@ -147,8 +133,8 @@ sealed class AutocompleteSuggestion {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun NativeMessageField(
-    value: String,
+fun MessageField(
+    initialValue: String,
     onValueChange: (String) -> Unit,
     onAddAttachment: () -> Unit,
     onCommitAttachment: (Uri) -> Unit,
@@ -163,10 +149,11 @@ fun NativeMessageField(
     failedValidation: Boolean = false,
     serverId: String? = null,
     channelId: String? = null,
+    valueIsBlank: Boolean = false,
     editMode: Boolean = false,
+    initialValueDirtyMarker: Any = Unit,
     cancelEdit: () -> Unit = {},
     onFocusChange: (Boolean) -> Unit = {},
-    onSelectionChange: (Pair<Int, Int>) -> Unit = {}
 ) {
     val placeholderResource = when (channelType) {
         ChannelType.DirectMessage -> R.string.message_field_placeholder_dm
@@ -176,31 +163,95 @@ fun NativeMessageField(
         ChannelType.SavedMessages -> R.string.message_field_placeholder_notes
     }
 
-    var requestFocus by remember { mutableStateOf({}) }
-    var clearFocus by remember { mutableStateOf({}) }
-
     val sendButtonVisible =
-        (value.isNotBlank() || forceSendButton) && !disabled && !failedValidation
+        (!valueIsBlank || forceSendButton) && !disabled && !failedValidation
 
-    val density = LocalDensity.current
-
-    val scope = rememberCoroutineScope()
-
-    val selectionColour = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f).toArgb()
-    val cursorColour = MaterialTheme.colorScheme.primary.toArgb()
-    val failedValidationColour = MaterialTheme.colorScheme.error.toArgb()
-    val contentColour = LocalContentColor.current.toArgb()
-    val placeholderColour = LocalContentColor.current.copy(alpha = 0.5f).toArgb()
+    val focusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
 
     var selection by remember { mutableStateOf(0 to 0) }
     val autocompleteSuggestions = remember { mutableStateListOf<AutocompleteSuggestion>() }
     val autocompleteSuggestionState = rememberLazyListState()
 
+    val receiveContentListener = remember {
+        ReceiveContentListener { transferableContent ->
+            transferableContent.consume { item ->
+                val uri = item.uri
+                if (uri != null) {
+                    onCommitAttachment(uri)
+                }
+                uri != null
+            }
+        }
+    }
+
+    var textFieldState = rememberTextFieldState(
+        initialText = initialValue,
+        initialSelection = selection.asTextRange()
+    )
+
+    LaunchedEffect(initialValue, initialValueDirtyMarker) {
+        logcat { "New initial value: $initialValue" }
+        logcat { "Old state: $textFieldState" }
+        textFieldState.setTextAndPlaceCursorAtEnd(initialValue)
+        logcat { "New state: $textFieldState" }
+    }
+
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(textFieldState.text) {
+        logcat { "New text is ${textFieldState.text}" }
+        onValueChange(textFieldState.text.toString())
+
+        scope.launch {
+            autocompleteSuggestionState.animateScrollToItem(0)
+        }
+        autocompleteSuggestions.clear()
+
+        if (textFieldState.text.isNotBlank() &&
+            (textFieldState.selection.min == textFieldState.selection.max)
+        ) {
+            val lastWord = textFieldState.lastWord()
+            if (lastWord != null) {
+                when {
+                    lastWord.startsWith(':') && !lastWord.endsWith(':') -> {
+                        autocompleteSuggestions.addAll(
+                            Autocomplete.emoji(lastWord.substring(1))
+                        )
+                    }
+
+                    lastWord.startsWith('@') -> {
+                        if (channelId != null && serverId != null) {
+                            autocompleteSuggestions.addAll(
+                                Autocomplete.user(
+                                    channelId,
+                                    serverId,
+                                    lastWord.substring(1)
+                                )
+                            )
+                        }
+                    }
+
+                    lastWord.startsWith('#') -> {
+                        if (serverId != null) {
+                            autocompleteSuggestions.addAll(
+                                Autocomplete.channel(
+                                    serverId,
+                                    lastWord.substring(1)
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     LaunchedEffect(editMode) {
         if (editMode) {
-            requestFocus()
+            focusRequester.requestFocus()
         } else {
-            clearFocus()
+            focusManager.clearFocus()
         }
     }
 
@@ -208,7 +259,7 @@ fun NativeMessageField(
         modifier = modifier.background(MaterialTheme.colorScheme.surfaceContainer)
     ) {
         AnimatedVisibility(
-            visible = autocompleteSuggestions.size > 0,
+            visible = autocompleteSuggestions.isNotEmpty(),
             enter = expandIn(initialSize = { full ->
                 IntSize(
                     full.width,
@@ -241,12 +292,17 @@ fun NativeMessageField(
                         is AutocompleteSuggestion.User -> {
                             SuggestionChip(
                                 onClick = {
-                                    onValueChange(
-                                        value.applyAutocompleteSuggestion(
-                                            item,
-                                            selection.first
+                                    textFieldState.edit {
+                                        val lastWordStartsAt =
+                                            textFieldState.text
+                                                .substring(0, textFieldState.selection.max)
+                                                .lastWordStartsAt()
+                                        replace(
+                                            if (lastWordStartsAt == -1) 0 else (lastWordStartsAt + 1),
+                                            textFieldState.selection.max,
+                                            "@${item.user.username}#${item.user.discriminator} "
                                         )
-                                    )
+                                    }
                                 },
                                 label = { Text("@${item.user.username}#${item.user.discriminator}") },
                                 icon = {
@@ -269,12 +325,29 @@ fun NativeMessageField(
                         is AutocompleteSuggestion.Channel -> {
                             SuggestionChip(
                                 onClick = {
-                                    onValueChange(
-                                        value.applyAutocompleteSuggestion(
-                                            item,
-                                            selection.first
+                                    textFieldState.edit {
+                                        val lastWordStartsAt =
+                                            textFieldState.text
+                                                .substring(0, textFieldState.selection.max)
+                                                .lastWordStartsAt()
+
+                                        val replacement =
+                                            if (item.channel.name?.contains(
+                                                    " ",
+                                                    ignoreCase = true
+                                                ) == true
+                                            ) {
+                                                "<#${item.channel.id}> "
+                                            } else {
+                                                "#${item.channel.name} "
+                                            }
+
+                                        replace(
+                                            if (lastWordStartsAt == -1) 0 else (lastWordStartsAt + 1),
+                                            textFieldState.selection.max,
+                                            replacement
                                         )
-                                    )
+                                    }
                                 },
                                 label = { Text("#${item.channel.name}") },
                                 icon = {
@@ -293,12 +366,17 @@ fun NativeMessageField(
                         is AutocompleteSuggestion.Emoji -> {
                             SuggestionChip(
                                 onClick = {
-                                    onValueChange(
-                                        value.applyAutocompleteSuggestion(
-                                            item,
-                                            selection.first
+                                    textFieldState.edit {
+                                        val lastWordStartsAt =
+                                            textFieldState.text
+                                                .substring(0, textFieldState.selection.max)
+                                                .lastWordStartsAt()
+                                        replace(
+                                            if (lastWordStartsAt == -1) 0 else (lastWordStartsAt + 1),
+                                            textFieldState.selection.max,
+                                            item.shortcode + " "
                                         )
-                                    )
+                                    }
                                 },
                                 label = {
                                     if (item.custom != null) {
@@ -353,7 +431,7 @@ fun NativeMessageField(
                         .clickable {
                             if (!editMode) {
                                 // hide keyboard because it's annoying
-                                clearFocus()
+                                focusManager.clearFocus()
                                 onAddAttachment()
                             }
                         }
@@ -362,191 +440,68 @@ fun NativeMessageField(
                 )
             }
 
-            AndroidView(
-                factory = { context ->
-                    object : androidx.appcompat.widget.AppCompatEditText(context) {
-                        var serverId: String? = null
-
-                        override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? {
-                            var ic = super.onCreateInputConnection(outAttrs)
-                            EditorInfoCompat.setContentMimeTypes(
-                                outAttrs,
-                                arrayOf("image/*")
-                            )
-                            val mimeTypes = ViewCompat.getOnReceiveContentMimeTypes(this)
-                            if (mimeTypes != null) {
-                                EditorInfoCompat.setContentMimeTypes(outAttrs, mimeTypes)
-                                ic = ic?.let {
-                                    InputConnectionCompat.createWrapper(
-                                        this,
-                                        it,
-                                        outAttrs
-                                    )
-                                }
-                            }
-                            return ic
-                        }
-
-                        override fun onSelectionChanged(selStart: Int, selEnd: Int) {
-                            super.onSelectionChanged(selStart, selEnd)
-                            onSelectionChange(selStart to selEnd)
-                            selection = selStart to selEnd
-
-                            scope.launch {
-                                autocompleteSuggestionState.animateScrollToItem(0)
-                            }
-                            autocompleteSuggestions.clear()
-
-                            if (text?.isNotBlank() == false) return
-                            if (selStart != selEnd) return
-
-                            val lastWord =
-                                text?.substring(0, selStart)?.split(" ")?.lastOrNull() ?: return
-
-                            when {
-                                lastWord.startsWith(':') && !lastWord.endsWith(':') -> {
-                                    autocompleteSuggestions.addAll(
-                                        Autocomplete.emoji(lastWord.substring(1))
-                                    )
-                                }
-
-                                lastWord.startsWith('@') -> {
-                                    if (channelId == null) return
-                                    autocompleteSuggestions.addAll(
-                                        Autocomplete.user(
-                                            channelId,
-                                            this.serverId,
-                                            lastWord.substring(1)
-                                        )
-                                    )
-                                }
-
-                                lastWord.startsWith('#') -> {
-                                    if (this.serverId == null) return
-                                    autocompleteSuggestions.addAll(
-                                        Autocomplete.channel(
-                                            this.serverId!!,
-                                            lastWord.substring(1)
-                                        )
-                                    )
-                                }
-                            }
-                        }
-
-                        override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
-                            return when (keyCode) {
-                                KeyEvent.KEYCODE_ENTER -> {
-                                    if (event.isCtrlPressed && sendButtonVisible) {
-                                        onSendMessage()
-                                        true
-                                    } else super.onKeyUp(keyCode, event)
-                                }
-
-                                else -> super.onKeyUp(keyCode, event)
-                            }
-                        }
-                    }.apply {
-                        background = null
-                        textSize = 16f
-                        setPadding((density.density * 16.dp.value).toInt())
-
-                        // Propagate text changes to parent
-                        addTextChangedListener {
-                            onValueChange(it.toString())
-                        }
-
-                        // Hide/show keyboard on focus change and propagate to parent
-                        onFocusChangeListener =
-                            android.view.View.OnFocusChangeListener { _, hasFocus ->
-                                val keyboard =
-                                    context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                                if (hasFocus) {
-                                    keyboard.showSoftInput(
-                                        this,
-                                        0
-                                    )
-                                } else {
-                                    keyboard.hideSoftInputFromWindow(this.windowToken, 0)
-                                }
-
-                                onFocusChange(hasFocus)
-                            }
-
-                        ViewCompat.setOnReceiveContentListener(
-                            this,
-                            arrayOf("image/*")
-                        ) { _, payload ->
-                            // Check mimetype
-                            if (payload.clip.description.hasMimeType("image/*")) {
-                                // Get image
-                                val item = payload.clip.getItemAt(0)
-                                val uri = item.uri
-
-                                if (uri == null) {
-                                    Log.e("MessageField", "Received payload with null uri")
-                                    return@setOnReceiveContentListener payload
-                                }
-
-                                onCommitAttachment(uri)
-
-                                return@setOnReceiveContentListener null
-                            }
-                            payload
-                        }
-
-                        isFocusable = true
-                        isFocusableInTouchMode = true
-
-                        typeface = ResourcesCompat.getFont(context, R.font.inter)
-
-                        // Set colours
-                        highlightColor = selectionColour
-                        setTextColor(contentColour)
-                        setHintTextColor(ColorStateList.valueOf(placeholderColour))
-
-                        // Caret colour and size
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            val shapeDrawable = ShapeDrawable(RectShape())
-                            shapeDrawable.paint.color = cursorColour
-                            val sizeInDp = 1
-                            val sizeInPixels = (sizeInDp * resources.displayMetrics.density).toInt()
-                            shapeDrawable.intrinsicWidth = sizeInPixels
-                            shapeDrawable.intrinsicHeight = sizeInPixels
-
-                            setTextCursorDrawable(shapeDrawable)
-                        }
-
-                        clearFocus = {
-                            this.clearFocus()
-                        }
-                        requestFocus = {
-                            this.requestFocus()
-                        }
-                    }
-                },
-                update = {
-                    if (value != it.text.toString()) {
-                        it.setText(value)
-                        it.setSelection(value.length)
-                        it.invalidate()
-                    }
-                    it.hint = it.context.getString(placeholderResource, channelName)
-                    it.serverId = serverId
-                    if (failedValidation) {
-                        it.setTextColor(failedValidationColour)
-                    } else {
-                        it.setTextColor(contentColour)
-                    }
-
-                    if (it.text?.isEmpty() == true) {
-                        it.maxLines = 1
-                    } else {
-                        it.maxLines = 5
-                    }
-                },
+            BasicTextField(
+                state = textFieldState,
+                textStyle = LocalTextStyle.current.copy(
+                    color = if (failedValidation) {
+                        MaterialTheme.colorScheme.error
+                    } else LocalContentColor.current
+                ),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    capitalization = KeyboardCapitalization.Sentences,
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.None,
+                    showKeyboardOnFocus = false
+                ),
                 modifier = Modifier
                     .weight(1f)
-                    .testTag("message_field")
+                    .heightIn(max = 128.dp)
+                    .verticalScroll(rememberScrollState())
+                    .onFocusChanged {
+                        onFocusChange(it.isFocused)
+                    }
+                    .focusRequester(focusRequester)
+                    .contentReceiver(receiveContentListener)
+                    .onKeyEvent {
+                        if (it.type == KeyEventType.KeyUp) {
+                            when {
+                                it.key == Key.Enter &&
+                                        !it.isShiftPressed &&
+                                        !it.isAltPressed &&
+                                        it.isCtrlPressed &&
+                                        !it.isMetaPressed -> {
+                                    onSendMessage()
+                                    return@onKeyEvent true
+                                }
+
+                                it.key == Key.Escape &&
+                                        !it.isShiftPressed &&
+                                        !it.isAltPressed &&
+                                        !it.isCtrlPressed &&
+                                        !it.isMetaPressed -> {
+                                    cancelEdit()
+                                    return@onKeyEvent true
+                                }
+                            }
+                        }
+
+                        return@onKeyEvent false
+                    },
+                decorator = { innerTextField ->
+                    Box(Modifier.padding(horizontal = 16.dp, vertical = 18.dp)) {
+                        if (textFieldState.text.isEmptyOrOnlyNewlines()) {
+                            Text(
+                                stringResource(placeholderResource, channelName),
+                                style = LocalTextStyle.current.copy(
+                                    color = LocalContentColor.current.copy(alpha = 0.5f)
+                                ),
+                                modifier = Modifier.align(Alignment.CenterStart)
+                            )
+                        }
+                        innerTextField()
+                    }
+                }
             )
 
             Icon(
@@ -557,7 +512,7 @@ fun NativeMessageField(
                     .clip(CircleShape)
                     .size(32.dp)
                     .clickable {
-                        clearFocus()
+                        focusManager.clearFocus()
                         onPickEmoji()
                     }
                     .padding(4.dp)
@@ -610,8 +565,8 @@ fun NativeMessageField(
 @Preview
 @Composable
 fun NativeMessageFieldPreview() {
-    NativeMessageField(
-        value = "Hello world!",
+    MessageField(
+        initialValue = "Hello world!",
         onValueChange = {},
         onAddAttachment = {},
         onCommitAttachment = {},
@@ -626,6 +581,5 @@ fun NativeMessageFieldPreview() {
         editMode = false,
         cancelEdit = {},
         onFocusChange = {},
-        onSelectionChange = {}
     )
 }

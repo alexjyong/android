@@ -122,7 +122,7 @@ import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
 import chat.revolt.components.chat.DateDivider
 import chat.revolt.components.chat.Message
-import chat.revolt.components.chat.NativeMessageField
+import chat.revolt.components.chat.MessageField
 import chat.revolt.components.chat.SystemMessage
 import chat.revolt.components.emoji.EmojiPicker
 import chat.revolt.components.generic.GroupIcon
@@ -969,7 +969,7 @@ fun ChannelScreen(
                                             AssistChip(
                                                 onClick = {
                                                     viewModel.editingMessage = null
-                                                    viewModel.putDraftContent("")
+                                                    viewModel.putDraftContent("", true)
                                                 },
                                                 label = {
                                                     Text(stringResource(R.string.message_field_editing_message))
@@ -992,8 +992,9 @@ fun ChannelScreen(
                                         }
                                     }
 
-                                    NativeMessageField(
-                                        value = viewModel.draftContent,
+                                    MessageField(
+                                        initialValue = viewModel.initialTextFieldValue,
+                                        initialValueDirtyMarker = viewModel.initialTextFieldValueDirtyMarker,
                                         onValueChange = viewModel::putDraftContent,
                                         onAddAttachment = {
                                             if (viewModel.activePane == ChannelScreenActivePane.AttachmentPicker) {
@@ -1032,6 +1033,11 @@ fun ChannelScreen(
                                         serverId = viewModel.channel?.server,
                                         channelId = channelId,
                                         failedValidation = viewModel.draftContent.length > 2000,
+                                        valueIsBlank = viewModel.draftContent.isBlank(),
+                                        cancelEdit = {
+                                            viewModel.editingMessage = null
+                                            viewModel.putDraftContent("", true)
+                                        }
                                     )
 
                                     DropdownMenu(

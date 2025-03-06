@@ -78,6 +78,14 @@ class ChannelScreenViewModel @Inject constructor(
     var activePane by mutableStateOf<ChannelScreenActivePane>(ChannelScreenActivePane.None)
     var keyboardHeight by mutableIntStateOf(0)
 
+    // Setting [initialTextFieldValue] causes the text field to switch value.
+    // However [initialTextFieldValue] gets de-synced with the actual text field value when the user types.
+    // For a field that keeps track of the actual text field value, see [draftContent].
+    // Setting [draftContent] does not cause the text field to switch value.
+    // Note that if [initialTextFieldValue] is set to the same value it has now, the text field will not switch value.
+    // Set [initialTextFieldValueDirtyMarker] to a new value to force the text field to switch value.
+    var initialTextFieldValue by mutableStateOf("")
+    var initialTextFieldValueDirtyMarker by mutableStateOf("")
     var draftContent by mutableStateOf("")
     var draftAttachments = mutableStateListOf<FileArgs>()
     var draftReplyTo = mutableStateListOf<SendMessageReply>()
@@ -198,7 +206,7 @@ class ChannelScreenViewModel @Inject constructor(
     }
 
     fun putAtCursorPosition(text: String) {
-        putDraftContent(draftContent + text)
+        putDraftContent(draftContent + text, true)
     }
 
     private var lastSentBeginTyping: Instant? = null
@@ -241,7 +249,11 @@ class ChannelScreenViewModel @Inject constructor(
         }
     }
 
-    fun putDraftContent(content: String) {
+    /**
+     * Puts the draft content in the KV storage, the in-memory state of the message content,
+     * and, if [setInitial] is true, updates the text field to say the new [content].
+     */
+    fun putDraftContent(content: String, setInitial: Boolean = false) {
         viewModelScope.launch {
             kvStorage.set("draftContent/${channel?.id}", content)
         }
@@ -257,6 +269,10 @@ class ChannelScreenViewModel @Inject constructor(
         }
 
         draftContent = content
+        if (setInitial) {
+            initialTextFieldValue = content
+            initialTextFieldValueDirtyMarker = ULID.makeNext()
+        }
     }
 
     suspend fun addReplyTo(messageId: String) {
@@ -295,7 +311,7 @@ class ChannelScreenViewModel @Inject constructor(
                 messageId = editingMessage ?: return,
                 newContent = draftContent,
             )
-            putDraftContent("")
+            putDraftContent("", true)
         } catch (e: Exception) {
             Log.e("ChannelScreenViewModel", "Failed to edit message", e)
         }
@@ -368,7 +384,7 @@ class ChannelScreenViewModel @Inject constructor(
             updateItems(listOf(ChannelScreenItem.ProspectiveMessage(prospectiveMessage)) + items)
 
             kvStorage.remove("draftContent/${channel?.id}")
-            putDraftContent("")
+            putDraftContent("", true)
             draftReplyTo.clear()
             attachmentUploadProgress = 0f
 
@@ -723,7 +739,7 @@ class ChannelScreenViewModel @Inject constructor(
                             m is ChannelScreenItem.RegularMessage && m.message.id == it.messageId
                         } as? ChannelScreenItem.RegularMessage ?: return@onEach
 
-                        putDraftContent(message.message.content ?: "")
+                        putDraftContent(message.message.content ?: "", true)
                         this@ChannelScreenViewModel.draftAttachments.clear()
                         draftReplyTo.clear()
                     }
@@ -740,7 +756,7 @@ class ChannelScreenViewModel @Inject constructor(
                                 shouldMention
                             )
                         )
-                        putDraftContent(it.content)
+                        putDraftContent(it.content, true)
                     }
                 }
             }.catch {

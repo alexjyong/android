@@ -60,7 +60,7 @@ import chat.revolt.api.routes.microservices.autumn.uploadToAutumn
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.api.settings.SyncedSettings
-import chat.revolt.components.chat.NativeMessageField
+import chat.revolt.components.chat.MessageField
 import chat.revolt.components.emoji.EmojiPicker
 import chat.revolt.components.screens.chat.AttachmentManager
 import chat.revolt.components.screens.chat.drawer.ChannelItem
@@ -382,8 +382,8 @@ fun ShareTargetScreen(
                             )
                         }
 
-                        NativeMessageField(
-                            value = viewModel.messageContent,
+                        MessageField(
+                            initialValue = "",
                             onValueChange = { viewModel.messageContent = it },
                             canAttach = false,
                             forceSendButton = viewModel.attachments.isNotEmpty(),
@@ -404,7 +404,7 @@ fun ShareTargetScreen(
                                         context.getString(R.string.share_target_select_channel),
                                         Toast.LENGTH_SHORT
                                     ).show()
-                                    return@NativeMessageField
+                                    return@MessageField
                                 } else {
                                     viewModel.send(selectedChannel!!) {
                                         onFinished()
