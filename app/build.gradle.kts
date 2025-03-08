@@ -250,7 +250,7 @@ dependencies {
     implementation("androidx.documentfile:documentfile:1.0.1")
     implementation("androidx.browser:browser:1.8.0")
     implementation("androidx.webkit:webkit:1.12.1")
-    implementation("androidx.core:core-splashscreen:1.2.0-alpha02")
+    implementation("androidx.core:core-splashscreen:1.2.0-beta01")
     implementation("androidx.palette:palette-ktx:1.0.0")
 
     // Libraries used for legacy View-based UI
