@@ -47,14 +47,12 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.RevoltApplication
-import chat.revolt.api.REVOLT_SUPPORT
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.account.EmailPasswordAssessment
 import chat.revolt.api.routes.account.negotiateAuthentication
 import chat.revolt.api.routes.onboard.needsOnboarding
 import chat.revolt.components.generic.AnyLink
 import chat.revolt.components.generic.FormTextField
-import chat.revolt.components.generic.Weblink
 import chat.revolt.persistence.KVStorage
 import chat.revolt.ui.theme.FragmentMono
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -295,12 +293,6 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = hiltVi
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Weblink(
-                text = stringResource(R.string.password_manager_hint),
-                url = "$REVOLT_SUPPORT/kb/interface/android/using-a-password-manager",
-                modifier = Modifier.testTag("password_manager_kb_link")
-            )
-
             AnyLink(
                 text = stringResource(R.string.resend_verification),
                 action = {
