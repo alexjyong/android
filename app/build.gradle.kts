@@ -28,7 +28,7 @@ val glideVersion = "4.16.0"
 val ktorVersion = "3.0.0-beta-2"
 val media3Version = "1.5.0"
 val livekitVersion = "2.2.0"
-val material3Version = "1.4.0-alpha08"
+val material3Version = "1.4.0-alpha09"
 val androidXTestVersion = "1.6.1"
 
 fun property(fileName: String, propertyName: String, fallbackEnv: String? = null): String? {
