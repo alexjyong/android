@@ -223,6 +223,10 @@ object BrushCompat {
 
     @Composable
     fun parseColour(colour: String): Brush {
+        if (colour.isEmpty()) {
+            return Brush.solidColor(Color.Unspecified)
+        }
+
         when {
             colour.startsWith("var(") -> {
                 Log.d(
