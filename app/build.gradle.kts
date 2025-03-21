@@ -285,7 +285,7 @@ dependencies {
 
     // Markup
     implementation("org.jetbrains:markdown:0.7.3")
-    implementation("dev.snipme:highlights:0.9.1")
+    implementation("dev.snipme:highlights:1.0.0")
 
     // Livekit
     // FIXME temporarily not included, re-add when realtime media is to be implemented
