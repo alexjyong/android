@@ -161,6 +161,9 @@ fun formatLongAsTime(time: Long): String {
         )
         val relativeTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(date)
 
+        if (DateUtils.isToday(time)) {
+            return relativeTime
+        }
         "$relativeDate $relativeTime"
     } else {
         val absoluteDate = DateFormat.getDateInstance(DateFormat.SHORT).format(date)
