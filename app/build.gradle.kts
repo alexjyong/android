@@ -200,7 +200,7 @@ dependencies {
     androidTestImplementation(composeBom)
 
     // Jetpack Compose
-    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui:1.8.0-rc01")
     implementation("androidx.compose.ui:ui-util")
     implementation("androidx.compose.material3:material3:$material3Version")
     implementation("androidx.compose.material3:material3-window-size-class:$material3Version")

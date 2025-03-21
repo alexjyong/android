@@ -318,7 +318,7 @@ fun MessageField(
                                     )
                                 },
                                 modifier = Modifier
-                                    .animateItemPlacement()
+                                    .animateItem()
                             )
                         }
 
@@ -359,7 +359,7 @@ fun MessageField(
                                     }
                                 },
                                 modifier = Modifier
-                                    .animateItemPlacement()
+                                    .animateItem()
                             )
                         }
 
