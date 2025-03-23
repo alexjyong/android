@@ -63,7 +63,6 @@ import chat.revolt.components.generic.HealthAlert
 import chat.revolt.ndk.NativeLibraries
 import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.DefaultDestinationScreen
-import chat.revolt.screens.SplashScreen
 import chat.revolt.screens.about.AboutScreen
 import chat.revolt.screens.about.AttributionScreen
 import chat.revolt.screens.chat.ChatRouterScreen
@@ -73,6 +72,7 @@ import chat.revolt.screens.login.LoginGreetingScreen
 import chat.revolt.screens.login.LoginScreen
 import chat.revolt.screens.login.MfaScreen
 import chat.revolt.screens.login2.InitScreen
+import chat.revolt.screens.main.MainScreen
 import chat.revolt.screens.register.OnboardingScreen
 import chat.revolt.screens.register.RegisterDetailsScreen
 import chat.revolt.screens.register.RegisterGreetingScreen
@@ -492,7 +492,6 @@ fun AppEntrypoint(
                         onRetryConnection
                     )
                 }
-                composable("splash") { SplashScreen(navController) }
 
                 composable("login/greeting") { LoginGreetingScreen(navController) }
                 composable("login/login") { LoginScreen(navController) }
@@ -527,6 +526,8 @@ fun AppEntrypoint(
 
                 composable("login2/init") { InitScreen(navController, windowSizeClass) }
 
+                // This is only used outside of Polar mode
+                // Otherwise you may be looking for "main" right below
                 composable("chat",
                     enterTransition = {
                         slideIntoContainer(
@@ -552,6 +553,24 @@ fun AppEntrypoint(
                             navController.navigate("default")
                         }
                     )
+                }
+
+                // This is only the main screen in Polar mode
+                // Otherwise you may be looking for "chat" right above
+                composable("main",
+                    enterTransition = {
+                        slideIntoContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Up,
+                            animationSpec = tween(
+                                400,
+                                // cf. https://m3.material.io/styles/motion/easing-and-duration/tokens-specs#cbea5c6e-7b0d-47a0-98c3-767080a38d95
+                                easing = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1f)
+                            ),
+                            initialOffset = { it / 3 }
+                        ) + fadeIn(animationSpec = RevoltTweenFloat)
+                    }
+                ) {
+                    MainScreen(navController)
                 }
 
                 composable("create/group") { CreateGroupScreen(navController) }
