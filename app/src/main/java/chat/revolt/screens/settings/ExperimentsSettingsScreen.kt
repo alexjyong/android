@@ -30,6 +30,7 @@ class ExperimentsSettingsScreenViewModel : ViewModel() {
     fun init() {
         viewModelScope.launch {
             useKotlinMdRendererChecked.value = Experiments.useKotlinBasedMarkdownRenderer.isEnabled
+            usePolarChecked.value = Experiments.usePolar.isEnabled
         }
     }
 
