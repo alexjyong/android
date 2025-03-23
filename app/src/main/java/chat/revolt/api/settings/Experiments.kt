@@ -27,6 +27,7 @@ class ExperimentInstance(default: Boolean) {
  */
 object Experiments {
     val useKotlinBasedMarkdownRenderer = ExperimentInstance(false)
+    val usePolar = ExperimentInstance(false)
 
     suspend fun hydrateWithKv() {
         val kvStorage = KVStorage(RevoltApplication.instance)
@@ -38,7 +39,10 @@ object Experiments {
         }
 
         useKotlinBasedMarkdownRenderer.setEnabled(
-            kvStorage.getBoolean("exp/useKotlinBasedMarkdownRenderer") ?: false
+            kvStorage.getBoolean("exp/useKotlinBasedMarkdownRenderer") == true
+        )
+        usePolar.setEnabled(
+            kvStorage.getBoolean("exp/usePolar") == true
         )
     }
 }

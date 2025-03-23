@@ -50,6 +50,16 @@ class ExperimentsSettingsScreenViewModel : ViewModel() {
             useKotlinMdRendererChecked.value = value
         }
     }
+
+    val usePolarChecked = mutableStateOf(false)
+
+    fun setUsePolarChecked(value: Boolean) {
+        viewModelScope.launch {
+            kv.set("exp/usePolar", value)
+            Experiments.usePolar.setEnabled(value)
+            usePolarChecked.value = value
+        }
+    }
 }
 
 @Composable
@@ -77,10 +87,26 @@ fun ExperimentsSettingsScreen(
             trailingContent = {
                 Switch(
                     checked = viewModel.useKotlinMdRendererChecked.value,
-                    onCheckedChange = viewModel::setUseKotlinMdRendererChecked
+                    onCheckedChange = null
                 )
             },
             modifier = Modifier.clickable { viewModel.setUseKotlinMdRendererChecked(!viewModel.useKotlinMdRendererChecked.value) }
+        )
+
+        ListItem(
+            headlineContent = {
+                Text("Threefold Root User Interface")
+            },
+            supportingContent = {
+                Text("Polar")
+            },
+            trailingContent = {
+                Switch(
+                    checked = viewModel.usePolarChecked.value,
+                    onCheckedChange = null
+                )
+            },
+            modifier = Modifier.clickable { viewModel.setUsePolarChecked(!viewModel.usePolarChecked.value) }
         )
 
         Subcategory(
