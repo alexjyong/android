@@ -111,7 +111,7 @@ fun OverviewScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("You") },
+                title = { Text(stringResource(R.string.overview_screen_title)) },
                 navigationIcon = {
                     if (useDrawer) {
                         IconButton(onClick = {
