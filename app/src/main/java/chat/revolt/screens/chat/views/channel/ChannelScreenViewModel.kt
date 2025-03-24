@@ -143,7 +143,7 @@ class ChannelScreenViewModel @Inject constructor(
             denyMessageFieldIfNeeded()
         }
 
-        this.loadMessages(50)
+        this.loadMessages(50, markLastAsRead = true)
     }
 
     suspend fun unlockAgeGate() {
@@ -420,7 +420,8 @@ class ChannelScreenViewModel @Inject constructor(
         before: String? = null,
         after: String? = null,
         around: String? = null,
-        ignoreExisting: Boolean = false
+        ignoreExisting: Boolean = false,
+        markLastAsRead: Boolean = false
     ) {
         channel?.id?.let { channelId ->
             loadMessagesJob = viewModelScope.launch {
@@ -451,13 +452,11 @@ class ChannelScreenViewModel @Inject constructor(
                                 RevoltAPI.members.setMember(member.id.server, member)
                             }
                         }
-                    }
 
-                    val ackNewest: Boolean
-                    if (!didInitialChannelFetch) {
-                        didInitialChannelFetch = true
-                        ackNewest = true
-                    } else ackNewest = false
+                        if (markLastAsRead) {
+                            ackMessage(messages.firstOrNull()?.id ?: return@launch)
+                        }
+                    }
 
                     val newItems = messages.filter {
                         if (ignoreExisting) {
@@ -490,19 +489,6 @@ class ChannelScreenViewModel @Inject constructor(
                     }
 
                     updateItems(newItemsWithPosition)
-
-                    // If ackNewest is true, we ack the newest (first, as initial fetch is newest to oldest) message.
-                    if (ackNewest) {
-                        ackMessage(newItemsWithPosition.first {
-                            it is ChannelScreenItem.RegularMessage || it is ChannelScreenItem.SystemMessage
-                        }.let {
-                            when (it) {
-                                is ChannelScreenItem.RegularMessage -> it.message.id
-                                is ChannelScreenItem.SystemMessage -> it.message.id
-                                else -> null
-                            }
-                        } ?: return@launch)
-                    }
                 } catch (e: Exception) {
                     Log.e("ChannelScreenViewModel", "Failed to fetch messages", e)
                 }
