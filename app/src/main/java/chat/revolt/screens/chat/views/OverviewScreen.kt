@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,8 +32,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -64,7 +67,12 @@ import io.sentry.Sentry
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OverviewScreen(navController: NavController, useDrawer: Boolean, onDrawerClicked: () -> Unit) {
+fun OverviewScreen(
+    navController: NavController,
+    useDrawer: Boolean,
+    onDrawerClicked: () -> Unit,
+    includePadding: Boolean = true
+) {
     val context = LocalContext.current
 
     var isLoading by rememberSaveable { mutableStateOf(true) }
@@ -119,6 +127,9 @@ fun OverviewScreen(navController: NavController, useDrawer: Boolean, onDrawerCli
                 windowInsets = WindowInsets.zero
             )
         },
+        contentWindowInsets = if (includePadding) ScaffoldDefaults.contentWindowInsets else ScaffoldDefaults.contentWindowInsets.exclude(
+            NavigationBarDefaults.windowInsets
+        )
     ) { pv ->
         if (user == null && !isLoading) {
             NonIdealState(
@@ -138,8 +149,11 @@ fun OverviewScreen(navController: NavController, useDrawer: Boolean, onDrawerCli
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .padding(pv)
-                .padding(horizontal = 16.dp)
+                .then(
+                    Modifier
+                        .padding(pv)
+                        .padding(horizontal = 16.dp)
+                )
         ) {
             AnimatedContent(targetState = isLoading, label = "isLoading") { loading ->
                 Column(

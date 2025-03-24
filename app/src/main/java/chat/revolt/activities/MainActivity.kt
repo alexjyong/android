@@ -214,7 +214,11 @@ class MainActivityViewModel @Inject constructor(
                     Log.d("MainActivity", "Onboarding state is complete, logging in")
                     RevoltAPI.loginAs(token)
                     RevoltAPI.setSessionId(id)
-                    startWithDestination("chat")
+                    if (Experiments.usePolar.isEnabled) {
+                        startWithDestination("main")
+                    } else {
+                        startWithDestination("chat")
+                    }
                 } catch (e: Exception) {
                     Log.e("MainActivity", "Failed to login, could not log in", e)
                     couldNotLogIn.emit(true)
