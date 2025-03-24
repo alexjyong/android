@@ -23,6 +23,7 @@ import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
@@ -66,6 +68,7 @@ import chat.revolt.screens.DefaultDestinationScreen
 import chat.revolt.screens.about.AboutScreen
 import chat.revolt.screens.about.AttributionScreen
 import chat.revolt.screens.chat.ChatRouterScreen
+import chat.revolt.screens.chat.views.channel.ChannelScreen
 import chat.revolt.screens.create.CreateGroupScreen
 import chat.revolt.screens.labs.LabsRootScreen
 import chat.revolt.screens.login.LoginGreetingScreen
@@ -571,10 +574,55 @@ fun AppEntrypoint(
                                 easing = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1f)
                             ),
                             initialOffset = { it / 3 }
-                        ) + fadeIn(animationSpec = RevoltTweenFloat)
+                        ) + fadeIn(animationSpec = RevoltTweenFloat) + scaleIn(
+                            animationSpec = tween(
+                                400,
+                                // cf. https://m3.material.io/styles/motion/easing-and-duration/tokens-specs#cbea5c6e-7b0d-47a0-98c3-767080a38d95
+                                easing = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1f)
+                            ),
+                            initialScale = 0.8f,
+                            transformOrigin = TransformOrigin.Center
+                        )
                     }
                 ) {
                     MainScreen(navController)
+                }
+                composable(
+                    "main/conversation/{channelId}",
+                    enterTransition = {
+                        slideIntoContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Left,
+                            animationSpec = tween(
+                                600,
+                                // cf. https://m3.material.io/styles/motion/easing-and-duration/tokens-specs#cbea5c6e-7b0d-47a0-98c3-767080a38d95
+                                easing = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1f)
+                            ),
+                            initialOffset = { it }
+                        ) + fadeIn(animationSpec = RevoltTweenFloat)
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Right,
+                            animationSpec = tween(
+                                600,
+                                // cf. https://m3.material.io/styles/motion/easing-and-duration/tokens-specs#cbea5c6e-7b0d-47a0-98c3-767080a38d95
+                                easing = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1f)
+                            ),
+                            targetOffset = { it }
+                        ) + fadeOut(animationSpec = RevoltTweenFloat)
+                    }
+                ) { backStackEntry ->
+                    val channelId = backStackEntry.arguments?.getString("channelId") ?: ""
+                    ChannelScreen(
+                        channelId = channelId,
+                        onToggleDrawer = {},
+                        useDrawer = false,
+                        useBackButton = true,
+                        backButtonAction = {
+                            navController.popBackStack()
+                        },
+                        useChatUI = true
+                    )
                 }
 
                 composable("create/group") { CreateGroupScreen(navController) }

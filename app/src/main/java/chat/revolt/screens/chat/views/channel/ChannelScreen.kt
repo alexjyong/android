@@ -45,11 +45,13 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
@@ -186,6 +188,9 @@ fun ChannelScreen(
     channelId: String,
     onToggleDrawer: () -> Unit,
     useDrawer: Boolean,
+    useBackButton: Boolean = false,
+    backButtonAction: (() -> Unit)? = null,
+    useChatUI: Boolean = true,
     viewModel: ChannelScreenViewModel = hiltViewModel()
 ) {
     // <editor-fold desc="State and effects">
@@ -495,12 +500,7 @@ fun ChannelScreen(
     // </editor-fold>
     // <editor-fold desc="Begin UI composition">
     Scaffold(
-        contentWindowInsets = WindowInsets(
-            left = 0,
-            right = 0,
-            top = 0,
-            bottom = 0
-        ),
+        contentWindowInsets = WindowInsets.zero,
         topBar = {
             TopAppBar(
                 modifier = Modifier.clickable {
@@ -602,13 +602,21 @@ fun ChannelScreen(
                         }
                     }
                 },
-                windowInsets = WindowInsets.zero,
+                windowInsets = if (useChatUI) WindowInsets.statusBars else WindowInsets.zero,
                 navigationIcon = {
                     if (useDrawer) {
                         IconButton(onClick = onToggleDrawer) {
                             Icon(
                                 imageVector = Icons.Default.Menu,
                                 contentDescription = stringResource(id = R.string.menu)
+                            )
+                        }
+                    }
+                    if (useBackButton) {
+                        IconButton(onClick = backButtonAction ?: {}) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                                contentDescription = stringResource(id = R.string.back)
                             )
                         }
                     }

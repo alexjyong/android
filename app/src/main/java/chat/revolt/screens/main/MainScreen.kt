@@ -14,6 +14,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.screens.chat.views.OverviewScreen
@@ -47,7 +48,7 @@ fun MainScreen(navController: NavController) {
                         )
                     },
                     label = {
-                        Text("Communities")
+                        Text(stringResource(R.string.main_tab_communities))
                     }
                 )
                 NavigationBarItem(
@@ -66,7 +67,7 @@ fun MainScreen(navController: NavController) {
                         )
                     },
                     label = {
-                        Text("Conversations")
+                        Text(stringResource(R.string.main_tab_conversations))
                     }
                 )
                 NavigationBarItem(
@@ -85,7 +86,7 @@ fun MainScreen(navController: NavController) {
                         )
                     },
                     label = {
-                        Text("Overview")
+                        Text(stringResource(R.string.main_tab_overview))
                     }
                 )
             }
@@ -94,7 +95,12 @@ fun MainScreen(navController: NavController) {
         Box(Modifier.padding(pv)) {
             when (currentTab) {
                 MainScreenTab.Communities -> {}
-                MainScreenTab.Conversations -> {}
+                MainScreenTab.Conversations -> {
+                    ConversationsScreen(
+                        navController
+                    )
+                }
+
                 MainScreenTab.Overview -> {
                     OverviewScreen(
                         navController,

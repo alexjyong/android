@@ -169,6 +169,13 @@
     <string name="friends_deny_all_incoming">Clear all incoming requests</string>
     <string name="frends_new_group">New Group</string>
 
+    <!-- In an experimental iteration of the app's UI, there are three tabs. This is the tab which contains servers. -->
+    <string name="main_tab_communities">Communities</string>
+    <!-- In an experimental iteration of the app's UI, there are three tabs. This is the tab which contains direct messages and groups. -->
+    <string name="main_tab_conversations">Conversations</string>
+    <!-- In an experimental iteration of the app's UI, there are three tabs. This is the tab which contains the user's personal home page. -->
+    <string name="main_tab_overview">You</string>
+
     <string name="create_group">Create a new group</string>
     <string name="create_group_description">Round up your crew in a group chat. You can add up to %1$d people.</string>
     <string name="create_group_name">Group Name</string>
