@@ -1,15 +1,21 @@
 package chat.revolt.screens.settings
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,6 +38,22 @@ class ExperimentsSettingsScreenViewModel : ViewModel() {
             useKotlinMdRendererChecked.value = Experiments.useKotlinBasedMarkdownRenderer.isEnabled
             usePolarChecked.value = Experiments.usePolar.isEnabled
         }
+    }
+
+    val showNeedsRestartAlert = mutableStateOf(false)
+
+    // cf. https://stackoverflow.com/a/46848226
+    fun restartApp(context: Context) {
+        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+        if (intent == null) {
+            return
+        }
+
+        val componentName = intent.component
+        val mainIntent = Intent.makeRestartActivityTask(componentName)
+        mainIntent.`package` = context.packageName
+        context.startActivity(mainIntent)
+        Runtime.getRuntime().exit(0)
     }
 
     fun disableExperiments(then: () -> Unit = {}) {
@@ -58,6 +80,7 @@ class ExperimentsSettingsScreenViewModel : ViewModel() {
         viewModelScope.launch {
             kv.set("exp/usePolar", value)
             Experiments.usePolar.setEnabled(value)
+            showNeedsRestartAlert.value = true
             usePolarChecked.value = value
         }
     }
@@ -68,8 +91,42 @@ fun ExperimentsSettingsScreen(
     navController: NavController,
     viewModel: ExperimentsSettingsScreenViewModel = viewModel()
 ) {
+    val context = LocalContext.current
+
     LaunchedEffect(Unit) {
         viewModel.init()
+    }
+
+    if (viewModel.showNeedsRestartAlert.value) {
+        AlertDialog(
+            onDismissRequest = {
+                viewModel.showNeedsRestartAlert.value = false
+            },
+            title = {
+                Text("Restart Required")
+            },
+            text = {
+                Text("The changes you made require a restart to take effect.")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.restartApp(context)
+                    }
+                ) {
+                    Text("Restart")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.showNeedsRestartAlert.value = false
+                    }
+                ) {
+                    Text("Later")
+                }
+            }
+        )
     }
 
     SettingsPage(
