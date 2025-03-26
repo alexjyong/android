@@ -190,7 +190,7 @@ fun ChannelScreen(
     useDrawer: Boolean,
     useBackButton: Boolean = false,
     backButtonAction: (() -> Unit)? = null,
-    useChatUI: Boolean = true,
+    useChatUI: Boolean = false,
     viewModel: ChannelScreenViewModel = hiltViewModel()
 ) {
     // <editor-fold desc="State and effects">
