@@ -804,8 +804,10 @@ fun ChatRouterScreen(
                 )
             }
         } else {
+            var useSidebarGesture by remember { mutableStateOf(true) }
             DismissibleNavigationDrawer(
                 drawerState = drawerState,
+                gesturesEnabled = useSidebarGesture,
                 drawerContent = {
                     DismissibleDrawerSheet(
                         drawerContainerColor = Color.Transparent,
@@ -842,7 +844,11 @@ fun ChatRouterScreen(
                             toggleDrawer = {
                                 toggleDrawerLambda()
                             },
-                            drawerState = drawerState
+                            drawerState = drawerState,
+                            drawerGestureEnabled = useSidebarGesture,
+                            setDrawerGestureEnabled = {
+                                useSidebarGesture = it
+                            }
                         )
                     }
                 }
@@ -884,7 +890,9 @@ fun ChannelNavigator(
     topNav: NavController,
     useDrawer: Boolean,
     toggleDrawer: () -> Unit,
-    drawerState: DrawerState? = null
+    drawerState: DrawerState? = null,
+    drawerGestureEnabled: Boolean = true,
+    setDrawerGestureEnabled: (Boolean) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
 
@@ -922,7 +930,10 @@ fun ChannelNavigator(
                             }
                         }
                     },
-                    useDrawer = useDrawer
+                    useDrawer = useDrawer,
+                    drawerGestureEnabled = drawerGestureEnabled,
+                    setDrawerGestureEnabled = setDrawerGestureEnabled,
+                    drawerState = drawerState,
                 )
             }
 

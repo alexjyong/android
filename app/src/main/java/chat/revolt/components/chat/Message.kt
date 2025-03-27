@@ -184,7 +184,8 @@ fun Message(
     onReply: () -> Unit = {},
     onAddReaction: () -> Unit = {},
     fromWebhook: Boolean = false,
-    webhookName: String? = null
+    webhookName: String? = null,
+    modifier: Modifier = Modifier
 ) {
     val author = RevoltAPI.userCache[message.author] ?: return CircularProgressIndicator()
     val context = LocalContext.current
@@ -200,7 +201,7 @@ fun Message(
 
     val authorIsBlocked = remember(author) { author.relationship == "Blocked" }
 
-    Column(Modifier.animateContentSize()) {
+    Column(modifier.animateContentSize()) {
         if (message.tail == false) {
             Spacer(modifier = Modifier.height(10.dp))
         }
