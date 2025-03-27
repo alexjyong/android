@@ -489,6 +489,10 @@ class ChannelScreenViewModel @Inject constructor(
                     }
 
                     updateItems(newItemsWithPosition)
+
+                    if (!didInitialChannelFetch) {
+                        didInitialChannelFetch = true
+                    }
                 } catch (e: Exception) {
                     Log.e("ChannelScreenViewModel", "Failed to fetch messages", e)
                 }
