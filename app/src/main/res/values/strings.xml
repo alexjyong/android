@@ -268,6 +268,9 @@
     <string name="x_days_ago">%1$d days ago</string>
     <string name="edited">(edited)</string>
 
+    <string name="swipe_to_reply_keep_swiping">Reply</string>
+    <string name="swipe_to_reply_release">Release to reply</string>
+
     <string name="disconnected">Disconnected</string>
     <string name="tap_to_reconnect">Tap to reconnect</string>
     <string name="reconnecting">Reconnecting…</string>

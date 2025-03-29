@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntAsState
@@ -36,7 +37,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -49,6 +49,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
@@ -88,6 +89,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -99,6 +101,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -115,6 +118,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.documentfile.provider.DocumentFile
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -150,6 +154,7 @@ import chat.revolt.components.screens.chat.AttachmentManager
 import chat.revolt.components.screens.chat.ChannelIcon
 import chat.revolt.components.screens.chat.ReplyManager
 import chat.revolt.components.screens.chat.TypingIndicator
+import chat.revolt.components.screens.chat.atoms.RegularMessage
 import chat.revolt.components.skeletons.MessageSkeleton
 import chat.revolt.components.skeletons.MessageSkeletonVariant
 import chat.revolt.internals.extensions.rememberChannelPermissions
@@ -716,189 +721,29 @@ fun ChannelScreen(
                             ) { index ->
                                 when (val item = viewModel.items[index]) {
                                     is ChannelScreenItem.RegularMessage -> {
-                                        var offsetX by remember { mutableFloatStateOf(0f) }
-                                        val animOffsetX by animateFloatAsState(
-                                            when {
-                                                offsetX > -20f -> 0f
-                                                else -> offsetX
+                                        RegularMessage(
+                                            item.message,
+                                            viewModel.channel,
+                                            setDrawerGestureEnabled = {
+                                                setDrawerGestureEnabled(it)
                                             },
-                                            label = "X offset of message for replies"
-                                        )
-                                        var markGestureInvalid by remember { mutableStateOf(false) }
-                                        var hapticFeedbackPerformed by remember {
-                                            mutableStateOf(
-                                                false
-                                            )
-                                        }
-
-                                        var onMoveHandler: (List<PointerInputChange>) -> Unit =
-                                            { changeList: List<PointerInputChange> ->
-                                                changeList
-                                                    .firstOrNull()
-                                                    ?.let {
-                                                        val deltaX =
-                                                            it.position.x - it.previousPosition.x
-                                                        val deltaY =
-                                                            it.position.y - it.previousPosition.y
-
-                                                        val couldBeTopDownScroll =
-                                                            deltaX > -30f
-                                                                    && abs(deltaY) > 30f
-                                                                    // too far in to consider it an accident
-                                                                    && offsetX >= -100f
-                                                        if (couldBeTopDownScroll) {
-                                                            offsetX = 0f
-                                                            markGestureInvalid = true
-                                                            return@let
-                                                        }
-
-                                                        val goesTowardsLeft =
-                                                            it.position.x < it.previousPosition.x
-                                                        if (goesTowardsLeft || offsetX <= -20f) {
-                                                            if (markGestureInvalid) {
-                                                                return@let
-                                                            }
-                                                            offsetX += deltaX
-                                                            setDrawerGestureEnabled(
-                                                                false
-                                                            )
-                                                        }
-
-                                                        if (goesTowardsLeft && offsetX <= -30f) {
-                                                            disableScroll = true
-                                                        }
-
-                                                        if (
-                                                            goesTowardsLeft
-                                                            && offsetX <= -300f
-                                                            && !hapticFeedbackPerformed
-                                                        ) {
-                                                            hapticFeedbackPerformed = true
-                                                            haptic.performHapticFeedback(
-                                                                HapticFeedbackType.GestureThresholdActivate
-                                                            )
-                                                        } else if (
-                                                            hapticFeedbackPerformed
-                                                            && offsetX >= -100f
-                                                        ) {
-                                                            hapticFeedbackPerformed = false
-                                                        }
-                                                    }
-                                            }
-
-                                        Box {
-                                            Message(
-                                                message = item.message,
-                                                onMessageContextMenu = {
-                                                    item.message.id?.let { messageId ->
-                                                        messageContextSheetTarget = messageId
-                                                        messageContextSheetShown = true
-                                                    }
-                                                },
-                                                onAvatarClick = {
-                                                    if (item.message.webhook != null) {
-                                                        scope.launch {
-                                                            ActionChannel.send(Action.OpenWebhookSheet)
-                                                        }
-                                                    } else {
-                                                        item.message.author?.let { author ->
-                                                            scope.launch {
-                                                                ActionChannel.send(
-                                                                    Action.OpenUserSheet(
-                                                                        author,
-                                                                        viewModel.channel?.server
-                                                                    )
-                                                                )
-                                                            }
-                                                        }
-                                                    }
-                                                },
-                                                onNameClick = {
-                                                    val author =
-                                                        item.message.author?.let { RevoltAPI.userCache[it] }
-                                                            ?: return@Message
-                                                    viewModel.putAtCursorPosition("@${author.username}#${author.discriminator}")
-                                                },
-                                                canReply = true,
-                                                onReply = {
-                                                    item.message.id?.let { messageId ->
-                                                        scope.launch {
-                                                            viewModel.addReplyTo(
-                                                                messageId
-                                                            )
-                                                        }
-                                                    }
-                                                },
-                                                onAddReaction = {
-                                                    item.message.id?.let { messageId ->
-                                                        reactSheetTarget = messageId
-                                                        reactSheetShown = true
-                                                    }
-                                                },
-                                                fromWebhook = item.message.webhook != null,
-                                                webhookName = item.message.webhook?.name,
-                                                modifier = Modifier
-                                                    .offset(
-                                                        x = with(LocalDensity.current) { animOffsetX.toDp() }
-                                                    )
-                                                    .then(
-                                                        if (LoadedSettings.messageReplyStyle == MessageReplyStyle.SwipeFromEnd)
-                                                            Modifier.supportSwipeReply(
-                                                                onDown = {},
-                                                                onMove = onMoveHandler,
-                                                                onUp = {
-                                                                    if (offsetX <= -300f) {
-                                                                        scope.launch {
-                                                                            item.message.id?.let {
-                                                                                viewModel.addReplyTo(
-                                                                                    it
-                                                                                )
-                                                                            }
-                                                                        }
-                                                                    }
-
-                                                                    setDrawerGestureEnabled(true)
-                                                                    markGestureInvalid = false
-                                                                    disableScroll = false
-                                                                    hapticFeedbackPerformed = false
-                                                                    offsetX = 0f
-                                                                }
-                                                            )
-                                                        else Modifier
-                                                    )
-                                            )
-                                            BoxWithConstraints(Modifier.fillMaxHeight()) {
-                                                Row(
-                                                    Modifier
-                                                        .fillMaxHeight()
-                                                        .offset(
-                                                            x = with(LocalDensity.current) {
-                                                                maxWidth - abs(
-                                                                    animOffsetX
-                                                                ).toDp()
-                                                            }
-                                                        )
-                                                        .background(
-                                                            MaterialTheme.colorScheme.primary.copy(
-                                                                alpha = 0.1f
-                                                            )
-                                                        )
-                                                        .fillMaxWidth(),
-                                                    verticalAlignment = Alignment.CenterVertically,
-                                                    horizontalArrangement = Arrangement.spacedBy(
-                                                        8.dp,
-                                                        Alignment.Start
-                                                    )
-                                                ) {
-                                                    Text(
-                                                        when {
-                                                            offsetX <= -300f -> "stop"
-                                                            else -> "keep"
-                                                        }
-                                                    )
+                                            setDisableScroll = {
+                                                disableScroll = it
+                                            },
+                                            showMessageBottomSheet = {
+                                                messageContextSheetTarget = it
+                                                messageContextSheetShown = true
+                                            },
+                                            showReactBottomSheet = {
+                                                item.message.id?.let {
+                                                    reactSheetTarget = it
+                                                    reactSheetShown = true
                                                 }
-                                            }
-                                        }
+                                            },
+                                            putTextAtCursorPosition = viewModel::putAtCursorPosition,
+                                            replyToMessage = viewModel::addReplyTo,
+                                            scope = scope
+                                        )
                                     }
 
                                     is ChannelScreenItem.ProspectiveMessage -> {
