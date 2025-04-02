@@ -17,7 +17,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.EaseInOutExpo
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.tween
@@ -62,6 +61,7 @@ import chat.revolt.api.settings.Experiments
 import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.components.generic.HealthAlert
+import chat.revolt.material.EasingTokens
 import chat.revolt.ndk.NativeLibraries
 import chat.revolt.persistence.KVStorage
 import chat.revolt.screens.DefaultDestinationScreen
@@ -535,14 +535,14 @@ fun AppEntrypoint(
 
                 // This is only used outside of Polar mode
                 // Otherwise you may be looking for "main" right below
-                composable("chat",
+                composable(
+                    "chat",
                     enterTransition = {
                         slideIntoContainer(
                             AnimatedContentTransitionScope.SlideDirection.Up,
                             animationSpec = tween(
                                 400,
-                                // cf. https://m3.material.io/styles/motion/easing-and-duration/tokens-specs#cbea5c6e-7b0d-47a0-98c3-767080a38d95
-                                easing = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1f)
+                                easing = EasingTokens.EmphasizedDecelerate
                             ),
                             initialOffset = { it / 3 }
                         ) + fadeIn(animationSpec = RevoltTweenFloat)
@@ -564,21 +564,20 @@ fun AppEntrypoint(
 
                 // This is only the main screen in Polar mode
                 // Otherwise you may be looking for "chat" right above
-                composable("main",
+                composable(
+                    "main",
                     enterTransition = {
                         slideIntoContainer(
                             AnimatedContentTransitionScope.SlideDirection.Up,
                             animationSpec = tween(
                                 400,
-                                // cf. https://m3.material.io/styles/motion/easing-and-duration/tokens-specs#cbea5c6e-7b0d-47a0-98c3-767080a38d95
-                                easing = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1f)
+                                easing = EasingTokens.EmphasizedDecelerate
                             ),
                             initialOffset = { it / 3 }
                         ) + fadeIn(animationSpec = RevoltTweenFloat) + scaleIn(
                             animationSpec = tween(
                                 400,
-                                // cf. https://m3.material.io/styles/motion/easing-and-duration/tokens-specs#cbea5c6e-7b0d-47a0-98c3-767080a38d95
-                                easing = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1f)
+                                easing = EasingTokens.EmphasizedDecelerate
                             ),
                             initialScale = 0.8f,
                             transformOrigin = TransformOrigin.Center
@@ -594,8 +593,7 @@ fun AppEntrypoint(
                             AnimatedContentTransitionScope.SlideDirection.Left,
                             animationSpec = tween(
                                 600,
-                                // cf. https://m3.material.io/styles/motion/easing-and-duration/tokens-specs#cbea5c6e-7b0d-47a0-98c3-767080a38d95
-                                easing = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1f)
+                                easing = EasingTokens.EmphasizedDecelerate
                             ),
                             initialOffset = { it }
                         ) + fadeIn(animationSpec = RevoltTweenFloat)
@@ -605,8 +603,7 @@ fun AppEntrypoint(
                             AnimatedContentTransitionScope.SlideDirection.Right,
                             animationSpec = tween(
                                 600,
-                                // cf. https://m3.material.io/styles/motion/easing-and-duration/tokens-specs#cbea5c6e-7b0d-47a0-98c3-767080a38d95
-                                easing = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1f)
+                                easing = EasingTokens.EmphasizedDecelerate
                             ),
                             targetOffset = { it }
                         ) + fadeOut(animationSpec = RevoltTweenFloat)
