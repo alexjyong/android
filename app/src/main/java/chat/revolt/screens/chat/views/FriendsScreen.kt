@@ -127,7 +127,9 @@ fun FriendsScreen(topNav: NavController, useDrawer: Boolean, onDrawerClicked: ()
                 }
 
                 items(FriendRequests.getIncoming().size) {
-                    val item = FriendRequests.getIncoming()[it]
+                    val item = FriendRequests.getIncoming().getOrNull(it)
+                    if (item == null) return@items
+
                     MemberListItem(
                         member = null,
                         user = item,
@@ -151,7 +153,9 @@ fun FriendsScreen(topNav: NavController, useDrawer: Boolean, onDrawerClicked: ()
                 }
 
                 items(FriendRequests.getOutgoing().size) {
-                    val item = FriendRequests.getOutgoing()[it]
+                    val item = FriendRequests.getOutgoing().getOrNull(it)
+                    if (item == null) return@items
+
                     MemberListItem(
                         member = null,
                         user = item,
@@ -175,7 +179,9 @@ fun FriendsScreen(topNav: NavController, useDrawer: Boolean, onDrawerClicked: ()
                 }
 
                 items(FriendRequests.getOnlineFriends().size) {
-                    val item = FriendRequests.getOnlineFriends()[it]
+                    val item = FriendRequests.getOnlineFriends().getOrNull(it)
+                    if (item == null) return@items
+
                     MemberListItem(
                         member = null,
                         user = item,
@@ -199,7 +205,9 @@ fun FriendsScreen(topNav: NavController, useDrawer: Boolean, onDrawerClicked: ()
                 }
 
                 items(FriendRequests.getFriends(true).size) {
-                    val item = FriendRequests.getFriends(true)[it]
+                    val item = FriendRequests.getFriends(true).getOrNull(it)
+                    if (item == null) return@items
+
                     MemberListItem(
                         member = null,
                         user = item,
@@ -224,7 +232,9 @@ fun FriendsScreen(topNav: NavController, useDrawer: Boolean, onDrawerClicked: ()
 
 
                 items(FriendRequests.getBlocked().size) {
-                    val item = FriendRequests.getBlocked()[it]
+                    val item = FriendRequests.getBlocked().getOrNull(it)
+                    if (item == null) return@items
+                    
                     MemberListItem(
                         member = null,
                         user = item,
