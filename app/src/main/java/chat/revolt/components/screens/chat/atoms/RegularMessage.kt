@@ -4,8 +4,9 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -218,54 +219,45 @@ fun RegularMessage(
         with(LocalDensity.current) {
             val msgHeightAsDp = messageHeight.toDp()
             BoxWithConstraints(Modifier.height(msgHeightAsDp)) {
-                AnimatedContent(
-                    targetState = canReleaseToSend,
-                    transitionSpec = {
-                        if (canReleaseToSend) {
-                            slideInVertically { -it } togetherWith slideOutVertically { it }
-                        } else {
-                            slideInVertically { it } togetherWith slideOutVertically { -it }
-                        }
-                    },
-                    label = "Swipe to Reply indicator content slide"
+                Row(
+                    Modifier
+                        .height(msgHeightAsDp)
+                        .requiredHeightIn(max = msgHeightAsDp) // must not cause message to be taller
+                        .offset(
+                            x = with(LocalDensity.current) {
+                                maxWidth - abs(
+                                    animOffsetX
+                                ).toDp()
+                            }
+                        )
+                        .background(indicatorBackground)
+                        .fillMaxWidth()
+                        .padding(start = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(
+                        8.dp,
+                        Alignment.Start
+                    )
                 ) {
-                    Row(
-                        Modifier
-                            .height(msgHeightAsDp)
-                            .requiredHeightIn(max = msgHeightAsDp) // must not cause message to be taller
-                            .offset(
-                                x = with(LocalDensity.current) {
-                                    maxWidth - abs(
-                                        animOffsetX
-                                    ).toDp()
-                                }
+                    Icon(
+                        painter = painterResource(R.drawable.ic_reply_24dp),
+                        contentDescription = null,
+                        modifier = Modifier.size(
+                            min(
+                                msgHeightAsDp - 4.dp,
+                                24.dp
                             )
-                            .background(
-                                // indicatorBackground
-                                if (it) MaterialTheme.colorScheme.inversePrimary
-                                else MaterialTheme.colorScheme.primaryContainer
-                            )
-                            .fillMaxWidth()
-                            .padding(start = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(
-                            8.dp,
-                            Alignment.Start
-                        )
+                        ),
+                        tint = indicatorForeground
+                    )
+                    AnimatedContent(
+                        targetState = canReleaseToSend,
+                        transitionSpec = {
+                            fadeIn(animationSpec = spring()) togetherWith
+                                    fadeOut(animationSpec = spring())
+                        },
+                        label = "Swipe to Reply indicator label"
                     ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_reply_24dp),
-                            contentDescription = null,
-                            modifier = Modifier.size(
-                                min(
-                                    msgHeightAsDp - 4.dp,
-                                    24.dp
-                                )
-                            ),
-                            tint = // indicatorForeground
-                            if (it) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.onPrimaryContainer
-                        )
                         Text(
                             when (it) {
                                 true -> stringResource(
@@ -276,7 +268,8 @@ fun RegularMessage(
                                     R.string.swipe_to_reply_keep_swiping
                                 )
                             },
-                            color = indicatorForeground
+                            color = indicatorForeground,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
