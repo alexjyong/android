@@ -46,6 +46,9 @@ import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
 import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
+import logcat.LogPriority
+import logcat.asLog
+import logcat.logcat
 
 @Composable
 fun UserButtons(
@@ -63,7 +66,15 @@ fun UserButtons(
         Button(
             onClick = {
                 scope.launch {
-                    friendUser("${user.username}#${user.discriminator}")
+                    try {
+                        friendUser("${user.username}#${user.discriminator}")
+                    } catch (e: Exception) {
+                        // Button did nothing, but not an error
+                        if (e.message == "NoEffect") return@launch
+                        
+                        // Log all other errors
+                        logcat(LogPriority.ERROR) { e.asLog() }
+                    }
                 }
             },
             modifier = Modifier.weight(1f)
@@ -82,7 +93,12 @@ fun UserButtons(
                     Button(
                         onClick = {
                             scope.launch {
-                                friendUser("${user.username}#${user.discriminator}")
+                                try {
+                                    friendUser("${user.username}#${user.discriminator}")
+                                } catch (e: Exception) {
+                                    if (e.message == "NoEffect") return@launch
+                                    logcat(LogPriority.ERROR) { e.asLog() }
+                                }
                             }
                         },
                         modifier = Modifier.weight(1f)
@@ -165,7 +181,12 @@ fun UserButtons(
                 Button(
                     onClick = {
                         scope.launch {
-                            unfriendUser(user.id)
+                            try {
+                                unfriendUser(user.id)
+                            } catch (e: Exception) {
+                                if (e.message == "NoEffect") return@launch
+                                logcat(LogPriority.ERROR) { e.asLog() }
+                            }
                         }
                     },
                     modifier = Modifier.weight(1f)
@@ -178,7 +199,12 @@ fun UserButtons(
                 Button(
                     onClick = {
                         scope.launch {
-                            acceptFriendRequest(user.id)
+                            try {
+                                acceptFriendRequest(user.id)
+                            } catch (e: Exception) {
+                                if (e.message == "NoEffect") return@launch
+                                logcat(LogPriority.ERROR) { e.asLog() }
+                            }
                         }
                     },
                     modifier = Modifier.weight(1f)
@@ -188,7 +214,12 @@ fun UserButtons(
                 Button(
                     onClick = {
                         scope.launch {
-                            unfriendUser(user.id)
+                            try {
+                                unfriendUser(user.id)
+                            } catch (e: Exception) {
+                                if (e.message == "NoEffect") return@launch
+                                logcat(LogPriority.ERROR) { e.asLog() }
+                            }
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
@@ -205,7 +236,12 @@ fun UserButtons(
                 Button(
                     onClick = {
                         scope.launch {
-                            unblockUser(user.id)
+                            try {
+                                unblockUser(user.id)
+                            } catch (e: Exception) {
+                                if (e.message == "NoEffect") return@launch
+                                logcat(LogPriority.ERROR) { e.asLog() }
+                            }
                         }
                     },
                     modifier = Modifier.weight(1f)
@@ -231,7 +267,12 @@ fun UserButtons(
                                 },
                                 onClick = {
                                     scope.launch {
-                                        unfriendUser(user.id)
+                                        try {
+                                            unfriendUser(user.id)
+                                        } catch (e: Exception) {
+                                            if (e.message == "NoEffect") return@launch
+                                            logcat(LogPriority.ERROR) { e.asLog() }
+                                        }
                                     }
                                 }
                             )
@@ -247,7 +288,12 @@ fun UserButtons(
                             },
                             onClick = {
                                 scope.launch {
-                                    blockUser(user.id)
+                                    try {
+                                        blockUser(user.id)
+                                    } catch (e: Exception) {
+                                        if (e.message == "NoEffect") return@launch
+                                        logcat(LogPriority.ERROR) { e.asLog() }
+                                    }
                                 }
                             }
                         )
