@@ -1,6 +1,14 @@
 package chat.revolt.api.realtime.frames.receivable
 
-import chat.revolt.api.schemas.*
+import chat.revolt.api.schemas.Channel
+import chat.revolt.api.schemas.Embed
+import chat.revolt.api.schemas.Emoji
+import chat.revolt.api.schemas.Member
+import chat.revolt.api.schemas.Message
+import chat.revolt.api.schemas.Role
+import chat.revolt.api.schemas.Server
+import chat.revolt.api.schemas.ServerUserChoice
+import chat.revolt.api.schemas.User
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
@@ -222,7 +230,7 @@ data class UserRelationshipFrame(
     val type: String = "UserRelationship",
     val id: String,
     val user: User,
-    val status: String
+    val status: String? = null
 )
 
 typealias EmojiCreateFrame = Emoji

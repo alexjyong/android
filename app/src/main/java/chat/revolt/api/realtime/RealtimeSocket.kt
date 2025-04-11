@@ -454,11 +454,11 @@ object RealtimeSocket {
                 if (existing == null && userRelationshipFrame.user.id != null) {
                     RevoltAPI.userCache[userRelationshipFrame.user.id] =
                         userRelationshipFrame.user.copy(
-                            relationship = userRelationshipFrame.status
+                            relationship = userRelationshipFrame.status ?: "None"
                         )
                 } else if (existing != null && userRelationshipFrame.user.id != null) {
                     val merged = existing.mergeWithPartial(userRelationshipFrame.user).copy(
-                        relationship = userRelationshipFrame.status
+                        relationship = userRelationshipFrame.status ?: "None"
                     )
                     RevoltAPI.userCache[userRelationshipFrame.user.id] = merged
                 } else {
