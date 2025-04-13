@@ -46,7 +46,9 @@ you are adding a feature, you must follow these guidelines:
   it as per the design. If your UI/UX is not up to the mark, your PR may be rejected by the design
   team.
 - The feature must not be a duplicate of an existing feature.
-- The feature must not be a part of the [Roadmap](#) (To be published).
+- If you are adding a new feature, you should consult with the Android team at Revolt to make sure
+  that the feature is not already in development or planned for the future. Conflicting features
+  will not be merged.
 
 ## In General, ...
 
