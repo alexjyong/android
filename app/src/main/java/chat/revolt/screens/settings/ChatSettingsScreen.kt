@@ -180,7 +180,10 @@ fun ChatSettingsScreen(
                 RadioItem(
                     selected = LoadedSettings.messageReplyStyle == MessageReplyStyle.None,
                     onClick = { viewModel.updateMessageReplyStyle(MessageReplyStyle.None) },
-                    label = { Text(text = stringResource(R.string.settings_chat_quick_reply_none)) }
+                    label = { Text(text = stringResource(R.string.settings_chat_quick_reply_none)) },
+                    description = {
+                        Text(text = stringResource(R.string.settings_chat_quick_reply_none_description))
+                    }
                 )
                 RadioItem(
                     selected = LoadedSettings.messageReplyStyle == MessageReplyStyle.SwipeFromEnd,

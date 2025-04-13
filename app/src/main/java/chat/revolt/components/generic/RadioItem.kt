@@ -14,6 +14,7 @@ fun RadioItem(
     onClick: () -> Unit,
     label: @Composable () -> Unit,
     modifier: Modifier = Modifier,
+    description: @Composable () -> Unit = {},
 ) {
     ListItem(
         modifier = modifier
@@ -31,6 +32,9 @@ fun RadioItem(
                 selected = selected,
                 onClick = null
             )
+        },
+        supportingContent = {
+            description()
         }
     )
 }
