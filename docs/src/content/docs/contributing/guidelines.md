@@ -32,7 +32,9 @@ If you are fixing a bug, you must follow these guidelines:
 
 - Make sure the bug is reproducible and affects a wide variety of users.
 - The root cause of the bug must be the Android app itself, not the server or the API.
-- The root cause of the bug must be the Android app itself, not the device or the Android version.
+- The root cause of the bug must be the Android app itself, not the device.
+- If the root cause if a bug is the Android version, make sure any workaround is only used on
+  affected versions, while on other versions, the intended behavior is used.
 
 #### I want to add a feature
 
