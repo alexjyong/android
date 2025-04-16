@@ -507,10 +507,12 @@ fun ChatRouterScreen(
     }
 
     if (showAddServerSheet) {
-        val addServerSheetState = rememberModalBottomSheetState()
+        val addServerSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
         ModalBottomSheet(
             sheetState = addServerSheetState,
+            sheetGesturesEnabled = false,
+            dragHandle = {},
             onDismissRequest = {
                 showAddServerSheet = false
             }
@@ -563,10 +565,12 @@ fun ChatRouterScreen(
     }
 
     if (showWebhookInfoSheet) {
-        val webhookInfoSheetState = rememberModalBottomSheetState()
+        val webhookInfoSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
         ModalBottomSheet(
             sheetState = webhookInfoSheetState,
+            sheetGesturesEnabled = false,
+            dragHandle = {},
             onDismissRequest = {
                 showWebhookInfoSheet = false
             }
