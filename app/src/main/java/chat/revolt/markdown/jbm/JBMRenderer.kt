@@ -78,10 +78,10 @@ import chat.revolt.api.schemas.isInviteUri
 import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
-import chat.revolt.components.generic.RemoteImage
-import chat.revolt.components.generic.UserAvatar
-import chat.revolt.components.markdown.Annotations
-import chat.revolt.components.utils.detectTapGesturesConditionalConsume
+import chat.revolt.composables.generic.RemoteImage
+import chat.revolt.composables.generic.UserAvatar
+import chat.revolt.composables.markdown.Annotations
+import chat.revolt.composables.utils.detectTapGesturesConditionalConsume
 import chat.revolt.ui.theme.FragmentMono
 import chat.revolt.ui.theme.isThemeDark
 import dev.snipme.highlights.Highlights

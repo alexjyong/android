@@ -40,11 +40,11 @@ import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.user.patchSelf
 import chat.revolt.api.schemas.User
-import chat.revolt.components.generic.SheetButton
-import chat.revolt.components.generic.asApiName
-import chat.revolt.components.generic.presenceFromStatus
-import chat.revolt.components.screens.settings.UserOverview
-import chat.revolt.components.settings.profile.StatusPicker
+import chat.revolt.composables.generic.SheetButton
+import chat.revolt.composables.generic.asApiName
+import chat.revolt.composables.generic.presenceFromStatus
+import chat.revolt.composables.screens.settings.UserOverview
+import chat.revolt.composables.settings.profile.StatusPicker
 import kotlinx.coroutines.launch
 
 @Composable

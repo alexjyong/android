@@ -42,7 +42,7 @@ import chat.revolt.RevoltApplication
 import chat.revolt.api.routes.account.RegistrationBody
 import chat.revolt.api.routes.account.register
 import chat.revolt.api.routes.misc.getRootRoute
-import chat.revolt.components.generic.FormTextField
+import chat.revolt.composables.generic.FormTextField
 import com.hcaptcha.sdk.HCaptcha
 import com.hcaptcha.sdk.HCaptchaConfig
 import com.hcaptcha.sdk.HCaptchaSize

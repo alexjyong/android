@@ -47,8 +47,8 @@ import chat.revolt.api.routes.channel.deleteMessage
 import chat.revolt.api.routes.channel.react
 import chat.revolt.api.settings.Experiments
 import chat.revolt.callbacks.UiCallbacks
-import chat.revolt.components.chat.Message
-import chat.revolt.components.generic.SheetButton
+import chat.revolt.composables.chat.Message
+import chat.revolt.composables.generic.SheetButton
 import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
 

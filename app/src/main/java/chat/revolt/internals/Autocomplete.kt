@@ -2,7 +2,7 @@ package chat.revolt.internals
 
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.schemas.ChannelType
-import chat.revolt.components.chat.AutocompleteSuggestion
+import chat.revolt.composables.chat.AutocompleteSuggestion
 
 object Autocomplete {
     private val emojiImpl = EmojiImpl()

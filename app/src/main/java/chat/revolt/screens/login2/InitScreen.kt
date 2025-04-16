@@ -35,8 +35,8 @@ import chat.revolt.BuildConfig
 import chat.revolt.R
 import chat.revolt.api.REVOLT_MARKETING
 import chat.revolt.api.settings.LoadedSettings
-import chat.revolt.components.generic.AnyLink
-import chat.revolt.components.generic.Weblink
+import chat.revolt.composables.generic.AnyLink
+import chat.revolt.composables.generic.Weblink
 import chat.revolt.ui.theme.Theme
 import com.chuckerteam.chucker.api.Chucker
 

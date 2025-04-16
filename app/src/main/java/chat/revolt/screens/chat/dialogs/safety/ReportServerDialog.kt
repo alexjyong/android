@@ -35,8 +35,8 @@ import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.safety.putServerReport
 import chat.revolt.api.schemas.ContentReportReason
-import chat.revolt.components.generic.FormTextField
-import chat.revolt.components.screens.settings.ServerOverview
+import chat.revolt.composables.generic.FormTextField
+import chat.revolt.composables.screens.settings.ServerOverview
 import kotlinx.coroutines.launch
 
 enum class ServerReportFlowState {

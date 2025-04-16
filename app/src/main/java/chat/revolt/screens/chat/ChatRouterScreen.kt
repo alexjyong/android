@@ -68,9 +68,9 @@ import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.routes.push.subscribePush
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
-import chat.revolt.components.chat.DisconnectedNotice
-import chat.revolt.components.screens.chat.drawer.ChannelSideDrawer
-import chat.revolt.components.screens.voice.VoiceChannelOverlay
+import chat.revolt.composables.chat.DisconnectedNotice
+import chat.revolt.composables.screens.chat.drawer.ChannelSideDrawer
+import chat.revolt.composables.screens.voice.VoiceChannelOverlay
 import chat.revolt.dialogs.NotificationRationaleDialog
 import chat.revolt.internals.Changelogs
 import chat.revolt.internals.extensions.zero

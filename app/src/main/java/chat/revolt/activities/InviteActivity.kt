@@ -57,8 +57,8 @@ import chat.revolt.api.schemas.InviteJoined
 import chat.revolt.api.schemas.RsResult
 import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.api.settings.SyncedSettings
-import chat.revolt.components.generic.IconPlaceholder
-import chat.revolt.components.generic.RemoteImage
+import chat.revolt.composables.generic.IconPlaceholder
+import chat.revolt.composables.generic.RemoteImage
 import chat.revolt.ui.theme.RevoltTheme
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage

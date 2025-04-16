@@ -34,8 +34,8 @@ import chat.revolt.api.internals.FriendRequests
 import chat.revolt.api.routes.user.unfriendUser
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
-import chat.revolt.components.chat.MemberListItem
-import chat.revolt.components.generic.CountableListHeader
+import chat.revolt.composables.chat.MemberListItem
+import chat.revolt.composables.generic.CountableListHeader
 import chat.revolt.internals.extensions.zero
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

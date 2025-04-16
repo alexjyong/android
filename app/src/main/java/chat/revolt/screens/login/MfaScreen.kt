@@ -42,8 +42,8 @@ import chat.revolt.api.routes.account.MfaResponseRecoveryCode
 import chat.revolt.api.routes.account.MfaResponseTotpCode
 import chat.revolt.api.routes.account.authenticateWithMfaRecoveryCode
 import chat.revolt.api.routes.account.authenticateWithMfaTotpCode
-import chat.revolt.components.generic.CollapsibleCard
-import chat.revolt.components.generic.FormTextField
+import chat.revolt.composables.generic.CollapsibleCard
+import chat.revolt.composables.generic.FormTextField
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

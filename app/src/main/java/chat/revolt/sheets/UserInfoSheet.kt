@@ -46,15 +46,15 @@ import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.user.fetchUserProfile
 import chat.revolt.api.schemas.Profile
 import chat.revolt.api.settings.FeatureFlags
-import chat.revolt.components.chat.RoleListEntry
-import chat.revolt.components.chat.UserBadgeList
-import chat.revolt.components.chat.UserBadgeRow
-import chat.revolt.components.generic.NonIdealState
-import chat.revolt.components.generic.UserAvatar
-import chat.revolt.components.markdown.RichMarkdown
-import chat.revolt.components.screens.settings.RawUserOverview
-import chat.revolt.components.screens.settings.UserButtons
-import chat.revolt.components.sheets.SheetTile
+import chat.revolt.composables.chat.RoleListEntry
+import chat.revolt.composables.chat.UserBadgeList
+import chat.revolt.composables.chat.UserBadgeRow
+import chat.revolt.composables.generic.NonIdealState
+import chat.revolt.composables.generic.UserAvatar
+import chat.revolt.composables.markdown.RichMarkdown
+import chat.revolt.composables.screens.settings.RawUserOverview
+import chat.revolt.composables.screens.settings.UserButtons
+import chat.revolt.composables.sheets.SheetTile
 import kotlinx.datetime.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)

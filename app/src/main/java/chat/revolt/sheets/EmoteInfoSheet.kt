@@ -36,8 +36,8 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.custom.fetchEmoji
 import chat.revolt.api.schemas.Emoji
 import chat.revolt.api.schemas.Server
-import chat.revolt.components.generic.RemoteImage
-import chat.revolt.components.generic.SheetButton
+import chat.revolt.composables.generic.RemoteImage
+import chat.revolt.composables.generic.SheetButton
 import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
 

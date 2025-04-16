@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
-import chat.revolt.components.generic.SheetHeaderPadding
+import chat.revolt.composables.generic.SheetHeaderPadding
 import chat.revolt.markdown.jbm.JBM
 import chat.revolt.markdown.jbm.JBMApi
 import org.intellij.markdown.ast.ASTNode

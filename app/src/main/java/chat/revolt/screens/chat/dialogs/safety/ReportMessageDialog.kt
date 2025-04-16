@@ -44,8 +44,8 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.safety.putMessageReport
 import chat.revolt.api.routes.user.blockUser
 import chat.revolt.api.schemas.ContentReportReason
-import chat.revolt.components.chat.Message
-import chat.revolt.components.generic.FormTextField
+import chat.revolt.composables.chat.Message
+import chat.revolt.composables.generic.FormTextField
 import kotlinx.coroutines.launch
 
 enum class MessageReportFlowState {

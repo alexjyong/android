@@ -37,8 +37,8 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.safety.putUserReport
 import chat.revolt.api.routes.user.blockUser
 import chat.revolt.api.schemas.UserReportReason
-import chat.revolt.components.generic.FormTextField
-import chat.revolt.components.screens.settings.UserOverview
+import chat.revolt.composables.generic.FormTextField
+import chat.revolt.composables.screens.settings.UserOverview
 import kotlinx.coroutines.launch
 
 enum class UserReportFlowState {

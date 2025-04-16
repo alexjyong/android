@@ -28,8 +28,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import chat.revolt.R
-import chat.revolt.components.generic.ListHeader
-import chat.revolt.components.generic.RadioItem
+import chat.revolt.composables.generic.ListHeader
+import chat.revolt.composables.generic.RadioItem
 import kotlinx.coroutines.launch
 import kotlin.enums.EnumEntries
 

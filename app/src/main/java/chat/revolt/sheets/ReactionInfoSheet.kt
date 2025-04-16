@@ -51,8 +51,8 @@ import chat.revolt.api.routes.user.fetchUser
 import chat.revolt.api.schemas.Emoji
 import chat.revolt.api.schemas.User
 import chat.revolt.api.settings.LoadedSettings
-import chat.revolt.components.chat.MemberListItem
-import chat.revolt.components.generic.RemoteImage
+import chat.revolt.composables.chat.MemberListItem
+import chat.revolt.composables.generic.RemoteImage
 import chat.revolt.internals.text.MessageProcessor
 import chat.revolt.persistence.KVStorage
 import kotlinx.coroutines.launch

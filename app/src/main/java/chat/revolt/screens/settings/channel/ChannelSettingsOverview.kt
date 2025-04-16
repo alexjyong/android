@@ -60,8 +60,8 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.channel.patchChannel
 import chat.revolt.api.routes.microservices.autumn.uploadToAutumn
 import chat.revolt.api.schemas.Channel
-import chat.revolt.components.generic.InlineMediaPicker
-import chat.revolt.components.generic.ListHeader
+import chat.revolt.composables.generic.InlineMediaPicker
+import chat.revolt.composables.generic.ListHeader
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.ktor.http.ContentType

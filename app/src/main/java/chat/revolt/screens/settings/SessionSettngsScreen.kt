@@ -53,9 +53,9 @@ import chat.revolt.api.routes.auth.fetchAllSessions
 import chat.revolt.api.routes.auth.logoutAllSessions
 import chat.revolt.api.routes.auth.logoutSessionById
 import chat.revolt.api.schemas.Session
-import chat.revolt.components.generic.ListHeader
-import chat.revolt.components.markdown.RichMarkdown
-import chat.revolt.components.settings.sessions.SessionItem
+import chat.revolt.composables.generic.ListHeader
+import chat.revolt.composables.markdown.RichMarkdown
+import chat.revolt.composables.settings.sessions.SessionItem
 import kotlinx.coroutines.launch
 
 class SessionSettingsScreenViewModel : ViewModel() {

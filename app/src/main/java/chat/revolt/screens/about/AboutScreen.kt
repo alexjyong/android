@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -58,7 +57,7 @@ import chat.revolt.api.REVOLT_BASE
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.routes.misc.Root
 import chat.revolt.api.routes.misc.getRootRoute
-import chat.revolt.components.generic.PrimaryTabs
+import chat.revolt.composables.generic.PrimaryTabs
 import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString

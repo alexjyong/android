@@ -54,8 +54,8 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.account.EmailPasswordAssessment
 import chat.revolt.api.routes.account.negotiateAuthentication
 import chat.revolt.api.routes.onboard.needsOnboarding
-import chat.revolt.components.generic.AnyLink
-import chat.revolt.components.generic.FormTextField
+import chat.revolt.composables.generic.AnyLink
+import chat.revolt.composables.generic.FormTextField
 import chat.revolt.persistence.KVStorage
 import chat.revolt.ui.theme.FragmentMono
 import dagger.hilt.android.lifecycle.HiltViewModel

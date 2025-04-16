@@ -46,7 +46,7 @@ import chat.revolt.api.internals.FriendRequests
 import chat.revolt.api.routes.channel.createGroupDM
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
-import chat.revolt.components.chat.MemberListItem
+import chat.revolt.composables.chat.MemberListItem
 import kotlinx.coroutines.launch
 
 const val MAX_PEOPLE_IN_GROUP = 50

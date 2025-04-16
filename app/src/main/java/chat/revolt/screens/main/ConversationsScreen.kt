@@ -34,7 +34,7 @@ import chat.revolt.api.RevoltAPI
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.User
 import chat.revolt.api.settings.LoadedSettings
-import chat.revolt.components.generic.UserAvatar
+import chat.revolt.composables.generic.UserAvatar
 import chat.revolt.internals.extensions.zero
 
 // Note - this is not a traditional screen per se, as it is a part of the main screen

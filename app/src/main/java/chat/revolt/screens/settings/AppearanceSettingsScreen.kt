@@ -65,9 +65,9 @@ import chat.revolt.api.RevoltCbor
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.api.settings.SyncedSettings
-import chat.revolt.components.generic.ListHeader
-import chat.revolt.components.screens.settings.appearance.ColourChip
-import chat.revolt.components.screens.settings.appearance.CornerRadiusPicker
+import chat.revolt.composables.generic.ListHeader
+import chat.revolt.composables.screens.settings.appearance.ColourChip
+import chat.revolt.composables.screens.settings.appearance.CornerRadiusPicker
 import chat.revolt.sheets.ColourPickerSheet
 import chat.revolt.ui.theme.OverridableColourScheme
 import chat.revolt.ui.theme.Theme

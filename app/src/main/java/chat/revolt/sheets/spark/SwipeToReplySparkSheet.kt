@@ -19,7 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
-import chat.revolt.components.vectorassets.SwipeToReplySpark
+import chat.revolt.composables.vectorassets.SwipeToReplySpark
 
 @Composable
 fun SwipeToReplySparkSheet(

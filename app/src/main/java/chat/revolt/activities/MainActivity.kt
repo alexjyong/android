@@ -60,7 +60,7 @@ import chat.revolt.api.schemas.HealthNotice
 import chat.revolt.api.settings.Experiments
 import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.api.settings.SyncedSettings
-import chat.revolt.components.generic.HealthAlert
+import chat.revolt.composables.generic.HealthAlert
 import chat.revolt.material.EasingTokens
 import chat.revolt.ndk.NativeLibraries
 import chat.revolt.persistence.KVStorage

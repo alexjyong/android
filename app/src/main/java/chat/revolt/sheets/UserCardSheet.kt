@@ -40,7 +40,7 @@ import chat.revolt.BuildConfig
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.schemas.User
-import chat.revolt.components.profile.UserCard
+import chat.revolt.composables.profile.UserCard
 import chat.revolt.internals.Platform
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

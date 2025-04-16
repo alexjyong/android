@@ -38,8 +38,8 @@ import chat.revolt.api.internals.has
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
-import chat.revolt.components.generic.SheetButton
-import chat.revolt.components.screens.chat.ChannelSheetHeader
+import chat.revolt.composables.generic.SheetButton
+import chat.revolt.composables.screens.chat.ChannelSheetHeader
 import chat.revolt.internals.extensions.rememberChannelPermissions
 import chat.revolt.screens.chat.dialogs.InviteDialog
 import kotlinx.coroutines.delay

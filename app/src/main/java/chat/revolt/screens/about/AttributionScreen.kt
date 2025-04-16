@@ -41,7 +41,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import chat.revolt.R
-import chat.revolt.components.screens.settings.AttributionItem
+import chat.revolt.composables.screens.settings.AttributionItem
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray

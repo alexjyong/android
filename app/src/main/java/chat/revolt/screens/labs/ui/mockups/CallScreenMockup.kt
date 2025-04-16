@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import chat.revolt.R
 import chat.revolt.api.schemas.ChannelType
-import chat.revolt.components.screens.chat.ChannelIcon
+import chat.revolt.composables.screens.chat.ChannelIcon
 import chat.revolt.screens.labs.LabsFeature
 
 @LabsFeature

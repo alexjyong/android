@@ -12,7 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import chat.revolt.RevoltApplication
 import chat.revolt.api.internals.getComponentActivity
-import chat.revolt.components.screens.splash.DisconnectedScreen
+import chat.revolt.composables.screens.splash.DisconnectedScreen
 import com.google.android.material.color.DynamicColors
 
 @Composable

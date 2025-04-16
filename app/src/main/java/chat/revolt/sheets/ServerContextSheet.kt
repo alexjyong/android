@@ -34,9 +34,9 @@ import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.server.leaveOrDeleteServer
-import chat.revolt.components.generic.SheetButton
-import chat.revolt.components.markdown.RichMarkdown
-import chat.revolt.components.screens.settings.ServerOverview
+import chat.revolt.composables.generic.SheetButton
+import chat.revolt.composables.markdown.RichMarkdown
+import chat.revolt.composables.screens.settings.ServerOverview
 import chat.revolt.internals.Platform
 import kotlinx.coroutines.launch
 

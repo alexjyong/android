@@ -30,8 +30,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
-import chat.revolt.components.generic.DobPicker
-import chat.revolt.components.generic.DobRegion
+import chat.revolt.composables.generic.DobPicker
+import chat.revolt.composables.generic.DobRegion
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone

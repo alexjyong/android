@@ -41,8 +41,8 @@ import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.api.settings.MessageReplyStyle
 import chat.revolt.api.settings.SpecialEmbedSettings
 import chat.revolt.api.settings.SyncedSettings
-import chat.revolt.components.generic.ListHeader
-import chat.revolt.components.generic.RadioItem
+import chat.revolt.composables.generic.ListHeader
+import chat.revolt.composables.generic.RadioItem
 import kotlinx.coroutines.launch
 
 class ChatSettingsScreenViewModel : ViewModel() {

@@ -41,11 +41,11 @@ import chat.revolt.api.routes.channel.fetchGroupParticipants
 import chat.revolt.api.routes.server.fetchMembers
 import chat.revolt.api.schemas.Member
 import chat.revolt.api.schemas.User
-import chat.revolt.components.chat.MemberListItem
-import chat.revolt.components.generic.CountableListHeader
-import chat.revolt.components.generic.Presence
-import chat.revolt.components.generic.SheetHeaderPadding
-import chat.revolt.components.generic.presenceFromStatus
+import chat.revolt.composables.chat.MemberListItem
+import chat.revolt.composables.generic.CountableListHeader
+import chat.revolt.composables.generic.Presence
+import chat.revolt.composables.generic.SheetHeaderPadding
+import chat.revolt.composables.generic.presenceFromStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.distinctUntilChanged

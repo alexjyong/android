@@ -15,7 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import chat.revolt.components.generic.GradientStopEditor
+import chat.revolt.composables.generic.GradientStopEditor
 import chat.revolt.settings.dsl.SettingsPage
 
 @Composable

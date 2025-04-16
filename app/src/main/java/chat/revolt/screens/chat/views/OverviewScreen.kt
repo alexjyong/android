@@ -58,9 +58,9 @@ import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.user.fetchSelf
 import chat.revolt.api.schemas.User
-import chat.revolt.components.generic.NonIdealState
-import chat.revolt.components.screens.settings.UserOverview
-import chat.revolt.components.skeletons.UserOverviewSkeleton
+import chat.revolt.composables.generic.NonIdealState
+import chat.revolt.composables.screens.settings.UserOverview
+import chat.revolt.composables.skeletons.UserOverviewSkeleton
 import chat.revolt.internals.extensions.zero
 import chat.revolt.sheets.UserCardSheet
 import io.sentry.Sentry

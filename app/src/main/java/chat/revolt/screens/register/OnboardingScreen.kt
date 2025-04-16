@@ -27,7 +27,7 @@ import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.routes.onboard.OnboardingCompletionBody
 import chat.revolt.api.routes.onboard.completeOnboarding
-import chat.revolt.components.generic.FormTextField
+import chat.revolt.composables.generic.FormTextField
 import chat.revolt.persistence.KVStorage
 import kotlinx.coroutines.launch
 

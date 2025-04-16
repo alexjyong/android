@@ -54,8 +54,8 @@ import chat.revolt.api.routes.microservices.autumn.uploadToAutumn
 import chat.revolt.api.routes.user.fetchUserProfile
 import chat.revolt.api.routes.user.patchSelf
 import chat.revolt.api.schemas.Profile
-import chat.revolt.components.generic.InlineMediaPicker
-import chat.revolt.components.screens.settings.RawUserOverview
+import chat.revolt.composables.generic.InlineMediaPicker
+import chat.revolt.composables.screens.settings.RawUserOverview
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.ktor.http.ContentType
