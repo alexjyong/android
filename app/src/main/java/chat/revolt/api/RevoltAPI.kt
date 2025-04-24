@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateMapOf
 import chat.revolt.BuildConfig
 import chat.revolt.RevoltApplication
+import chat.revolt.api.RevoltAPI.initialize
 import chat.revolt.api.internals.Members
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
@@ -55,7 +56,7 @@ import chat.revolt.api.schemas.Channel as ChannelSchema
 const val REVOLT_BASE = "https://api.revolt.chat/0.8"
 const val REVOLT_SUPPORT = "https://support.revolt.chat"
 const val REVOLT_MARKETING = "https://revolt.chat"
-const val REVOLT_FILES = "https://autumn.revolt.chat"
+const val REVOLT_FILES = "https://cdn.revoltusercontent.com"
 const val REVOLT_JANUARY = "https://jan.revolt.chat"
 const val REVOLT_APP = "https://app.revolt.chat"
 const val REVOLT_INVITES = "https://rvlt.gg"
