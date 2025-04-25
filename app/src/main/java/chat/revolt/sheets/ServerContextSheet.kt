@@ -141,119 +141,118 @@ fun ServerContextSheet(
         )
     }
 
-    Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier
-            .padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 4.dp)
-            .verticalScroll(rememberScrollState()),
-    ) {
-        ServerOverview(server)
+    Column(Modifier.verticalScroll(rememberScrollState())) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier
+                .padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 4.dp),
+        ) {
+            ServerOverview(server)
 
-        SelectionContainer {
-            RichMarkdown(
-                input = if (server.description?.isBlank() == false) {
-                    server.description
-                } else {
-                    stringResource(
-                        R.string.server_context_sheet_description_empty
-                    )
-                }
-            )
-        }
-
-        HorizontalDivider()
-    }
-
-    SheetButton(
-        leadingContent = {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_content_copy_id_24dp),
-                contentDescription = null
-            )
-        },
-        headlineContent = {
-            Text(
-                text = stringResource(id = R.string.server_context_sheet_actions_copy_id)
-            )
-        },
-        onClick = {
-            if (server.id == null) return@SheetButton
-
-            clipboardManager.setText(AnnotatedString(server.id))
-
-            if (Platform.needsShowClipboardNotification()) {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.server_context_sheet_actions_copy_id_copied),
-                    Toast.LENGTH_SHORT
-                ).show()
+            SelectionContainer {
+                RichMarkdown(
+                    input = if (server.description?.isBlank() == false) {
+                        server.description
+                    } else {
+                        stringResource(
+                            R.string.server_context_sheet_description_empty
+                        )
+                    }
+                )
             }
 
-            coroutineScope.launch {
-                onHideSheet()
-            }
+            HorizontalDivider()
         }
-    )
 
-    SheetButton(
-        leadingContent = {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_eye_check_24dp),
-                contentDescription = null
-            )
-        },
-        headlineContent = {
-            Text(
-                text = stringResource(id = R.string.server_context_sheet_actions_mark_read)
-            )
-        },
-        onClick = {
-            coroutineScope.launch {
-                server.id?.let {
-                    RevoltAPI.unreads.markServerAsRead(it, sync = true)
-                }
-                onHideSheet()
-            }
-        }
-    )
-
-    if (server.owner != RevoltAPI.selfId) {
         SheetButton(
             leadingContent = {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_flag_24dp),
+                    painter = painterResource(id = R.drawable.ic_content_copy_id_24dp),
                     contentDescription = null
                 )
             },
             headlineContent = {
                 Text(
-                    text = stringResource(id = R.string.server_context_sheet_actions_report),
+                    text = stringResource(id = R.string.server_context_sheet_actions_copy_id)
                 )
             },
-            dangerous = true,
             onClick = {
-                onReportServer()
+                if (server.id == null) return@SheetButton
+
+                clipboardManager.setText(AnnotatedString(server.id))
+
+                if (Platform.needsShowClipboardNotification()) {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.server_context_sheet_actions_copy_id_copied),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                coroutineScope.launch {
+                    onHideSheet()
+                }
             }
         )
 
         SheetButton(
             leadingContent = {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_arrow_left_bold_box_24dp),
-                    contentDescription = null,
+                    painter = painterResource(id = R.drawable.ic_eye_check_24dp),
+                    contentDescription = null
                 )
             },
             headlineContent = {
                 Text(
-                    text = stringResource(id = R.string.server_context_sheet_actions_leave)
+                    text = stringResource(id = R.string.server_context_sheet_actions_mark_read)
                 )
             },
-            dangerous = true,
             onClick = {
-                showLeaveConfirmation = true
+                coroutineScope.launch {
+                    server.id?.let {
+                        RevoltAPI.unreads.markServerAsRead(it, sync = true)
+                    }
+                    onHideSheet()
+                }
             }
         )
+
+        if (server.owner != RevoltAPI.selfId) {
+            SheetButton(
+                leadingContent = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_flag_24dp),
+                        contentDescription = null
+                    )
+                },
+                headlineContent = {
+                    Text(
+                        text = stringResource(id = R.string.server_context_sheet_actions_report),
+                    )
+                },
+                dangerous = true,
+                onClick = {
+                    onReportServer()
+                }
+            )
+
+            SheetButton(
+                leadingContent = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_arrow_left_bold_box_24dp),
+                        contentDescription = null,
+                    )
+                },
+                headlineContent = {
+                    Text(
+                        text = stringResource(id = R.string.server_context_sheet_actions_leave)
+                    )
+                },
+                dangerous = true,
+                onClick = {
+                    showLeaveConfirmation = true
+                }
+            )
+        }
     }
-
-
 }
