@@ -941,7 +941,7 @@ fun ChannelNavigator(
                     useDrawer = useDrawer,
                     drawerGestureEnabled = drawerGestureEnabled,
                     setDrawerGestureEnabled = setDrawerGestureEnabled,
-                    drawerState = drawerState,
+                    drawerIsOpen = drawerState?.isOpen == true,
                 )
             }
 

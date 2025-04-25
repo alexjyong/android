@@ -197,7 +197,7 @@ fun ChannelScreen(
     useBackButton: Boolean = false,
     drawerGestureEnabled: Boolean = true,
     setDrawerGestureEnabled: (Boolean) -> Unit = {},
-    drawerState: DrawerState? = null,
+    drawerIsOpen: Boolean = false,
     backButtonAction: (() -> Unit)? = null,
     useChatUI: Boolean = false,
     viewModel: ChannelScreenViewModel = hiltViewModel()
@@ -205,7 +205,6 @@ fun ChannelScreen(
     // <editor-fold desc="State and effects">
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val haptic = LocalHapticFeedback.current
     val config = LocalConfiguration.current
 
     LaunchedEffect(Unit) {
@@ -255,7 +254,7 @@ fun ChannelScreen(
     }
 
     LaunchedEffect(Unit) {
-        if (context.resources.configuration.keyboard and Configuration.KEYBOARD_QWERTY != 0) {
+        if (config.keyboard and Configuration.KEYBOARD_QWERTY != 0) {
             viewModel.usesPhysicalKeyboard()
         }
     }
@@ -709,6 +708,7 @@ fun ChannelScreen(
                                         RegularMessage(
                                             item.message,
                                             viewModel.channel,
+                                            drawerIsOpen = drawerIsOpen,
                                             setDrawerGestureEnabled = {
                                                 setDrawerGestureEnabled(it)
                                             },
