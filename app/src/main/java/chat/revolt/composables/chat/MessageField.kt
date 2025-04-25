@@ -92,7 +92,6 @@ import chat.revolt.composables.generic.UserAvatar
 import chat.revolt.composables.screens.chat.ChannelIcon
 import chat.revolt.internals.Autocomplete
 import kotlinx.coroutines.launch
-import logcat.logcat
 
 fun Pair<Int, Int>.asTextRange(): TextRange {
     return TextRange(this.first, this.second)
@@ -191,16 +190,12 @@ fun MessageField(
     )
 
     LaunchedEffect(initialValue, initialValueDirtyMarker) {
-        logcat { "New initial value: $initialValue" }
-        logcat { "Old state: $textFieldState" }
         textFieldState.setTextAndPlaceCursorAtEnd(initialValue)
-        logcat { "New state: $textFieldState" }
     }
 
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(textFieldState.text) {
-        logcat { "New text is ${textFieldState.text}" }
         onValueChange(textFieldState.text.toString())
 
         scope.launch {
