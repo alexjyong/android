@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 /**
@@ -27,6 +28,7 @@ fun SheetSelection(
     title: @Composable () -> Unit,
     description: @Composable () -> Unit,
     modifier: Modifier = Modifier,
+    arrowTint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     onClick: () -> Unit,
 ) {
     Row(
@@ -55,7 +57,7 @@ fun SheetSelection(
         Icon(
             imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            tint = arrowTint
         )
     }
 }

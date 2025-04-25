@@ -388,6 +388,8 @@
     <string name="server_context_sheet_actions_leave_confirm_no">Stay</string>
     <string name="server_context_sheet_actions_leave_silently">Leave Silently</string>
     <string name="server_context_sheet_actions_report">Report</string>
+    <string name="server_context_sheet_moderators_early_disclaimer_title">Looking for server settings?</string>
+    <string name="server_context_sheet_moderators_early_disclaimer_body">We\'re still working on bringing server management to our Android app. Please use the web app to manage your server for now.</string>
 
     <string name="user_info_sheet_open">Open user info</string>
     <string name="user_info_sheet_user_not_found">Can\'t resolve this user</string>
