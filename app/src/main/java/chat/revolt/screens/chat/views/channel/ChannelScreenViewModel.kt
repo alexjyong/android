@@ -132,7 +132,7 @@ class ChannelScreenViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            draftContent = kvStorage.get("draftContent/$id") ?: ""
+            putDraftContent(kvStorage.get("draftContent/$id") ?: "", true)
         }
         this.draftAttachments = mutableStateListOf()
         this.draftReplyTo = mutableStateListOf()
