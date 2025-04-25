@@ -694,6 +694,7 @@ class ChannelScreenViewModel @Inject constructor(
                     is RealtimeSocketFrames.Reconnected -> {
                         Log.d("ChannelScreen", "Reconnected to WS.")
                         loadMessages(50, ignoreExisting = true)
+                        typingUsers.clear()
                         listenToWsEvents()
                     }
                 }
