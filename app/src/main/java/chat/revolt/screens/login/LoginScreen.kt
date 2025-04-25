@@ -1,7 +1,6 @@
 package chat.revolt.screens.login
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -50,12 +49,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.RevoltApplication
+import chat.revolt.api.REVOLT_APP
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.account.EmailPasswordAssessment
 import chat.revolt.api.routes.account.negotiateAuthentication
 import chat.revolt.api.routes.onboard.needsOnboarding
-import chat.revolt.composables.generic.AnyLink
 import chat.revolt.composables.generic.FormTextField
+import chat.revolt.composables.generic.Weblink
 import chat.revolt.persistence.KVStorage
 import chat.revolt.ui.theme.FragmentMono
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -271,15 +271,9 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = hiltVi
                     }
                 )
 
-                AnyLink(
+                Weblink(
                     text = stringResource(R.string.password_forgot),
-                    action = {
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.comingsoon_toast),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    },
+                    url = "$REVOLT_APP/login/reset",
                     modifier = Modifier.padding(vertical = 7.dp)
                 )
 
@@ -303,15 +297,9 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = hiltVi
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AnyLink(
+            Weblink(
                 text = stringResource(R.string.resend_verification),
-                action = {
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.comingsoon_toast),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                },
+                url = "$REVOLT_APP/login/resend",
                 modifier = Modifier
                     .padding(vertical = 7.dp)
                     .testTag("resend_verification_link")
