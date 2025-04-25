@@ -4,8 +4,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -28,8 +29,10 @@ fun SwipeToReplySparkSheet(
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(horizontal = 16.dp)
     ) {
+        Spacer(Modifier.height(32.dp))
         Image(SwipeToReplySpark, contentDescription = null)
 
         Spacer(Modifier) // Counts towards the vertical arrangement
@@ -45,21 +48,20 @@ fun SwipeToReplySparkSheet(
             textAlign = TextAlign.Center
         )
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Button(
-                onClick = onDismissSheet,
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(stringResource(R.string.spark_swipe_to_reply_cta))
-            }
             TextButton(
                 onClick = onOpenOptions,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.spark_swipe_to_reply_customise))
+            }
+            Button(
+                onClick = onDismissSheet,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.spark_swipe_to_reply_cta))
             }
         }
     }

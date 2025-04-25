@@ -92,6 +92,7 @@ import chat.revolt.sheets.ServerContextSheet
 import chat.revolt.sheets.StatusSheet
 import chat.revolt.sheets.UserInfoSheet
 import chat.revolt.sheets.WebHookUserSheet
+import chat.revolt.sheets.spark.SwipeToReplySparkSheet
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -150,6 +151,7 @@ class ChatRouterViewModel @Inject constructor(
     var latestChangelogBody by mutableStateOf("")
     var showNotificationRationale by mutableStateOf(false)
     var showEarlyAccessSpark by mutableStateOf(false)
+    var showSwipeToReplySpark by mutableStateOf(false)
 
     private val changelogs = Changelogs(context, kvStorage)
 
@@ -166,9 +168,17 @@ class ChatRouterViewModel @Inject constructor(
                 changelogs.markAsSeen()
             }
 
-            val seenEarlyAccess = kvStorage.get("spark/earlyAccess/dismissed")
+            val seenEarlyAccess = kvStorage.getBoolean("spark/earlyAccess/dismissed")
+            val seenSwipeToReply = kvStorage.getBoolean("spark/swipeToReply/dismissed")
             if (seenEarlyAccess == null) {
                 showEarlyAccessSpark = true
+                // we don't show swipe to reply to new users,
+                // as they would expect it to be working already
+                kvStorage.set("spark/swipeToReply/dismissed", true)
+            }
+
+            if (seenEarlyAccess == true && seenSwipeToReply != true) {
+                showSwipeToReplySpark = true
             }
 
             val hasNotificationPermission =
@@ -225,6 +235,13 @@ class ChatRouterViewModel @Inject constructor(
         showEarlyAccessSpark = false
         viewModelScope.launch {
             kvStorage.set("spark/earlyAccess/dismissed", true)
+        }
+    }
+
+    fun dismissSwipeToReplySpark() {
+        showSwipeToReplySpark = false
+        viewModelScope.launch {
+            kvStorage.set("spark/swipeToReply/dismissed", true)
         }
     }
 
@@ -746,6 +763,31 @@ fun ChatRouterScreen(
                         earlyAccessSheetState.hide()
                         viewModel.dismissEarlyAccessSpark()
                     }
+                }
+            )
+        }
+    }
+
+    if (viewModel.showSwipeToReplySpark) {
+        val swipeToReplySheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+        ModalBottomSheet(
+            sheetState = swipeToReplySheetState,
+            sheetGesturesEnabled = false,
+            dragHandle = {},
+            onDismissRequest = {
+                // Only dismiss using button in sheet
+            }
+        ) {
+            SwipeToReplySparkSheet(
+                onDismissSheet = {
+                    scope.launch {
+                        swipeToReplySheetState.hide()
+                        viewModel.dismissSwipeToReplySpark()
+                    }
+                },
+                onOpenOptions = {
+                    topNav.navigate("settings/chat")
                 }
             )
         }

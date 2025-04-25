@@ -69,6 +69,7 @@ class DebugSettingsScreenViewModel @Inject constructor(
     fun forgetAllSparks() {
         forgetPhysicalKeyboardSpark()
         forgetEarlyAccessSpark()
+        forgetSwipeToReplySpark()
     }
 
     fun forgetPhysicalKeyboardSpark() {
@@ -80,6 +81,12 @@ class DebugSettingsScreenViewModel @Inject constructor(
     fun forgetEarlyAccessSpark() {
         viewModelScope.launch {
             kvStorage.remove("spark/earlyAccess/dismissed")
+        }
+    }
+
+    fun forgetSwipeToReplySpark() {
+        viewModelScope.launch {
+            kvStorage.remove("spark/swipeToReply/dismissed")
         }
     }
 
@@ -227,6 +234,9 @@ fun DebugSettingsScreen(
                     }
                     ElevatedButton(onClick = { viewModel.forgetEarlyAccessSpark() }) {
                         Text("Forget early access spark")
+                    }
+                    ElevatedButton(onClick = { viewModel.forgetSwipeToReplySpark() }) {
+                        Text("Forget swipe to reply spark")
                     }
                     Button(onClick = { viewModel.forgetAllSparks() }) {
                         Text("Forget all sparks")
