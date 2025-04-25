@@ -100,3 +100,27 @@ data class EmojiParent(
     val type: String? = null,
     val id: String? = null
 )
+
+/**
+ * Like [Server] but with complete channel objects instead of only IDs.
+ */
+@Serializable
+data class ServerWithChannelObjects(
+    @SerialName("_id")
+    val id: String? = null,
+    val owner: String? = null,
+    val name: String? = null,
+    val description: String? = null,
+    val channels: List<Channel>? = null,
+    val categories: List<Category>? = null,
+    @SerialName("system_messages")
+    val systemMessages: SystemMessages? = null,
+    val roles: Map<String, Role>? = null,
+    @SerialName("default_permissions")
+    val defaultPermissions: Long? = null,
+    val icon: AutumnResource? = null,
+    val banner: AutumnResource? = null,
+    val flags: Long? = null,
+    val analytics: Boolean? = null,
+    val discoverable: Boolean? = null
+)

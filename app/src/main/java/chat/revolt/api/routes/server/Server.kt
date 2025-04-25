@@ -6,11 +6,14 @@ import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.api
 import chat.revolt.api.schemas.Member
+import chat.revolt.api.schemas.ServerWithChannelObjects
 import chat.revolt.api.schemas.User
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
+import io.ktor.client.request.post
 import io.ktor.client.request.put
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
@@ -90,4 +93,32 @@ suspend fun leaveOrDeleteServer(serverId: String, leaveSilently: Boolean = false
     RevoltHttp.delete("/servers/$serverId".api()) {
         parameter("leave_silently", leaveSilently)
     }
+}
+
+@Serializable
+data class ServerCreationBody(
+    val name: String,
+    val description: String? = null,
+    val nsfw: Boolean = false
+)
+
+suspend fun createServer(
+    name: String,
+    description: String = "",
+    nsfw: Boolean = false
+): ServerWithChannelObjects {
+    val body = ServerCreationBody(name, description, nsfw)
+
+    val response = RevoltHttp.post("/servers/create".api()) {
+        setBody(RevoltJson.encodeToString(ServerCreationBody.serializer(), body))
+    }
+
+    try {
+        val error = RevoltJson.decodeFromString(RevoltError.serializer(), response.bodyAsText())
+        throw Exception(error.type)
+    } catch (e: SerializationException) {
+        // Not an error
+    }
+
+    return RevoltJson.decodeFromString(ServerWithChannelObjects.serializer(), response.bodyAsText())
 }

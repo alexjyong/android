@@ -517,7 +517,11 @@ fun ChatRouterScreen(
                 showAddServerSheet = false
             }
         ) {
-            AddServerSheet()
+            AddServerSheet(
+                onDismiss = {
+                    showAddServerSheet = false
+                }
+            )
         }
     }
 
