@@ -53,14 +53,18 @@ import kotlinx.serialization.json.Json
 import java.net.SocketException
 import chat.revolt.api.schemas.Channel as ChannelSchema
 
-const val REVOLT_BASE = "https://api.revolt.chat/0.8"
+val REVOLT_BASE =
+    if (BuildConfig.USE_ALPHA_API) "https://alpha.revolt.chat/api" else "https://api.revolt.chat/0.8"
 const val REVOLT_SUPPORT = "https://support.revolt.chat"
 const val REVOLT_MARKETING = "https://revolt.chat"
-const val REVOLT_FILES = "https://cdn.revoltusercontent.com"
-const val REVOLT_JANUARY = "https://jan.revolt.chat"
+val REVOLT_FILES =
+    if (BuildConfig.USE_ALPHA_API) "https://alpha.revolt.chat/autumn" else "https://cdn.revoltusercontent.com"
+val REVOLT_JANUARY =
+    if (BuildConfig.USE_ALPHA_API) "https://alpha.revolt.chat/january" else "https://jan.revolt.chat"
 const val REVOLT_APP = "https://app.revolt.chat"
 const val REVOLT_INVITES = "https://rvlt.gg"
-const val REVOLT_WEBSOCKET = "wss://ws.revolt.chat"
+val REVOLT_WEBSOCKET =
+    if (BuildConfig.USE_ALPHA_API) "wss://alpha.revolt.chat/ws" else "wss://ws.revolt.chat"
 const val REVOLT_KJBOOK = "https://revoltchat.github.io/android"
 
 fun String.api(): String {

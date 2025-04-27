@@ -27,7 +27,12 @@ val hiltVersion = "2.52"
 val glideVersion = "4.16.0"
 val ktorVersion = "3.0.0-beta-2"
 val media3Version = "1.5.0"
-val livekitVersion = "2.14.1"
+
+object LivekitVersion {
+    val core = "2.14.1"
+    val componentsCompose = "1.3.1"
+}
+
 val material3Version = "1.4.0-alpha10"
 val androidXTestVersion = "1.6.1"
 
@@ -131,6 +136,12 @@ android {
                 "String",
                 "FLAVOUR_ID",
                 "\"${buildproperty("build.flavour_id", "RVX_BUILD_FLAVOUR_ID")}\""
+            )
+
+            buildConfigField(
+                "boolean",
+                "USE_ALPHA_API",
+                "${buildproperty("dev.use_alpha_api", "RVX_DEV_USE_ALPHA_API")}"
             )
         }
     }
@@ -288,7 +299,8 @@ dependencies {
     implementation("dev.snipme:highlights:1.0.0")
 
     // Livekit
-    implementation("io.livekit:livekit-android:$livekitVersion")
+    implementation("io.livekit:livekit-android:${LivekitVersion.core}")
+    implementation("io.livekit:livekit-android-compose-components:${LivekitVersion.componentsCompose}")
 
     // Firebase - Cloud Messaging
     implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
