@@ -50,6 +50,7 @@ import io.ktor.websocket.readText
 import io.ktor.websocket.send
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.serialization.SerializationException
+import logcat.logcat
 
 enum class DisconnectionState {
     Disconnected,
@@ -146,10 +147,14 @@ object RealtimeSocket {
 
             "Ready" -> {
                 val readyFrame = RevoltJson.decodeFromString(ReadyFrame.serializer(), rawFrame)
-                Log.d(
-                    "RealtimeSocket",
-                    "Received ready frame with ${readyFrame.users.size} users, ${readyFrame.servers.size} servers, ${readyFrame.channels.size} channels, and ${readyFrame.emojis.size} emojis."
-                )
+
+                logcat {
+                    "Received ready frame with ${readyFrame.users.size} users, " +
+                            "${readyFrame.servers.size} servers, " +
+                            "${readyFrame.channels.size} channels, " +
+                            "${readyFrame.emojis.size} emojis, " +
+                            "and ${readyFrame.voiceStates.size} voice states."
+                }
 
                 Log.d("RealtimeSocket", "Adding users to cache.")
                 val userMap = readyFrame.users.associateBy { it.id!! }

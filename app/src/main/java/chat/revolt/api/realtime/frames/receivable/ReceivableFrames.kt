@@ -1,6 +1,7 @@
 package chat.revolt.api.realtime.frames.receivable
 
 import chat.revolt.api.schemas.Channel
+import chat.revolt.api.schemas.ChannelVoiceState
 import chat.revolt.api.schemas.Embed
 import chat.revolt.api.schemas.Emoji
 import chat.revolt.api.schemas.Member
@@ -42,7 +43,8 @@ data class ReadyFrame(
     val users: List<User>,
     val servers: List<Server>,
     val channels: List<Channel>,
-    val emojis: List<Emoji>
+    val emojis: List<Emoji>,
+    @SerialName("voice_states") val voiceStates: List<ChannelVoiceState>,
 )
 
 typealias MessageFrame = Message

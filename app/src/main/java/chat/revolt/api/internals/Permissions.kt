@@ -41,9 +41,10 @@ enum class PermissionBit(val value: Long) {
     MuteMembers(1L shl 33),
     DeafenMembers(1L shl 34),
     MoveMembers(1L shl 35),
+    Listen(1L shl 36),
 
     // * Misc. permissions
-    // % Bits 36 to 52: free area
+    // % Bits 37 to 52: free area
     // % Bits 53 to 64: do not use
 
     // * Grant all permissions
@@ -85,7 +86,8 @@ object BitDefaults {
                 PermissionBit.SendEmbeds +
                 PermissionBit.UploadFiles +
                 PermissionBit.Connect +
-                PermissionBit.Speak
+                PermissionBit.Speak +
+                PermissionBit.Listen
 
     val SavedMessages =
         PermissionBit.GrantAllSafe.value
