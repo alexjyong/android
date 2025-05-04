@@ -61,7 +61,6 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -95,7 +94,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
@@ -200,6 +198,7 @@ fun ChannelScreen(
     drawerIsOpen: Boolean = false,
     backButtonAction: (() -> Unit)? = null,
     useChatUI: Boolean = false,
+    onEnterVoiceUI: () -> Unit = {},
     viewModel: ChannelScreenViewModel = hiltViewModel()
 ) {
     // <editor-fold desc="State and effects">
@@ -848,72 +847,87 @@ fun ChannelScreen(
                             }
                         }
 
-                        if (viewModel.showPhysicalKeyboardSpark) {
-                            Card(
-                                modifier = Modifier
-                                    .align(Alignment.TopCenter)
-                                    .padding(8.dp)
-                            ) {
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                                    modifier = Modifier.padding(16.dp)
-                                ) {
-                                    Text(
-                                        stringResource(R.string.spark_keyboard_shortcuts),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        fontWeight = FontWeight.SemiBold
-                                    )
-                                    Text(
-                                        buildAnnotatedString {
-                                            val raw =
-                                                stringResource(R.string.spark_keyboard_shortcuts_description)
-                                            val before = raw.substringBefore("%1\$s")
-                                            val after = raw.substringAfter("%1\$s")
-
-                                            append(before)
-                                            appendInlineContent("metaKey", "Meta")
-                                            append(" + /")
-                                            append(after)
-                                        },
-                                        inlineContent = mapOf(
-                                            "metaKey" to InlineTextContent(
-                                                placeholder = Placeholder(
-                                                    width = 1.em,
-                                                    height = 1.em,
-                                                    placeholderVerticalAlign = PlaceholderVerticalAlign.Center
-                                                )
-                                            ) {
-                                                with(LocalDensity.current) {
-                                                    Image(
-                                                        painterResource(R.drawable.ic_meta_key_24dp),
-                                                        contentDescription = null,
-                                                        /*modifier = Modifier.size(1.em.toDp())*/
-                                                    )
-                                                }
-                                            }
-                                        ),
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                    Row(
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .padding(8.dp)
+                        ) {
+                            if (viewModel.showPhysicalKeyboardSpark) {
+                                Card {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                                        modifier = Modifier.padding(16.dp)
                                     ) {
-                                        Button(
-                                            onClick = {
-                                                viewModel.dismissPhysicalKeyboardSpark()
+                                        Text(
+                                            stringResource(R.string.spark_keyboard_shortcuts),
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                        Text(
+                                            buildAnnotatedString {
+                                                val raw =
+                                                    stringResource(R.string.spark_keyboard_shortcuts_description)
+                                                val before = raw.substringBefore("%1\$s")
+                                                val after = raw.substringAfter("%1\$s")
+
+                                                append(before)
+                                                appendInlineContent("metaKey", "Meta")
+                                                append(" + /")
+                                                append(after)
                                             },
-                                            modifier = Modifier.weight(1f)
+                                            inlineContent = mapOf(
+                                                "metaKey" to InlineTextContent(
+                                                    placeholder = Placeholder(
+                                                        width = 1.em,
+                                                        height = 1.em,
+                                                        placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+                                                    )
+                                                ) {
+                                                    with(LocalDensity.current) {
+                                                        Image(
+                                                            painterResource(R.drawable.ic_meta_key_24dp),
+                                                            contentDescription = null,
+                                                            /*modifier = Modifier.size(1.em.toDp())*/
+                                                        )
+                                                    }
+                                                }
+                                            ),
+                                            style = MaterialTheme.typography.bodyLarge
+                                        )
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
                                         ) {
-                                            Text(stringResource(R.string.spark_keyboard_shortcuts_dismiss))
-                                        }
-                                        TextButton(
-                                            onClick = {
-                                                (context as Activity).requestShowKeyboardShortcuts()
-                                            },
-                                            modifier = Modifier.weight(1f)
-                                        ) {
-                                            Text(stringResource(R.string.spark_keyboard_shortcuts_cta))
+                                            Button(
+                                                onClick = {
+                                                    viewModel.dismissPhysicalKeyboardSpark()
+                                                },
+                                                modifier = Modifier.weight(1f)
+                                            ) {
+                                                Text(stringResource(R.string.spark_keyboard_shortcuts_dismiss))
+                                            }
+                                            TextButton(
+                                                onClick = {
+                                                    (context as Activity).requestShowKeyboardShortcuts()
+                                                },
+                                                modifier = Modifier.weight(1f)
+                                            ) {
+                                                Text(stringResource(R.string.spark_keyboard_shortcuts_cta))
+                                            }
                                         }
                                     }
+                                }
+                            }
+
+                            if (viewModel.channel?.channelType == ChannelType.VoiceChannel) {
+                                Button(
+                                    onClick = {
+                                        onEnterVoiceUI()
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                ) {
+                                    Text("Join Voice Channel")
                                 }
                             }
                         }

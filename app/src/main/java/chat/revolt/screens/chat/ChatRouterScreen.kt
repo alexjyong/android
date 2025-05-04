@@ -266,7 +266,9 @@ class ChatRouterViewModel @Inject constructor(
 fun ChatRouterScreen(
     topNav: NavController,
     windowSizeClass: WindowSizeClass,
+    disableBackHandler: Boolean,
     onNullifiedUser: () -> Unit,
+    onEnterVoiceUI: () -> Unit,
     viewModel: ChatRouterViewModel = hiltViewModel()
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -848,9 +850,11 @@ fun ChatRouterScreen(
                     dest = viewModel.currentDestination,
                     topNav = topNav,
                     useDrawer = false,
+                    disableBackHandler = disableBackHandler,
                     toggleDrawer = {
                         toggleDrawerLambda()
-                    }
+                    },
+                    onEnterVoiceUI = onEnterVoiceUI,
                 )
             }
         } else {
@@ -891,6 +895,7 @@ fun ChatRouterScreen(
                             dest = viewModel.currentDestination,
                             topNav = topNav,
                             useDrawer = true,
+                            disableBackHandler = disableBackHandler,
                             toggleDrawer = {
                                 toggleDrawerLambda()
                             },
@@ -898,7 +903,8 @@ fun ChatRouterScreen(
                             drawerGestureEnabled = useSidebarGesture,
                             setDrawerGestureEnabled = {
                                 useSidebarGesture = it
-                            }
+                            },
+                            onEnterVoiceUI = onEnterVoiceUI,
                         )
                     }
                 }
@@ -942,11 +948,13 @@ fun ChannelNavigator(
     toggleDrawer: () -> Unit,
     drawerState: DrawerState? = null,
     drawerGestureEnabled: Boolean = true,
+    disableBackHandler: Boolean = false,
+    onEnterVoiceUI: () -> Unit = {},
     setDrawerGestureEnabled: (Boolean) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
 
-    BackHandler(enabled = useDrawer) {
+    BackHandler(useDrawer && !disableBackHandler) {
         toggleDrawer()
     }
 
@@ -984,6 +992,7 @@ fun ChannelNavigator(
                     drawerGestureEnabled = drawerGestureEnabled,
                     setDrawerGestureEnabled = setDrawerGestureEnabled,
                     drawerIsOpen = drawerState?.isOpen == true,
+                    onEnterVoiceUI = onEnterVoiceUI,
                 )
             }
 
