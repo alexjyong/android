@@ -99,7 +99,7 @@ fun OverviewScreen(
     var showUserCardSheet by rememberSaveable { mutableStateOf(false) }
 
     if (showUserCardSheet) {
-        val state = rememberModalBottomSheetState()
+        val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         ModalBottomSheet(
             sheetState = state,
             onDismissRequest = { showUserCardSheet = false },
