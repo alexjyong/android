@@ -91,6 +91,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -888,7 +889,9 @@ fun ChannelScreen(
                                                         Image(
                                                             painterResource(R.drawable.ic_meta_key_24dp),
                                                             contentDescription = null,
-                                                            /*modifier = Modifier.size(1.em.toDp())*/
+                                                            colorFilter = ColorFilter.tint(
+                                                                LocalContentColor.current
+                                                            )
                                                         )
                                                     }
                                                 }
