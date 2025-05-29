@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -145,6 +146,7 @@ import chat.revolt.composables.skeletons.MessageSkeleton
 import chat.revolt.composables.skeletons.MessageSkeletonVariant
 import chat.revolt.internals.extensions.rememberChannelPermissions
 import chat.revolt.internals.extensions.zero
+import chat.revolt.screens.chat.LocalIsConnected
 import chat.revolt.sheets.ChannelInfoSheet
 import chat.revolt.sheets.MessageContextSheet
 import chat.revolt.sheets.ReactSheet
@@ -513,126 +515,137 @@ fun ChannelScreen(
     Scaffold(
         contentWindowInsets = WindowInsets.zero,
         topBar = {
-            TopAppBar(
-                modifier = Modifier.clickable {
-                    channelInfoSheetShown = true
-                },
-                title = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        viewModel.channel?.let {
-                            when (it.channelType) {
-                                ChannelType.DirectMessage -> {
+            Column {
+                AnimatedVisibility(LocalIsConnected.current) {
+                    Spacer(
+                        Modifier
+                            .height(
+                                WindowInsets.statusBars.asPaddingValues()
+                                    .calculateTopPadding()
+                            )
+                    )
+                }
+                TopAppBar(
+                    modifier = Modifier.clickable {
+                        channelInfoSheetShown = true
+                    },
+                    title = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            viewModel.channel?.let {
+                                when (it.channelType) {
+                                    ChannelType.DirectMessage -> {
+                                        val partner =
+                                            RevoltAPI.userCache[ChannelUtils.resolveDMPartner(it)]
+                                        UserAvatar(
+                                            username = it.name ?: stringResource(R.string.unknown),
+                                            userId = ChannelUtils.resolveDMPartner(it) ?: "",
+                                            size = 24.dp,
+                                            presenceSize = 12.dp,
+                                            avatar = partner?.avatar
+                                        )
+                                    }
+
+                                    ChannelType.Group -> {
+                                        GroupIcon(
+                                            name = it.name ?: stringResource(R.string.unknown),
+                                            size = 24.dp,
+                                            icon = it.icon
+                                        )
+                                    }
+
+                                    else -> {
+                                        ChannelIcon(
+                                            channelType = it.channelType ?: ChannelType.TextChannel,
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .alpha(0.8f)
+                                        )
+                                    }
+                                }
+
+                                CompositionLocalProvider(
+                                    LocalTextStyle provides LocalTextStyle.current.copy(
+                                        fontSize = 20.sp,
+                                        lineHeightStyle = LineHeightStyle(
+                                            alignment = LineHeightStyle.Alignment.Bottom,
+                                            trim = LineHeightStyle.Trim.LastLineBottom
+                                        )
+                                    )
+                                ) {
+                                    when (it.channelType) {
+                                        ChannelType.TextChannel, ChannelType.VoiceChannel, ChannelType.Group -> Text(
+                                            it.name ?: stringResource(R.string.unknown),
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+
+                                        ChannelType.SavedMessages -> Text(
+                                            stringResource(R.string.channel_notes),
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+
+                                        ChannelType.DirectMessage -> Text(
+                                            ChannelUtils.resolveName(it)
+                                                ?: stringResource(R.string.unknown),
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+
+                                        else -> Text(
+                                            stringResource(R.string.unknown),
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    }
+                                }
+
+                                if (it.channelType == ChannelType.DirectMessage) {
                                     val partner =
                                         RevoltAPI.userCache[ChannelUtils.resolveDMPartner(it)]
-                                    UserAvatar(
-                                        username = it.name ?: stringResource(R.string.unknown),
-                                        userId = ChannelUtils.resolveDMPartner(it) ?: "",
-                                        size = 24.dp,
-                                        presenceSize = 12.dp,
-                                        avatar = partner?.avatar
+                                    PresenceBadge(
+                                        presence = presenceFromStatus(
+                                            partner?.status?.presence,
+                                            online = partner?.online == true
+                                        ),
+                                        size = 12.dp
                                     )
                                 }
 
-                                ChannelType.Group -> {
-                                    GroupIcon(
-                                        name = it.name ?: stringResource(R.string.unknown),
-                                        size = 24.dp,
-                                        icon = it.icon
-                                    )
-                                }
-
-                                else -> {
-                                    ChannelIcon(
-                                        channelType = it.channelType ?: ChannelType.TextChannel,
-                                        modifier = Modifier
-                                            .size(24.dp)
-                                            .alpha(0.8f)
-                                    )
-                                }
-                            }
-
-                            CompositionLocalProvider(
-                                LocalTextStyle provides LocalTextStyle.current.copy(
-                                    fontSize = 20.sp,
-                                    lineHeightStyle = LineHeightStyle(
-                                        alignment = LineHeightStyle.Alignment.Bottom,
-                                        trim = LineHeightStyle.Trim.LastLineBottom
-                                    )
-                                )
-                            ) {
-                                when (it.channelType) {
-                                    ChannelType.TextChannel, ChannelType.VoiceChannel, ChannelType.Group -> Text(
-                                        it.name ?: stringResource(R.string.unknown),
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-
-                                    ChannelType.SavedMessages -> Text(
-                                        stringResource(R.string.channel_notes),
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-
-                                    ChannelType.DirectMessage -> Text(
-                                        ChannelUtils.resolveName(it)
-                                            ?: stringResource(R.string.unknown),
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-
-                                    else -> Text(
-                                        stringResource(R.string.unknown),
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                }
-                            }
-
-                            if (it.channelType == ChannelType.DirectMessage) {
-                                val partner =
-                                    RevoltAPI.userCache[ChannelUtils.resolveDMPartner(it)]
-                                PresenceBadge(
-                                    presence = presenceFromStatus(
-                                        partner?.status?.presence,
-                                        online = partner?.online == true
-                                    ),
-                                    size = 12.dp
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(16.dp)
+                                        .alpha(0.5f)
                                 )
                             }
-
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(16.dp)
-                                    .alpha(0.5f)
-                            )
+                        }
+                    },
+                    windowInsets = if (useChatUI) WindowInsets.statusBars else WindowInsets.zero,
+                    navigationIcon = {
+                        if (useDrawer) {
+                            IconButton(onClick = onToggleDrawer) {
+                                Icon(
+                                    imageVector = Icons.Default.Menu,
+                                    contentDescription = stringResource(id = R.string.menu)
+                                )
+                            }
+                        }
+                        if (useBackButton) {
+                            IconButton(onClick = backButtonAction ?: {}) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                                    contentDescription = stringResource(id = R.string.back)
+                                )
+                            }
                         }
                     }
-                },
-                windowInsets = if (useChatUI) WindowInsets.statusBars else WindowInsets.zero,
-                navigationIcon = {
-                    if (useDrawer) {
-                        IconButton(onClick = onToggleDrawer) {
-                            Icon(
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = stringResource(id = R.string.menu)
-                            )
-                        }
-                    }
-                    if (useBackButton) {
-                        IconButton(onClick = backButtonAction ?: {}) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                                contentDescription = stringResource(id = R.string.back)
-                            )
-                        }
-                    }
-                }
-            )
+                )
+            }
         }
     ) { pv ->
         Crossfade(

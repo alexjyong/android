@@ -44,7 +44,7 @@ data class ReadyFrame(
     val servers: List<Server>,
     val channels: List<Channel>,
     val emojis: List<Emoji>,
-    @SerialName("voice_states") val voiceStates: List<ChannelVoiceState>,
+    @SerialName("voice_states") val voiceStates: List<ChannelVoiceState> = listOf(),
 )
 
 typealias MessageFrame = Message
