@@ -142,6 +142,7 @@ import chat.revolt.composables.screens.chat.ChannelIcon
 import chat.revolt.composables.screens.chat.ReplyManager
 import chat.revolt.composables.screens.chat.TypingIndicator
 import chat.revolt.composables.screens.chat.atoms.RegularMessage
+import chat.revolt.composables.screens.chat.molecules.JoinVoiceChannelButton
 import chat.revolt.composables.skeletons.MessageSkeleton
 import chat.revolt.composables.skeletons.MessageSkeletonVariant
 import chat.revolt.internals.extensions.rememberChannelPermissions
@@ -201,7 +202,6 @@ fun ChannelScreen(
     drawerIsOpen: Boolean = false,
     backButtonAction: (() -> Unit)? = null,
     useChatUI: Boolean = false,
-    onEnterVoiceUI: () -> Unit = {},
     viewModel: ChannelScreenViewModel = hiltViewModel()
 ) {
     // <editor-fold desc="State and effects">
@@ -936,15 +936,7 @@ fun ChannelScreen(
                             }
 
                             if (viewModel.channel?.channelType == ChannelType.VoiceChannel) {
-                                Button(
-                                    onClick = {
-                                        onEnterVoiceUI()
-                                    },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                ) {
-                                    Text("Join Voice Channel")
-                                }
+                                JoinVoiceChannelButton(channelId)
                             }
                         }
                     }

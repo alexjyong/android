@@ -77,7 +77,6 @@ import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
 import chat.revolt.composables.chat.DisconnectedNotice
 import chat.revolt.composables.screens.chat.drawer.ChannelSideDrawer
-import chat.revolt.composables.screens.voice.VoiceChannelOverlay
 import chat.revolt.dialogs.NotificationRationaleDialog
 import chat.revolt.internals.Changelogs
 import chat.revolt.internals.extensions.zero
@@ -277,7 +276,7 @@ fun ChatRouterScreen(
     windowSizeClass: WindowSizeClass,
     disableBackHandler: Boolean,
     onNullifiedUser: () -> Unit,
-    onEnterVoiceUI: () -> Unit,
+    onEnterVoiceUI: (String) -> Unit,
     viewModel: ChatRouterViewModel = hiltViewModel()
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -314,9 +313,6 @@ fun ChatRouterScreen(
     var reactionInfoSheetEmoji by remember { mutableStateOf("") }
 
     var useTabletAwareUI by remember { mutableStateOf(false) }
-
-    var voiceChannelOverlay by remember { mutableStateOf(false) }
-    var voiceChannelOverlayChannelId by remember { mutableStateOf("") }
 
     var showReportUser by remember { mutableStateOf(false) }
     var reportUserTarget by remember { mutableStateOf("") }
@@ -457,8 +453,7 @@ fun ChatRouterScreen(
                     }
 
                     is Action.OpenVoiceChannelOverlay -> {
-                        voiceChannelOverlayChannelId = action.channelId
-                        voiceChannelOverlay = true
+                        onEnterVoiceUI(action.channelId)
                     }
 
                     is Action.OpenWebhookSheet -> {
@@ -725,12 +720,6 @@ fun ChatRouterScreen(
         }
     }
 
-    if (voiceChannelOverlay) {
-        VoiceChannelOverlay(voiceChannelOverlayChannelId) {
-            voiceChannelOverlay = false
-        }
-    }
-
     val askNotificationsPermission =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
@@ -990,7 +979,7 @@ fun ChannelNavigator(
     drawerState: DrawerState? = null,
     drawerGestureEnabled: Boolean = true,
     disableBackHandler: Boolean = false,
-    onEnterVoiceUI: () -> Unit = {},
+    onEnterVoiceUI: (String) -> Unit = {},
     setDrawerGestureEnabled: (Boolean) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
@@ -1033,7 +1022,6 @@ fun ChannelNavigator(
                     drawerGestureEnabled = drawerGestureEnabled,
                     setDrawerGestureEnabled = setDrawerGestureEnabled,
                     drawerIsOpen = drawerState?.isOpen == true,
-                    onEnterVoiceUI = onEnterVoiceUI,
                 )
             }
 

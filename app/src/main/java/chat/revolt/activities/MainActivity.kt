@@ -48,10 +48,12 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,6 +62,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -84,6 +87,7 @@ import chat.revolt.api.settings.Experiments
 import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.composables.generic.HealthAlert
+import chat.revolt.composables.voice.VoicePermissionSwitch
 import chat.revolt.material.EasingTokens
 import chat.revolt.ndk.NativeLibraries
 import chat.revolt.persistence.KVStorage
@@ -433,7 +437,9 @@ fun AppEntrypoint(
     onRetryConnection: () -> Unit,
     onUpdateNextDestination: (String) -> Unit = {}
 ) {
-    var showVoiceUI by remember { mutableStateOf(false) }
+    var showVoiceUI by rememberSaveable { mutableStateOf(false) }
+    var voiceChannelID by rememberSaveable { mutableStateOf<String?>(null) }
+
     val chatUIScale by animateFloatAsState(
         if (showVoiceUI) 0.8f else 1.0f,
         animationSpec = tween(
@@ -451,6 +457,11 @@ fun AppEntrypoint(
 
     BackHandler(showVoiceUI) {
         showVoiceUI = false
+    }
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+    LaunchedEffect(showVoiceUI) {
+        if (showVoiceUI) keyboardController?.hide()
     }
 
     val navController = rememberNavController()
@@ -612,8 +623,9 @@ fun AppEntrypoint(
                                 )
                                 navController.navigate("default")
                             },
-                            onEnterVoiceUI = {
+                            onEnterVoiceUI = { channelId ->
                                 showVoiceUI = true
+                                voiceChannelID = channelId
                             },
                         )
                     }
@@ -752,10 +764,16 @@ fun AppEntrypoint(
                             .widthIn(max = 600.dp)
                             .padding(8.dp)
                     ) {
-                        Button(onClick = {
-                            showVoiceUI = false
-                        }) {
-                            Text("Close voice UI")
+                        VoicePermissionSwitch(
+                            onCancel = {
+                                showVoiceUI = false
+                            }
+                        ) {
+                            Button(onClick = {
+                                showVoiceUI = false
+                            }) {
+                                Text("Close voice UI")
+                            }
                         }
                     }
                 }
