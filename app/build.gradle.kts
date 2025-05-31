@@ -29,8 +29,8 @@ val ktorVersion = "3.0.0-beta-2"
 val media3Version = "1.5.0"
 
 object LivekitVersion {
-    val core = "2.14.1"
-    val componentsCompose = "1.3.0"
+    val core = "2.16.0"
+    val componentsCompose = "1.3.1"
 }
 
 val material3Version = "1.4.0-alpha10"

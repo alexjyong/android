@@ -38,7 +38,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -88,6 +87,7 @@ import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.composables.generic.HealthAlert
 import chat.revolt.composables.voice.VoicePermissionSwitch
+import chat.revolt.composables.voice.VoiceSheet
 import chat.revolt.material.EasingTokens
 import chat.revolt.ndk.NativeLibraries
 import chat.revolt.persistence.KVStorage
@@ -438,7 +438,7 @@ fun AppEntrypoint(
     onUpdateNextDestination: (String) -> Unit = {}
 ) {
     var showVoiceUI by rememberSaveable { mutableStateOf(false) }
-    var voiceChannelID by rememberSaveable { mutableStateOf<String?>(null) }
+    var voiceChannelId by rememberSaveable { mutableStateOf<String?>(null) }
 
     val chatUIScale by animateFloatAsState(
         if (showVoiceUI) 0.8f else 1.0f,
@@ -625,7 +625,7 @@ fun AppEntrypoint(
                             },
                             onEnterVoiceUI = { channelId ->
                                 showVoiceUI = true
-                                voiceChannelID = channelId
+                                voiceChannelId = channelId
                             },
                         )
                     }
@@ -769,10 +769,14 @@ fun AppEntrypoint(
                                 showVoiceUI = false
                             }
                         ) {
-                            Button(onClick = {
-                                showVoiceUI = false
-                            }) {
-                                Text("Close voice UI")
+                            voiceChannelId?.let {
+                                VoiceSheet(
+                                    it,
+                                    onDisconnect = {
+                                        showVoiceUI = false
+                                        voiceChannelId = null
+                                    }
+                                )
                             }
                         }
                     }

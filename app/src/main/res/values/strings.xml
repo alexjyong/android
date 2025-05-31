@@ -604,6 +604,10 @@
     <string name="voice_join_permission_rationale_assurance">Don\'t worry, we won\'t use your microphone or camera without your permission.</string>
     <string name="voice_join_permission_rationale_cta">Grant permissions</string>
 
+    <string name="voice_error_not_supported">Voice channels are not available at the moment.</string>
+    <string name="voice_error_no_nodes">All voice nodes are unavailable at the moment. Please try again later.</string>
+    <string name="voice_error_generic">An error occurred. Please try again later.</string>
+
     <string name="spark_notifications_rationale">Stay in the loop</string>
     <string name="spark_notifications_rationale_description">Enable notifications to be kept up to date with messages and mentions.</string>
     <string name="spark_notifications_rationale_cta">Enable notifications</string>
