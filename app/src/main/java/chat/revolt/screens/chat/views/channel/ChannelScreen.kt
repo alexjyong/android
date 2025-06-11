@@ -960,9 +960,7 @@ fun ChannelScreen(
                                             onToggleSpoiler = {
                                                 val index = viewModel.draftAttachments
                                                     .indexOfFirst { a -> a.pickerIdentifier == it.pickerIdentifier }
-                                                logcat {
-                                                    "Toggling spoiler for attachment at index $index"
-                                                }
+                                                
                                                 if (index != -1) {
                                                     val attachment =
                                                         viewModel.draftAttachments[index]
