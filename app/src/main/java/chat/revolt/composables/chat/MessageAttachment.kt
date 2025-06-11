@@ -1,5 +1,6 @@
 package chat.revolt.composables.chat
 
+import android.annotation.SuppressLint
 import android.text.format.Formatter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,6 +21,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +39,11 @@ import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.schemas.AutumnResource
 import chat.revolt.composables.generic.RemoteImage
 import chat.revolt.composables.media.AudioPlayer
+import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
+import dev.chrisbanes.haze.materials.HazeMaterials
+import dev.chrisbanes.haze.rememberHazeState
 
 @Composable
 fun FileAttachment(attachment: AutumnResource) {
@@ -71,9 +81,14 @@ fun FileAttachment(attachment: AutumnResource) {
     }
 }
 
+@OptIn(ExperimentalHazeMaterialsApi::class)
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun ImageAttachment(attachment: AutumnResource) {
     val url = "$REVOLT_FILES/attachments/${attachment.id}/${attachment.filename}"
+    var spoilerShown by remember { mutableStateOf(false) }
+    val hazeState =
+        if (attachment.filename?.startsWith("SPOILER_") == true) rememberHazeState() else null
 
     BoxWithConstraints {
         RemoteImage(
@@ -83,9 +98,34 @@ fun ImageAttachment(attachment: AutumnResource) {
                 .width(attachment.metadata?.width?.toInt()?.dp ?: maxWidth)
                 .aspectRatio(
                     attachment.metadata!!.width!!.toFloat() / attachment.metadata.height!!.toFloat()
+                )
+                .then(
+                    if (hazeState != null) Modifier.hazeSource(state = hazeState)
+                    else Modifier
                 ),
             description = attachment.filename ?: "Image"
         )
+        if (attachment.filename?.startsWith("SPOILER_") == true && !spoilerShown) {
+            Box(
+                modifier = Modifier
+                    .hazeEffect(state = hazeState, style = HazeMaterials.ultraThin())
+                    .width(attachment.metadata?.width?.toInt()?.dp ?: maxWidth)
+                    .aspectRatio(
+                        attachment.metadata!!.width!!.toFloat() / attachment.metadata.height!!.toFloat()
+                    )
+                    .clickable { spoilerShown = true },
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .clip(MaterialTheme.shapes.medium)
+                        .hazeEffect(state = hazeState, style = HazeMaterials.regular())
+                        .padding(8.dp)
+                ) {
+                    Text(stringResource(R.string.attachment_spoiler))
+                }
+            }
+        }
     }
 }
 
@@ -108,6 +148,7 @@ fun VideoPlayButton() {
     )
 }
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun VideoAttachment(attachment: AutumnResource) {
     val url = "$REVOLT_FILES/attachments/${attachment.id}/${attachment.filename}"

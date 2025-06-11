@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,10 +22,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -37,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -53,9 +58,15 @@ import java.io.File
 
 @Composable
 fun FilePreviewSheet(
-    args: FileArgs, canRemove: Boolean, onRemove: () -> Unit, onDismiss: () -> Unit
+    args: FileArgs,
+    canRemove: Boolean,
+    onRemove: () -> Unit,
+    onToggleSpoiler: () -> Unit,
+    onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
+
+    var localIsSpoiler by remember { mutableStateOf(args.spoiler) }
 
     Column(
         Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
@@ -80,6 +91,39 @@ fun FilePreviewSheet(
             color = LocalContentColor.current.copy(alpha = 0.6f),
             textAlign = TextAlign.Center
         )
+
+        Box(
+            modifier = Modifier
+                .clip(MaterialTheme.shapes.medium)
+                .clickable {
+                    onToggleSpoiler()
+                    localIsSpoiler = !localIsSpoiler
+                }
+                .padding(top = 8.dp)
+        ) {
+            ListItem(
+                headlineContent = {
+                    Text(
+                        stringResource(R.string.attachment_preview_spoiler)
+                    )
+                },
+                supportingContent = {
+                    Text(
+                        stringResource(R.string.attachment_preview_spoiler_description)
+                    )
+                },
+                trailingContent = {
+                    Switch(
+                        checked = localIsSpoiler,
+                        onCheckedChange = null,
+                    )
+                },
+                colors = ListItemDefaults.colors().copy(
+                    containerColor = Color.Transparent,
+                )
+            )
+        }
+
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(onClick = {
                 onDismiss()
@@ -111,6 +155,7 @@ fun AttachmentManager(
     uploading: Boolean,
     uploadProgress: Float = 0f,
     onRemove: (FileArgs) -> Unit,
+    onToggleSpoiler: (FileArgs) -> Unit,
     canRemove: Boolean = true,
     canPreview: Boolean = true
 ) {
@@ -126,18 +171,26 @@ fun AttachmentManager(
             }, sheetState = sheetState
         ) {
             previewingAttachment?.let {
-                FilePreviewSheet(args = it, canRemove = canRemove, onRemove = {
-                    onRemove(it)
-                    scope.launch {
-                        sheetState.hide()
-                        showPreviewSheet = false
+                FilePreviewSheet(
+                    args = it,
+                    canRemove = canRemove,
+                    onRemove = {
+                        onRemove(it)
+                        scope.launch {
+                            sheetState.hide()
+                            showPreviewSheet = false
+                        }
+                    },
+                    onToggleSpoiler = {
+                        onToggleSpoiler(it)
+                    },
+                    onDismiss = {
+                        scope.launch {
+                            sheetState.hide()
+                            showPreviewSheet = false
+                        }
                     }
-                }, onDismiss = {
-                    scope.launch {
-                        sheetState.hide()
-                        showPreviewSheet = false
-                    }
-                })
+                )
             }
         }
     }
@@ -159,20 +212,21 @@ fun AttachmentManager(
                 .padding(horizontal = 8.dp, vertical = 4.dp)
         ) {
             attachments.forEach { attachment ->
-                Row(modifier = Modifier
-                    .padding(4.dp)
-                    .clip(MaterialTheme.shapes.small)
-                    .clickable {
-                        if (canPreview) {
-                            previewingAttachment = attachment
-                            showPreviewSheet = true
+                Row(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .clickable {
+                            if (canPreview) {
+                                previewingAttachment = attachment
+                                showPreviewSheet = true
+                            }
                         }
-                    }
-                    .background(
-                        color = MaterialTheme.colorScheme.background,
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .padding(8.dp)) {
+                        .background(
+                            color = MaterialTheme.colorScheme.background,
+                            shape = MaterialTheme.shapes.small
+                        )
+                        .padding(8.dp)) {
                     Text(attachment.filename, maxLines = 1)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
@@ -190,13 +244,14 @@ fun AttachmentManager(
 @Preview
 @Composable
 fun AttachmentManagerPreview() {
-    AttachmentManager(attachments = listOf(
-        FileArgs(
-            filename = "file1.png", contentType = "image/png", file = File("file1.png")
-        ), FileArgs(
-            filename = "file2.png", contentType = "image/png", file = File("file2.png")
-        ), FileArgs(
-            filename = "file3.png", contentType = "image/png", file = File("file3.png")
-        )
-    ), uploading = false, onRemove = {})
+    AttachmentManager(
+        attachments = listOf(
+            FileArgs(
+                filename = "file1.png", contentType = "image/png", file = File("file1.png")
+            ), FileArgs(
+                filename = "file2.png", contentType = "image/png", file = File("file2.png")
+            ), FileArgs(
+                filename = "file3.png", contentType = "image/png", file = File("file3.png")
+            )
+        ), uploading = false, onToggleSpoiler = {}, onRemove = {})
 }

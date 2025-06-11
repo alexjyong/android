@@ -61,7 +61,6 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -95,7 +94,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
@@ -155,6 +153,7 @@ import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
+import logcat.logcat
 import java.io.File
 import kotlin.math.max
 
@@ -957,6 +956,21 @@ fun ChannelScreen(
                                             canPreview = true,
                                             onRemove = {
                                                 viewModel.draftAttachments.remove(it)
+                                            },
+                                            onToggleSpoiler = {
+                                                val index = viewModel.draftAttachments
+                                                    .indexOfFirst { a -> a.pickerIdentifier == it.pickerIdentifier }
+                                                logcat {
+                                                    "Toggling spoiler for attachment at index $index"
+                                                }
+                                                if (index != -1) {
+                                                    val attachment =
+                                                        viewModel.draftAttachments[index]
+                                                    viewModel.draftAttachments[index] =
+                                                        attachment.copy(
+                                                            spoiler = !attachment.spoiler
+                                                        )
+                                                }
                                             }
                                         )
                                     }

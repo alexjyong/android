@@ -377,6 +377,16 @@ fun ShareTargetScreen(
                                 attachments = viewModel.attachments,
                                 uploading = viewModel.attachmentsUploading,
                                 uploadProgress = viewModel.attachmentProgress,
+                                onToggleSpoiler = {
+                                    val index = viewModel.attachments
+                                        .indexOfFirst { a -> a.pickerIdentifier == it.pickerIdentifier }
+                                    if (index != -1) {
+                                        val attachment = viewModel.attachments[index]
+                                        viewModel.attachments[index] = attachment.copy(
+                                            spoiler = !attachment.spoiler
+                                        )
+                                    }
+                                },
                                 onRemove = {},
                                 canRemove = false
                             )

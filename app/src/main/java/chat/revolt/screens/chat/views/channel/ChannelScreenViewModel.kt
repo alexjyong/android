@@ -344,7 +344,7 @@ class ChannelScreenViewModel @Inject constructor(
                 try {
                     val id = uploadToAutumn(
                         it.file,
-                        it.filename,
+                        if (it.spoiler) "SPOILER_${it.filename}" else it.filename,
                         "attachments",
                         ContentType.parse(it.contentType),
                         onProgress = { current, total ->

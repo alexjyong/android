@@ -26,7 +26,8 @@ data class FileArgs(
     val file: File,
     val filename: String,
     val contentType: String,
-    val pickerIdentifier: String? = null
+    val spoiler: Boolean = false,
+    val pickerIdentifier: String? = null,
 )
 
 suspend fun uploadToAutumn(

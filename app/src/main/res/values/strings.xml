@@ -113,8 +113,12 @@
     <string name="reply_mention_off">\@ off</string>
     <string name="too_many_replies">You can only reply to %1$d messages at a time.</string>
 
+    <string name="attachment_spoiler">Spoiler</string>
+
     <string name="attachment_preview_remove">Remove</string>
     <string name="attachment_preview_close">Close</string>
+    <string name="attachment_preview_spoiler">Mark as spoiler</string>
+    <string name="attachment_preview_spoiler_description">This attachment will only be revealed when tapped.</string>
 
     <string name="emoji_category_smileys">Smileys &amp; Emotions</string>
     <string name="emoji_category_people">People &amp; Body</string>
