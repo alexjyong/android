@@ -103,7 +103,7 @@
     <string name="friends_all">همه</string>
     <string name="friends_blocked">مسدود</string>
     <string name="friends_deny_all_incoming">تمام درخواست های دریافتی را پاک کنید</string>
-    <string name="frends_new_group">گروه جدید</string>
+    <string name="friends_new_group">گروه جدید</string>
     <string name="create_group">یک گروه جدید ایجاد کنید</string>
     <string name="create_group_name">اسم گروه</string>
     <string name="create_group_search">جستجوی دوستان</string>

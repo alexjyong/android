@@ -195,7 +195,7 @@
     <string name="status_invisible_explainer">Revolt budete moci používat jako obvykle, ale pro ostatní lidi se budete vypadat offline.</string>
     <string name="channel_link_invalid">Tento kanál nelze zobrazit</string>
     <string name="channel_info_sheet_options_notifications_manage">Správa oznámení</string>
-    <string name="frends_new_group">Nová skupina</string>
+    <string name="friends_new_group">Nová skupina</string>
     <string name="create_group">Vytvořit novou skupinu</string>
     <string name="create_group_name">Název skupiny</string>
     <string name="create_group_search">Hledat přátele</string>

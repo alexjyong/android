@@ -433,7 +433,7 @@
     <string name="message_context_sheet_actions_delete_confirmation_yes">Burahin</string>
     <string name="message_context_sheet_actions_delete_confirmation_no">Panatilihin</string>
     <string name="server_context_sheet_actions_report">Iulat</string>
-    <string name="frends_new_group">Bagong Groupo</string>
+    <string name="friends_new_group">Bagong Groupo</string>
     <string name="create_group">Gumawa ng bagong groupo</string>
     <string name="create_group_name">Pangalan ng Groupo</string>
     <string name="create_group_search">Maghanap ng Mga Kaibigan</string>

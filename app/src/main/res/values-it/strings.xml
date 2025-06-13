@@ -439,7 +439,7 @@
     <string name="user_info_sheet_user_is_bot">Questo è un bot.</string>
     <string name="create_group_search">Cerca Amici</string>
     <string name="create_group_action">Crea</string>
-    <string name="frends_new_group">Nuovo Gruppo</string>
+    <string name="friends_new_group">Nuovo Gruppo</string>
     <string name="create_group_name">Nome del Gruppo</string>
     <string name="user_info_sheet_user_is_bot_easter_egg">Questo è un bot... che ha un piano.</string>
     <string name="user_info_sheet_category_owner">Proprietario</string>

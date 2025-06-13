@@ -104,7 +104,7 @@
     <string name="friends_outgoing_requests">คำขอเป็นเพื่อนขาออก</string>
     <string name="friends_all">ทั้งหมด</string>
     <string name="friends_deny_all_incoming">ลบคำขอขาเข้าทั้งหมด</string>
-    <string name="frends_new_group">กลุ่มใหม่</string>
+    <string name="friends_new_group">กลุ่มใหม่</string>
     <string name="create_group">สร้างกลุ่มใหม่</string>
     <string name="create_group_description">รวมพลกับเพื่อนๆ ของคุณในแชท คุณสามารถเพิ่มได้สูงสุด %1$d คน</string>
     <string name="create_group_name">ชื่อกลุ่ม</string>

@@ -460,7 +460,7 @@
     <string name="channel_settings_delete_confirm_yes">Supprimer</string>
     <string name="channel_settings_delete_confirm_no">Conserver</string>
     <string name="discover_alt">Découvrir</string>
-    <string name="frends_new_group">Nouveau groupe</string>
+    <string name="friends_new_group">Nouveau groupe</string>
     <string name="create_group">Créer un nouveau groupe</string>
     <string name="create_group_description">Rassemblez vos amis dans un groupe de conversation. Vous pouvez ajouter jusqu\'à %1$d personnes.</string>
     <string name="create_group_name">Nom du groupe</string>

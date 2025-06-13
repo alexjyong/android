@@ -337,7 +337,7 @@
     <string name="settings_changelogs_historical_version_header">Registro de alterações de %1$s</string>
     <string name="settings_changelogs_new_header">O que está cozinhando ✨</string>
     <string name="settings_changelogs">Registros de alterações</string>
-    <string name="frends_new_group">Novo grupo</string>
+    <string name="friends_new_group">Novo grupo</string>
     <string name="create_group">Crie um novo grupo</string>
     <string name="create_group_name">Nome do grupo</string>
     <string name="create_group_search">Procurar amigos</string>

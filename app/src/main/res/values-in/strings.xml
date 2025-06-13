@@ -309,7 +309,7 @@
     <string name="status_invisible_explainer">Kamu bisa menggunakan Revolt seperti biasa, namun kamu tidak akan terlihat daring oleh orang lain.</string>
     <string name="status_offline">Luring</string>
     <string name="emote_info_from_unicode">Emoji bawaan yang bisa digunakan di mana saja</string>
-    <string name="frends_new_group">Grup Baru</string>
+    <string name="friends_new_group">Grup Baru</string>
     <string name="create_group">Buat grup baru</string>
     <string name="create_group_description">Undang teman-temanmu ke obrolan grup. Kamu bisa menambahkan %1$d orang.</string>
     <string name="create_group_name">Nama Grup</string>

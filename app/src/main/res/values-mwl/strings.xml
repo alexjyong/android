@@ -471,7 +471,7 @@
     <string name="channel_settings_overview_nsfw">Marcar cumo Einaporpriado (+18)</string>
     <string name="channel_settings_overview_nsfw_description">Outelizadores son requesitados a cunfirmar la sue eidade antes de s\'ouniren a canales Einaporpriados (+18).</string>
     <string name="channel_settings_overview_nsfw_undo_confirm_description">Outelizadores yá nun ban a ser requesitados a cunfirmar la sue eidade antes de s\'ouniren a este canal. Por fabor stá seguro que\'l cuntenido ye aporpriado a to las eidades.</string>
-    <string name="frends_new_group">Nuobo Grupo</string>
+    <string name="friends_new_group">Nuobo Grupo</string>
     <string name="message_field_editing_message_cancel_alt">Cancelar eidiçon</string>
     <string name="channel_context_sheet_open">Abrir canales d’açones</string>
     <string name="colour_picker_use_default">Padron</string>

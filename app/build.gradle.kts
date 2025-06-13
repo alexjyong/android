@@ -277,8 +277,9 @@ dependencies {
     implementation("dev.chrisbanes.haze:haze:1.6.4")
     implementation("dev.chrisbanes.haze:haze-materials:1.6.4")
 
-    // ZXing - QR Code generation
+    // QR code related
     implementation("com.google.zxing:core:3.5.3")
+    implementation("io.github.g00fy2.quickie:quickie-bundled:1.11.0")
 
     // Persistence
     implementation("app.cash.sqldelight:android-driver:2.0.1")

@@ -1,5 +1,6 @@
 package chat.revolt.api.internals
 
+import androidx.core.net.toUri
 import chat.revolt.api.RevoltCbor
 import chat.revolt.api.schemas.User
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -36,5 +37,17 @@ object UserQR {
                 )
             )
         )
+    }
+
+    @OptIn(ExperimentalEncodingApi::class, ExperimentalSerializationApi::class)
+    fun fromUri(uriString: String): UserQRContents? {
+        return try {
+            val uri = uriString.toUri()
+            val base64 = uri.query ?: return null
+            val decodedBytes = Base64.decode(base64)
+            RevoltCbor.decodeFromByteArray(UserQRContents.serializer(), decodedBytes)
+        } catch (e: Exception) {
+            null
+        }
     }
 }

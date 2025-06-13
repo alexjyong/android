@@ -266,7 +266,7 @@
     <string name="channel_age_gate_title">Bu kanal NSFW olarak işaretlendi</string>
     <string name="channel_age_gate_description">Bu kanalı görüntülemek için 18 yaşında veya üzerinde olmalısın.</string>
     <string name="channel_age_gate_dob_section">Doğum tarihi</string>
-    <string name="frends_new_group">Yeni Grup</string>
+    <string name="friends_new_group">Yeni Grup</string>
     <string name="create_group">Yeni grup oluştur</string>
     <string name="create_group_name">Grup İsmi</string>
     <string name="create_group_action">Oluştur</string>

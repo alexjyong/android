@@ -234,7 +234,7 @@
     <string name="channel_age_gate_dob_month">الشهر</string>
     <string name="channel_age_gate_dob_year">السنة</string>
     <string name="report_user_heading">أخبرنا ما هو الخطأ في هذا المستخدم</string>
-    <string name="frends_new_group">مجموعة جديدة</string>
+    <string name="friends_new_group">مجموعة جديدة</string>
     <string name="create_group">إنشاء مجموعة جديدة</string>
     <string name="create_group_description">اجمع فريقك في محادثة جماعية. يمكنك إضافة ما يصل إلى %1$d شخصًا</string>
     <string name="file_picker_chip_documents">الملفات</string>

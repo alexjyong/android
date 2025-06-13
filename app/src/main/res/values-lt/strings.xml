@@ -136,7 +136,7 @@
     <string name="friends_outgoing_requests">Išsiųsti prašymai</string>
     <string name="friends_all">Visi</string>
     <string name="friends_blocked">Užblokuotas</string>
-    <string name="frends_new_group">Nauja grupė</string>
+    <string name="friends_new_group">Nauja grupė</string>
     <string name="create_group">Sukurti naują grupę</string>
     <string name="create_group_description">Surinkite savo komandą į grupinį pokalbį. Galite įtraukti iki %1$d žmonių.</string>
     <string name="create_group_name">Grupės pavadinimas</string>

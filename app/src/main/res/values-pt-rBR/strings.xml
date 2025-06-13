@@ -476,7 +476,7 @@
     <string name="rate_limit_toast">Fica frio aí! Você tá fazendo isso demais em muito pouco tempo.</string>
     <string name="service_health_alert_body_default">Estamos passando por dificuldades com nossos serviços. Confira a página de status para mais informações.</string>
     <string name="attachment_preview_remove">Remover</string>
-    <string name="frends_new_group">Novo Grupo</string>
+    <string name="friends_new_group">Novo Grupo</string>
     <string name="create_group_description">Reúna sua turma em um bate-papo em grupo. Você pode adicionar até %1$d pessoas.</string>
     <string name="message_field_editing_message">Editando mensagem</string>
     <string name="message_failed_to_send">Falha ao enviar, segure para ver opções</string>

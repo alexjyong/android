@@ -434,7 +434,7 @@
     <string name="settings_changelogs_historical_version_header">Registro de Cambios para %1$s</string>
     <string name="settings_changelogs_historical_version_header_placeholder">esa versión</string>
     <string name="settings_feedback_description">Unete al servidor de Revolt para dar una opinion o sugerencia y reportar bugs.</string>
-    <string name="frends_new_group">Nuevo Grupo</string>
+    <string name="friends_new_group">Nuevo Grupo</string>
     <string name="create_group">Crear un nuevo grupo</string>
     <string name="create_group_action">Crear</string>
     <string name="settings_chat_quick_reply_none">Manten presionado para responder</string>

@@ -286,7 +286,7 @@
     <string name="server_flag_official">অফিসিয়াল সার্ভার</string>
     <string name="system_message_channel_icon_changed_alt">চ্যানেলের আইকন পরিবর্তিত হয়েছে</string>
     <string name="channel_link_invalid">আপনি এই চ্যানেলটি দেখতে পারবেন না</string>
-    <string name="frends_new_group">নতুন গ্রুপ</string>
+    <string name="friends_new_group">নতুন গ্রুপ</string>
     <string name="create_group_search">বন্ধুদের খুঁজুন</string>
     <string name="message_context_sheet_actions_delete_confirmation_title">মেসেজটি মুছে ফেলতে চান\?</string>
     <string name="message_context_sheet_actions_delete_confirmation_no">রাখুন</string>

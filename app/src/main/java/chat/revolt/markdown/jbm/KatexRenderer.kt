@@ -22,12 +22,17 @@ import androidx.webkit.WebViewAssetLoader
 import chat.revolt.activities.InviteActivity
 import chat.revolt.api.REVOLT_APP
 
-internal fun Color.asHexString(): String {
+internal fun Color.asHexString(includeAlphaComponent: Boolean = true): String {
     val argb = toArgb()
-    val alpha = (argb shr 24 and 0xff) / 255.0f
     val red = argb shr 16 and 0xff
     val green = argb shr 8 and 0xff
     val blue = argb and 0xff
+
+    if (!includeAlphaComponent) {
+        return String.format("#%02x%02x%02x", red, green, blue)
+    }
+
+    val alpha = (argb shr 24 and 0xff) / 255.0f
     return String.format("#%02x%02x%02x%02x", red, green, blue, (alpha * 255).toInt())
 }
 

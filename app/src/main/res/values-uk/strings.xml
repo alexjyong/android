@@ -448,7 +448,7 @@
     <string name="channel_age_gate_title">Цей канал позначено як NSFW</string>
     <string name="channel_age_gate_dob_section">Дата народження</string>
     <string name="server_context_sheet_actions_report">Поскаржитись</string>
-    <string name="frends_new_group">Створити групу</string>
+    <string name="friends_new_group">Створити групу</string>
     <string name="create_group">Створити нову групу</string>
     <string name="create_group_description">Зберіть команду в груповому чаті. Ви можете додати до %1$d людей.</string>
     <string name="create_group_name">Назва групи</string>

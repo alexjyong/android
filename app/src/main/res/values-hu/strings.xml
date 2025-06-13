@@ -434,7 +434,7 @@
     <string name="message_context_sheet_actions_delete_confirmation_yes">Törlés</string>
     <string name="message_context_sheet_actions_delete_confirmation_no">Mégsem törlöm</string>
     <string name="settings_feedback_description">Csatlakozz a Revolt szerveréhez – itt jelezhetsz vissza nekünk és tudsz minket elérni, jelentheted a hibákat.</string>
-    <string name="frends_new_group">Új csoport</string>
+    <string name="friends_new_group">Új csoport</string>
     <string name="create_group_description">Szedd össze a csapatodat csoportos chatbe. Legfeljebb %1$d személyt adhatsz hozzá.</string>
     <string name="user_info_sheet_user_is_bot">Ez egy Robi 🤖</string>
     <string name="create_group">Új csoport létrehozása</string>
