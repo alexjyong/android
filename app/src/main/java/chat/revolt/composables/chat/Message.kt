@@ -518,16 +518,25 @@ fun Message(
                                     }
                                 }
                             }
-
                         }
 
-                        if ((message.reactions?.size ?: 0) > 0) {
+                        val reactionsAndInteractions = remember(message.reactions) {
+                            message.reactions.orEmpty().toMutableMap().also {
+                                message.interactions?.reactions?.forEach { reaction ->
+                                    if (!it.containsKey(reaction)) {
+                                        it[reaction] = listOf()
+                                    }
+                                }
+                            }
+                        }
+
+                        if (reactionsAndInteractions.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(8.dp))
                             FlowRow(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                message.reactions?.forEach { reaction ->
+                                reactionsAndInteractions.forEach { reaction ->
                                     Reaction(
                                         reaction.key, reaction.value,
                                         onClick = { hasOwn ->

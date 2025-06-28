@@ -14,12 +14,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -63,7 +64,19 @@ fun ReactionInfoSheet(messageId: String, emoji: String, onDismiss: () -> Unit) {
     val message = RevoltAPI.messageCache[messageId] ?: return
     val channel = RevoltAPI.channelCache[message.channel] ?: return
     val reactions = message.reactions
-    val reactionEmoji = reactions?.keys?.toList()
+    val interactions = message.interactions?.reactions ?: emptyList()
+    val reactionEmoji =
+        (reactions?.keys?.toList() ?: emptyList())
+            .plus(interactions)
+            .distinct()
+            .filterNot { it.isEmpty() }
+            .sortedBy {
+                if (it.isUlid()) {
+                    RevoltAPI.emojiCache[it]?.name ?: it.codePointAt(0).toString()
+                } else {
+                    it.codePointAt(0).toString()
+                }
+            }
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -81,60 +94,62 @@ fun ReactionInfoSheet(messageId: String, emoji: String, onDismiss: () -> Unit) {
     var selectedReactionIndex by remember(
         messageId,
         emoji
-    ) { mutableIntStateOf(reactionEmoji?.indexOfFirst { it == emoji } ?: 0) }
+    ) { mutableIntStateOf(reactionEmoji.indexOfFirst { it == emoji }) }
 
-    if (selectedReactionIndex >= (reactionEmoji?.size ?: 0)) {
+    if (selectedReactionIndex >= reactionEmoji.size || selectedReactionIndex < 0) {
         selectedReactionIndex = 0
     }
 
-    if (reactionEmoji?.isEmpty() == true) {
+    if (reactionEmoji.isEmpty()) {
         onDismiss()
     }
 
     LazyColumn {
         stickyHeader(key = "tabs") {
-            ScrollableTabRow(
-                selectedTabIndex = selectedReactionIndex,
-                modifier = Modifier.fillMaxWidth(),
-                containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                divider = {}
-            ) {
-                reactionEmoji?.forEachIndexed { index, emoji ->
-                    Tab(
-                        text = {
-                            if (emoji.isUlid()) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    RemoteImage(
-                                        url = "$REVOLT_FILES/emojis/${emoji}",
-                                        description = null,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                    Spacer(Modifier.size(6.dp))
+            if (reactionEmoji.isNotEmpty() && selectedReactionIndex < reactionEmoji.size) {
+                PrimaryScrollableTabRow(
+                    selectedTabIndex = selectedReactionIndex,
+                    modifier = Modifier.fillMaxWidth(),
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                    divider = {}
+                ) {
+                    reactionEmoji.forEachIndexed { index, emoji ->
+                        Tab(
+                            text = {
+                                if (emoji.isUlid()) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        RemoteImage(
+                                            url = "$REVOLT_FILES/emojis/${emoji}",
+                                            description = null,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Spacer(Modifier.size(6.dp))
+                                        Text(
+                                            "${reactions?.get(emoji)?.size ?: 0}",
+                                            style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum")
+                                        )
+                                    }
+                                } else {
                                     Text(
-                                        "${reactions[emoji]?.size ?: 0}",
+                                        "$emoji ${reactions?.get(emoji)?.size ?: 0}",
                                         style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum")
                                     )
                                 }
-                            } else {
-                                Text(
-                                    "$emoji ${reactions[emoji]?.size ?: 0}",
-                                    style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum")
-                                )
-                            }
-                        },
-                        selected = selectedReactionIndex == index,
-                        onClick = { selectedReactionIndex = index }
-                    )
+                            },
+                            selected = selectedReactionIndex == index,
+                            onClick = { selectedReactionIndex = index }
+                        )
+                    }
                 }
+                HorizontalDivider()
             }
-            HorizontalDivider()
         }
 
-        if (reactionEmoji?.isNotEmpty() == true) {
-            item("info") {
+        item("info") {
+            if (reactionEmoji.isNotEmpty() == true) {
                 val current = reactionEmoji[selectedReactionIndex]
 
-                // Code related to enabling of experimental features
+                // <editor-fold desc="Code related to enabling of experimental features">
                 val interactionSource = remember { MutableInteractionSource() }
                 val canBeUsedForTapCountIncrement =
                     remember(selectedReactionIndex) {
@@ -197,7 +212,7 @@ fun ReactionInfoSheet(messageId: String, emoji: String, onDismiss: () -> Unit) {
                         }
                     )
                 }
-                // End of code related to enabling of experimental features
+                // </editor-fold>
 
                 Column(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -297,35 +312,35 @@ fun ReactionInfoSheet(messageId: String, emoji: String, onDismiss: () -> Unit) {
                     HorizontalDivider()
                 }
             }
+        }
 
-            val reactionsForEmoji = reactions[reactionEmoji[selectedReactionIndex]]
-            items(reactionsForEmoji?.size ?: 0) { index ->
-                val reaction = reactionsForEmoji?.get(index) ?: return@items
-                val userOrNull = RevoltAPI.userCache[reaction]
-                val user = userOrNull ?: User.getPlaceholder(reaction)
-                val member = if (channel.server != null && user.id != null) {
-                    RevoltAPI.members.getMember(channel.server, user.id)
-                } else {
-                    null
-                }
+        val reactionsForEmoji =
+            reactions?.get(reactionEmoji[selectedReactionIndex]) ?: emptyList()
+        items(items = reactionsForEmoji) { reaction ->
+            val userOrNull = RevoltAPI.userCache[reaction]
+            val user = userOrNull ?: User.getPlaceholder(reaction)
+            val member = if (channel.server != null && user.id != null) {
+                RevoltAPI.members.getMember(channel.server, user.id)
+            } else {
+                null
+            }
 
-                LaunchedEffect(reaction) {
-                    if (reaction !in RevoltAPI.userCache) {
-                        try {
-                            RevoltAPI.userCache[reaction] = fetchUser(reaction)
-                        } catch (e: Exception) {
-                            // too bad!
-                        }
+            LaunchedEffect(reaction) {
+                if (reaction !in RevoltAPI.userCache) {
+                    try {
+                        RevoltAPI.userCache[reaction] = fetchUser(reaction)
+                    } catch (e: Exception) {
+                        // too bad!
                     }
                 }
-
-                MemberListItem(
-                    member = member,
-                    user = user,
-                    serverId = channel.server,
-                    userId = reaction,
-                )
             }
+
+            MemberListItem(
+                member = member,
+                user = user,
+                serverId = channel.server,
+                userId = reaction,
+            )
         }
 
         item("bottom") {

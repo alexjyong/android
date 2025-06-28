@@ -21,6 +21,7 @@ data class Message(
     val masquerade: Masquerade? = null,
     val system: SystemInfo? = null,
     val webhook: WebHook? = null,
+    val interactions: InteractionsDescription? = null,
     val type: String? = null, // this is _only_ used for websocket events!
     val tail: Boolean? = null // this is used to determine if the message is the last in a message group
 ) {
@@ -116,4 +117,10 @@ data class SystemInfo(
 data class WebHook(
     val avatar: String? = null,
     val name: String? = null,
+)
+
+@Serializable
+data class InteractionsDescription(
+    val reactions: List<String>? = null,
+    @SerialName("restrict_reactions") val restrictReactions: Boolean? = null
 )
