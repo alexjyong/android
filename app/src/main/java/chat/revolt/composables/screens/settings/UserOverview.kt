@@ -165,7 +165,10 @@ fun RawUserOverview(
 
             Text(
                 text = AnnotatedString.Builder().apply {
-                    if (user.displayName != null) {
+                    // make sure
+                    // - the display name is not null or blank
+                    // - the display name is not the same as the username; both trimmed
+                    if (!user.displayName.isNullOrBlank() && ((user.displayName.trim() == user.username?.trim()) == false)) {
                         pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
                         append(user.displayName)
                         pop()
