@@ -1,22 +1,23 @@
 package chat.revolt.api.internals
 
-import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Shader
 import android.util.Log
 import android.widget.TextView
 import androidx.compose.ui.graphics.toArgb
+import androidx.core.graphics.toColorInt
+import chat.revolt.api.internals.colour.CSSColours
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.elevation.SurfaceColors
 
 object TextViewCompat {
     private fun tryParseDirectColour(colour: String): Int {
-        val additionalWebColour = ADDITIONAL_WEB_COLOURS[colour]
-        if (additionalWebColour != null) {
-            return additionalWebColour.toArgb()
+        val cssColour = CSSColours[colour]
+        if (cssColour != null) {
+            return cssColour.toArgb()
         }
 
-        return Color.parseColor(colour)
+        return colour.toColorInt()
     }
 
     private fun tryParseVariable(tv: TextView, varName: String): Int {
@@ -34,7 +35,7 @@ object TextViewCompat {
             "--background" -> SurfaceColors.SURFACE_0.getColor(tv.context)
 
             "--error" -> MaterialColors.getColor(tv, com.google.android.material.R.attr.colorError)
-            
+
             else -> tv.currentTextColor
         }
     }

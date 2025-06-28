@@ -2,6 +2,7 @@ package chat.revolt.markdown.jbm
 
 import chat.revolt.markdown.jbm.sequentialparsers.ChannelMentionParser
 import chat.revolt.markdown.jbm.sequentialparsers.CustomEmoteParser
+import chat.revolt.markdown.jbm.sequentialparsers.RoleMentionParser
 import chat.revolt.markdown.jbm.sequentialparsers.UserMentionParser
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
@@ -24,6 +25,7 @@ class RSMFlavourDescriptor : GFMFlavourDescriptor() {
             return listOf(
                 UserMentionParser(),
                 ChannelMentionParser(),
+                RoleMentionParser(),
                 CustomEmoteParser(),
                 AutolinkParser(listOf(MarkdownTokenTypes.AUTOLINK, GFMTokenTypes.GFM_AUTOLINK)),
                 BacktickParser(),

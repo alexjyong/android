@@ -60,4 +60,11 @@ object MessageProcessor {
 
         return returnable
     }
+
+    private val roleRegex = "<%([0-9A-HJKMNP-TV-Z]{26})>".toRegex()
+    fun findMentionedRoleIDs(content: String?): List<String> {
+        if (content.isNullOrEmpty()) return emptyList()
+        return roleRegex.findAll(content).map { it.groupValues[1] }.toList().distinct()
+            .filter { it.isNotEmpty() }
+    }
 }

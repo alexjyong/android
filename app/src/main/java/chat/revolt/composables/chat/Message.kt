@@ -1,5 +1,6 @@
 package chat.revolt.composables.chat
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.icu.text.DateFormat
 import android.net.Uri
@@ -37,9 +38,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -79,6 +84,7 @@ import chat.revolt.composables.generic.UserAvatarWidthPlaceholder
 import chat.revolt.composables.markdown.LocalMarkdownTreeConfig
 import chat.revolt.composables.markdown.RichMarkdown
 import chat.revolt.internals.text.Gigamoji
+import chat.revolt.internals.text.MessageProcessor
 import chat.revolt.markdown.jbm.JBM
 import chat.revolt.markdown.jbm.JBMRenderer
 import chat.revolt.markdown.jbm.LocalJBMarkdownTreeState
@@ -173,6 +179,7 @@ fun formatLongAsTime(time: Long): String {
     }
 }
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class, JBM::class)
 @Composable
 fun Message(
@@ -200,6 +207,17 @@ fun Message(
     )
 
     val authorIsBlocked = remember(author) { author.relationship == "Blocked" }
+
+    var mentionsSelfRole by remember(message) { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        val serverId =
+            RevoltAPI.channelCache[message.channel]?.server ?: return@LaunchedEffect
+        var selfMember = RevoltAPI.selfId?.let { RevoltAPI.members.getMember(serverId, it) }
+            ?: return@LaunchedEffect
+        var messageRoleMentions = MessageProcessor.findMentionedRoleIDs(message.content)
+
+        mentionsSelfRole = selfMember.roles?.any { it in messageRoleMentions } == true
+    }
 
     Column(modifier.animateContentSize()) {
         if (message.tail == false) {
@@ -244,7 +262,7 @@ fun Message(
         } else {
             Column(
                 modifier = Modifier.then(
-                    if (message.mentions?.contains(RevoltAPI.selfId) == true) {
+                    if ((message.mentions?.contains(RevoltAPI.selfId) == true) || mentionsSelfRole) {
                         Modifier.background(
                             MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                         )
@@ -260,12 +278,11 @@ fun Message(
                         InReplyTo(
                             channelId = chId,
                             messageId = reply,
-                            withMention = replyMessage?.author?.let {
+                            withMention = (replyMessage?.author?.let {
                                 message.mentions?.contains(
                                     replyMessage.author
                                 )
-                            }
-                                ?: false
+                            } == true),
                         ) {
                             // TODO Add jump to message
                             if (replyMessage == null) {
@@ -511,7 +528,8 @@ fun Message(
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 message.reactions?.forEach { reaction ->
-                                    Reaction(reaction.key, reaction.value,
+                                    Reaction(
+                                        reaction.key, reaction.value,
                                         onClick = { hasOwn ->
                                             scope.launch {
                                                 if (hasOwn) {

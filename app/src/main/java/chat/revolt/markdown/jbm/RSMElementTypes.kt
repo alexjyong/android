@@ -11,6 +11,9 @@ object RSMElementTypes {
     val CHANNEL_MENTION: IElementType = MarkdownElementType("CHANNEL_MENTION")
 
     @JvmField
+    val ROLE_MENTION: IElementType = MarkdownElementType("ROLE_MENTION")
+
+    @JvmField
     val CUSTOM_EMOTE: IElementType = MarkdownElementType("EMOJI")
 
     @JvmField

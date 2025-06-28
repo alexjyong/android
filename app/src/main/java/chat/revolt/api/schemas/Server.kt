@@ -75,7 +75,17 @@ data class Role(
     val colour: String? = null,
     val hoist: Boolean? = null,
     val rank: Double? = null
-)
+) {
+    fun mergeWithPartial(other: Role): Role {
+        return Role(
+            name = other.name ?: name,
+            permissions = other.permissions ?: permissions,
+            colour = other.colour ?: colour,
+            hoist = other.hoist ?: hoist,
+            rank = other.rank ?: rank
+        )
+    }
+}
 
 @Serializable
 data class PermissionDescription(

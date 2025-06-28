@@ -21,9 +21,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -46,6 +48,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
@@ -72,6 +75,8 @@ import chat.revolt.R
 import chat.revolt.activities.InviteActivity
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.BrushCompat
+import chat.revolt.api.internals.InstancedBrushCompat
 import chat.revolt.api.internals.isUlid
 import chat.revolt.api.routes.custom.fetchEmoji
 import chat.revolt.api.schemas.isInviteUri
@@ -102,10 +107,12 @@ enum class JBMAnnotations(val tag: String, val clickable: Boolean) {
     URL("URL", true),
     UserMention("UserMention", true),
     ChannelMention("ChannelMention", true),
+    RoleMention("RoleMention", false),
     CustomEmote("CustomEmote", true),
     Timestamp("Timestamp", false),
     Checkbox("Checkbox", false),
     UserAvatar("UserAvatar", true),
+    RoleChip("RoleChip", false),
     JBMBackgroundRoundingStart("JBMBackgroundRoundingStart", false),
     JBMBackgroundRoundingEnd("JBMBackgroundRoundingEnd", false),
 }
@@ -130,7 +137,8 @@ data class JBMarkdownTreeState(
     val colors: JBMColors = JBMColors(
         clickable = Color(0xFFFF00FF),
         clickableBackground = Color(0x2000FF00)
-    )
+    ),
+    val brushCompat: InstancedBrushCompat? = null
 )
 
 val LocalJBMarkdownTreeState =
@@ -153,6 +161,13 @@ fun JBMRenderer(content: String, modifier: Modifier = Modifier) {
             colors = JBMColors(
                 clickable = MaterialTheme.colorScheme.primary,
                 clickableBackground = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+            ),
+            brushCompat = InstancedBrushCompat(
+                defaultColour = LocalContentColor.current,
+                primaryColour = MaterialTheme.colorScheme.primary,
+                onBackgroundColour = MaterialTheme.colorScheme.onBackground,
+                backgroundColour = MaterialTheme.colorScheme.background,
+                errorColour = MaterialTheme.colorScheme.error,
             )
         )
     ) {
@@ -239,6 +254,50 @@ private fun annotateText(
 
                         append(MentionResolver.resolveChannel(channelId))
 
+                        pop()
+                        pop()
+                    }
+                }
+
+                RSMElementTypes.ROLE_MENTION -> {
+                    val contents = node.getTextInNode(sourceText).toString()
+                    val roleId = contents.removeSurrounding("<%", ">")
+                    if (roleId == contents || !roleId.isUlid() || state.currentServer == null) {
+                        // Invalid role mention. Append as if it were regular text.
+                        for (child in node.children) {
+                            append(annotateText(state, child))
+                        }
+                    } else {
+                        val server = RevoltAPI.serverCache[state.currentServer]
+                        val role = server?.roles?.get(roleId)
+                        val isGradient = role?.colour?.contains("gradient") == true
+
+                        pushStyle(
+                            SpanStyle(
+                                background = state.colors.clickableBackground
+                            )
+                        )
+                        pushStyle(
+                            SpanStyle(
+                                brush = (if (!isGradient) role?.colour?.let {
+                                    state.brushCompat?.parseColour(
+                                        it
+                                    )
+                                } else null)
+                                    ?: SolidColor(state.colors.clickable),
+                            )
+                        )
+                        pushStyle(
+                            SpanStyle(
+                                background = state.colors.clickableBackground
+                            )
+                        )
+                        append(" ")
+                        appendInlineContent(JBMAnnotations.RoleChip.tag, roleId)
+                        append(" ")
+                        append(role?.name ?: "invalid-role")
+                        append(" ")
+                        pop()
                         pop()
                         pop()
                     }
@@ -649,6 +708,40 @@ private fun JBMText(node: ASTNode, modifier: Modifier) {
                     }
                 }
             ),
+            JBMAnnotations.RoleChip.tag to with(LocalDensity.current) {
+                val placeholderBaseWidth =
+                    (LocalTextStyle.current.fontSize * 1.5).toPx() - (avatarPadding * 2).toPx()
+                val widthTolerancePx =
+                    2 // Else we get a gap of about 1-2 pixels due to rounding errors
+                val placeholderBaseHeight = (LocalTextStyle.current.fontSize * 1.5).toPx()
+                val heightTolerancePx = 2 // Dito
+
+                InlineTextContent(
+                    placeholder = Placeholder(
+                        width = (placeholderBaseWidth - widthTolerancePx).toSp(),
+                        height = (placeholderBaseHeight - heightTolerancePx).toSp(),
+                        placeholderVerticalAlign = PlaceholderVerticalAlign.Center
+                    ),
+                ) { id ->
+                    val role = RevoltAPI.serverCache[mdState.currentServer]?.roles?.get(id)
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .background(LocalJBMarkdownTreeState.current.colors.clickableBackground)
+                            .padding(vertical = avatarPadding)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .background(
+                                    role?.colour?.let { BrushCompat.parseColour(it) }
+                                        ?: SolidColor(MaterialTheme.colorScheme.primaryContainer)
+                                )
+                                .size((LocalTextStyle.current.fontSize * 1.5).toDp() - (avatarPadding * 2))
+                        )
+                    }
+                }
+            },
             JBMAnnotations.CustomEmote.tag to InlineTextContent(
                 placeholder = Placeholder(
                     width = LocalTextStyle.current.fontSize * 1.5,
@@ -811,10 +904,8 @@ private fun annotateHighlights(
                     it.location.end
                 )
             }
-
-            else -> null
         }
-    }.filterNotNull()
+    }
 
     return AnnotatedString(source, spanStyles = highlightStyles)
 }

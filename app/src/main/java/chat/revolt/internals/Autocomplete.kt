@@ -21,7 +21,7 @@ object Autocomplete {
         val customResults =
             RevoltAPI.emojiCache.values.filter {
                 it.name?.contains(query, ignoreCase = true) ?: false
-            }.map {
+            }.mapNotNull {
                 if (it.name != null) {
                     AutocompleteSuggestion.Emoji(
                         ":${it.id}:",
@@ -32,16 +32,16 @@ object Autocomplete {
                 } else {
                     null
                 }
-            }.filterNotNull().distinctBy { it.custom?.id }
+            }.distinctBy { it.custom?.id }
 
         return (unicodeResults + customResults)
     }
 
-    fun user(
+    fun userOrRole(
         channelId: String,
         serverId: String? = null,
         query: String
-    ): List<AutocompleteSuggestion.User> {
+    ): List<AutocompleteSuggestion> {
         val channel = RevoltAPI.channelCache[channelId] ?: return emptyList()
 
         return when (channel.channelType) {
@@ -102,6 +102,7 @@ object Autocomplete {
                 if (serverId == null) return emptyList()
                 if (query.length < 2) return emptyList()
 
+                val roles = RevoltAPI.serverCache[serverId]?.roles ?: emptyMap()
                 val byNickname = RevoltAPI.members.filterNamesFor(serverId, query)
                     .map { m -> m to RevoltAPI.userCache[m.id?.user] }.filter { (_, u) ->
                         u != null
@@ -112,7 +113,7 @@ object Autocomplete {
                     it.username?.contains(
                         query,
                         ignoreCase = true
-                    ) ?: false
+                    ) == true
                 }.mapNotNull {
                     it.id?.let { _ ->
                         RevoltAPI.members.getMember(
@@ -126,15 +127,32 @@ object Autocomplete {
                     member!! to user
                 }
 
-                val all = (byNickname + byUsername).distinctBy { it.first.id }
+                val allUsers = (byNickname + byUsername).distinctBy { it.first.id }
+                val rolesByName =
+                    roles.filter { it.value.name?.contains(query, ignoreCase = true) == true }
+                        .map { it.value to it.key }
 
-                all.map {
+
+                (allUsers.map {
                     AutocompleteSuggestion.User(
                         it.second,
                         it.first,
                         query
                     )
-                }
+                } + rolesByName.map { (role, roleId) ->
+                    AutocompleteSuggestion.Role(
+                        role,
+                        roleId,
+                        query
+                    )
+                })
+                    .sortedBy {
+                        when (it) {
+                            is AutocompleteSuggestion.User -> it.user.username
+                            is AutocompleteSuggestion.Role -> it.role.name
+                            else -> ""
+                        }
+                    }
             }
 
             null -> emptyList()
@@ -148,7 +166,7 @@ object Autocomplete {
         val server = RevoltAPI.serverCache[serverId] ?: return emptyList()
         val channels = server.channels?.mapNotNull { RevoltAPI.channelCache[it] } ?: emptyList()
 
-        return channels.filter { it.name?.contains(query, ignoreCase = true) ?: false }.map {
+        return channels.filter { it.name?.contains(query, ignoreCase = true) == true }.map {
             AutocompleteSuggestion.Channel(
                 it,
                 query

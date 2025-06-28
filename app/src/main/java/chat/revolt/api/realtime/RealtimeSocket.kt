@@ -26,6 +26,8 @@ import chat.revolt.api.realtime.frames.receivable.ServerDeleteFrame
 import chat.revolt.api.realtime.frames.receivable.ServerMemberJoinFrame
 import chat.revolt.api.realtime.frames.receivable.ServerMemberLeaveFrame
 import chat.revolt.api.realtime.frames.receivable.ServerMemberUpdateFrame
+import chat.revolt.api.realtime.frames.receivable.ServerRoleDeleteFrame
+import chat.revolt.api.realtime.frames.receivable.ServerRoleUpdateFrame
 import chat.revolt.api.realtime.frames.receivable.ServerUpdateFrame
 import chat.revolt.api.realtime.frames.receivable.UserRelationshipFrame
 import chat.revolt.api.realtime.frames.receivable.UserUpdateFrame
@@ -36,6 +38,7 @@ import chat.revolt.api.realtime.frames.sendable.PingFrame
 import chat.revolt.api.routes.server.fetchMember
 import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.ChannelType
+import chat.revolt.api.schemas.Role
 import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.c2dm.ChannelRegistrator
@@ -674,7 +677,6 @@ object RealtimeSocket {
             }
 
             "ServerMemberUpdate" -> {
-                Log.d("RealtimeSocket", "Received server member update frame. Raw: $rawFrame")
                 val serverMemberUpdateFrame =
                     RevoltJson.decodeFromString(ServerMemberUpdateFrame.serializer(), rawFrame)
                 Log.d(
@@ -728,6 +730,77 @@ object RealtimeSocket {
                     serverMemberLeaveFrame.id,
                     serverMemberLeaveFrame.user
                 )
+            }
+
+            "ServerRoleUpdate" -> {
+                val serverRoleUpdateFrame =
+                    RevoltJson.decodeFromString(ServerRoleUpdateFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received server role update frame for ${serverRoleUpdateFrame.id}."
+                )
+
+                val server = RevoltAPI.serverCache[serverRoleUpdateFrame.id]
+                if (server == null) {
+                    Log.d(
+                        "RealtimeSocket",
+                        "Server ${serverRoleUpdateFrame.id} not found in cache. Ignoring role update."
+                    )
+                    return
+                }
+
+                val existingRole = server.roles?.get(serverRoleUpdateFrame.roleId)
+                if (existingRole == null) {
+                    // New role.
+                    Log.d(
+                        "RealtimeSocket",
+                        "New role ${serverRoleUpdateFrame.roleId} in server ${serverRoleUpdateFrame.id}. Adding to cache."
+                    )
+                    val newRole = Role().mergeWithPartial(serverRoleUpdateFrame.data)
+                    val newServer = server.copy(
+                        roles = server.roles?.plus(
+                            Pair(serverRoleUpdateFrame.roleId, newRole)
+                        ) ?: mapOf(serverRoleUpdateFrame.roleId to newRole)
+                    )
+                    RevoltAPI.serverCache[serverRoleUpdateFrame.id] = newServer
+                } else {
+                    // True role update.
+                    Log.d(
+                        "RealtimeSocket",
+                        "Updating existing role ${serverRoleUpdateFrame.roleId} in server ${serverRoleUpdateFrame.id}."
+                    )
+                    val updatedRole = existingRole.mergeWithPartial(serverRoleUpdateFrame.data)
+                    val newServer = server.copy(
+                        roles = server.roles.plus(
+                            Pair(serverRoleUpdateFrame.roleId, updatedRole)
+                        )
+                    )
+                    RevoltAPI.serverCache[serverRoleUpdateFrame.id] = newServer
+                }
+            }
+
+            "ServerRoleDelete" -> {
+                val serverRoleDeleteFrame =
+                    RevoltJson.decodeFromString(ServerRoleDeleteFrame.serializer(), rawFrame)
+                Log.d(
+                    "RealtimeSocket",
+                    "Received server role delete frame for ${serverRoleDeleteFrame.id} and role ${serverRoleDeleteFrame.roleId}."
+                )
+
+                val server = RevoltAPI.serverCache[serverRoleDeleteFrame.id]
+                if (server == null) {
+                    Log.d(
+                        "RealtimeSocket",
+                        "Server ${serverRoleDeleteFrame.id} not found in cache. Ignoring role delete."
+                    )
+                    return
+                }
+
+                val newRoles = server.roles?.toMutableMap() ?: mutableMapOf()
+                newRoles.remove(serverRoleDeleteFrame.roleId)
+
+                RevoltAPI.serverCache[serverRoleDeleteFrame.id] =
+                    server.copy(roles = newRoles)
             }
 
             "Authenticated" -> {

@@ -85,6 +85,7 @@ import chat.revolt.R
 import chat.revolt.activities.RevoltTweenFloat
 import chat.revolt.activities.RevoltTweenInt
 import chat.revolt.api.REVOLT_FILES
+import chat.revolt.api.internals.BrushCompat
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.Member
 import chat.revolt.composables.generic.RemoteImage
@@ -126,6 +127,12 @@ sealed class AutocompleteSuggestion {
         val shortcode: String,
         val unicode: String?,
         val custom: chat.revolt.api.schemas.Emoji?,
+        val query: String
+    ) : AutocompleteSuggestion()
+
+    data class Role(
+        val role: chat.revolt.api.schemas.Role,
+        val id: String,
         val query: String
     ) : AutocompleteSuggestion()
 }
@@ -218,7 +225,7 @@ fun MessageField(
                     lastWord.startsWith('@') -> {
                         if (channelId != null && serverId != null) {
                             autocompleteSuggestions.addAll(
-                                Autocomplete.user(
+                                Autocomplete.userOrRole(
                                     channelId,
                                     serverId,
                                     lastWord.substring(1)
@@ -281,6 +288,7 @@ fun MessageField(
                         is AutocompleteSuggestion.User -> item.user.id!!
                         is AutocompleteSuggestion.Channel -> item.channel.id!!
                         is AutocompleteSuggestion.Emoji -> item.shortcode
+                        is AutocompleteSuggestion.Role -> item.id
                     }
                 }) {
                     when (val item = autocompleteSuggestions[it]) {
@@ -310,6 +318,48 @@ fun MessageField(
                                             "$REVOLT_FILES/avatars/$it"
                                         },
                                         size = SuggestionChipDefaults.IconSize,
+                                    )
+                                },
+                                modifier = Modifier
+                                    .animateItem()
+                            )
+                        }
+
+                        is AutocompleteSuggestion.Role -> {
+                            SuggestionChip(
+                                onClick = {
+                                    textFieldState.edit {
+                                        val lastWordStartsAt =
+                                            textFieldState.text
+                                                .substring(0, textFieldState.selection.max)
+                                                .lastWordStartsAt()
+                                        replace(
+                                            if (lastWordStartsAt == -1) 0 else (lastWordStartsAt + 1),
+                                            textFieldState.selection.max,
+                                            "<%${item.id}> "
+                                        )
+                                    }
+                                },
+                                label = {
+                                    Text(
+                                        text = "@${item.role.name}",
+                                        style = item.role.colour?.let {
+                                            LocalTextStyle.current.copy(
+                                                brush = BrushCompat.parseColour(it)
+                                            )
+                                        } ?: LocalTextStyle.current
+                                    )
+                                },
+                                icon = {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(CircleShape)
+                                            .background(
+                                                item.role.colour?.let { BrushCompat.parseColour(it) }
+                                                    ?: SolidColor(MaterialTheme.colorScheme.primaryContainer)
+                                            )
+                                            .size(SuggestionChipDefaults.IconSize)
+                                            .align(Alignment.CenterHorizontally),
                                     )
                                 },
                                 modifier = Modifier
