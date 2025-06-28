@@ -388,3 +388,14 @@ fun SettingsScreen(
         }
     }
 }
+
+@Composable
+private fun SettingsIcon(danger: Boolean = false, content: @Composable () -> Unit) {
+    CompositionLocalProvider(
+        LocalContentColor provides
+                if (danger) MaterialTheme.colorScheme.error
+                else MaterialTheme.colorScheme.onBackground
+    ) {
+        content()
+    }
+}
