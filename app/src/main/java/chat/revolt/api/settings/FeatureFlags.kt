@@ -43,6 +43,19 @@ sealed class UserCardsVariates {
     data class Restricted(val predicate: () -> Boolean) : UserCardsVariates()
 }
 
+@FeatureFlag("MassMentions")
+sealed class MassMentionsVariates {
+    @Treatment(
+        "Enable mass mentions and role mentions for all users"
+    )
+    object Enabled : MassMentionsVariates()
+
+    @Treatment(
+        "Disable mass mentions and role mentions for all users"
+    )
+    object Disabled : MassMentionsVariates()
+}
+
 object FeatureFlags {
     @FeatureFlag("LabsAccessControl")
     var labsAccessControl by mutableStateOf<LabsAccessControlVariates>(
@@ -80,5 +93,15 @@ object FeatureFlags {
         get() = when (userCards) {
             is UserCardsVariates.Enabled -> true
             is UserCardsVariates.Restricted -> (userCards as UserCardsVariates.Restricted).predicate()
+        }
+
+    @FeatureFlag("MassMentions")
+    var massMentions by mutableStateOf<MassMentionsVariates>(
+        MassMentionsVariates.Enabled
+    )
+    val massMentionsGranted: Boolean
+        get() = when (massMentions) {
+            is MassMentionsVariates.Enabled -> true
+            is MassMentionsVariates.Disabled -> false
         }
 }

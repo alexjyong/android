@@ -1,7 +1,11 @@
 package chat.revolt.internals
 
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.PermissionBit
+import chat.revolt.api.internals.Roles
+import chat.revolt.api.internals.has
 import chat.revolt.api.schemas.ChannelType
+import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.composables.chat.AutocompleteSuggestion
 
 object Autocomplete {
@@ -43,6 +47,18 @@ object Autocomplete {
         query: String
     ): List<AutocompleteSuggestion> {
         val channel = RevoltAPI.channelCache[channelId] ?: return emptyList()
+
+        val member = serverId?.let { RevoltAPI.members.getMember(serverId, RevoltAPI.selfId ?: "") }
+        val massMentionSuggestions = listOf("everyone", "online")
+            .filter { it.startsWith(query, ignoreCase = true) }
+
+        val selfPermissions = RevoltAPI.channelCache[channelId]?.let { ch ->
+            Roles.permissionFor(
+                ch,
+                RevoltAPI.userCache[RevoltAPI.selfId],
+                member
+            )
+        }
 
         return when (channel.channelType) {
             ChannelType.DirectMessage -> {
@@ -102,7 +118,9 @@ object Autocomplete {
                 if (serverId == null) return emptyList()
                 if (query.length < 2) return emptyList()
 
-                val roles = RevoltAPI.serverCache[serverId]?.roles ?: emptyMap()
+                val roles =
+                    if (selfPermissions has PermissionBit.MentionRoles && FeatureFlags.massMentionsGranted) RevoltAPI.serverCache[serverId]?.roles
+                        ?: emptyMap() else emptyMap()
                 val byNickname = RevoltAPI.members.filterNamesFor(serverId, query)
                     .map { m -> m to RevoltAPI.userCache[m.id?.user] }.filter { (_, u) ->
                         u != null
@@ -156,7 +174,9 @@ object Autocomplete {
             }
 
             null -> emptyList()
-        }
+        } + if (selfPermissions has PermissionBit.MentionEveryone && FeatureFlags.massMentionsGranted) massMentionSuggestions.map { mention ->
+            AutocompleteSuggestion.MassMention(mention)
+        } else listOf()
     }
 
     fun channel(

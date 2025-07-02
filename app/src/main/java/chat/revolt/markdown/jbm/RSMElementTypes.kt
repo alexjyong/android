@@ -12,6 +12,9 @@ object RSMElementTypes {
 
     @JvmField
     val ROLE_MENTION: IElementType = MarkdownElementType("ROLE_MENTION")
+    
+    @JvmField
+    val MASS_MENTION: IElementType = MarkdownElementType("MASS_MENTION")
 
     @JvmField
     val CUSTOM_EMOTE: IElementType = MarkdownElementType("EMOJI")

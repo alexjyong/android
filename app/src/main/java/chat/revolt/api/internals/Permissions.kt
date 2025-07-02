@@ -42,8 +42,14 @@ enum class PermissionBit(val value: Long) {
     DeafenMembers(1L shl 34),
     MoveMembers(1L shl 35),
 
+    // % 1 bit reserved
+
+    // * Channel permissions cont.
+    MentionEveryone(1L shl 37),
+    MentionRoles(1L shl 38),
+
     // * Misc. permissions
-    // % Bits 36 to 52: free area
+    // % Bits 38 to 52: free area
     // % Bits 53 to 64: do not use
 
     // * Grant all permissions

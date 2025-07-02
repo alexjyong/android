@@ -22,6 +22,11 @@ data class Message(
     val system: SystemInfo? = null,
     val webhook: WebHook? = null,
     val interactions: InteractionsDescription? = null,
+    val pinned: Boolean? = null,
+    /**
+     * See [chat.revolt.api.internals.MessageFlag]
+     */
+    val flags: Int? = null,
     val type: String? = null, // this is _only_ used for websocket events!
     val tail: Boolean? = null // this is used to determine if the message is the last in a message group
 ) {

@@ -64,9 +64,11 @@ import chat.revolt.activities.media.VideoViewActivity
 import chat.revolt.api.REVOLT_FILES
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.BrushCompat
+import chat.revolt.api.internals.MessageFlag
 import chat.revolt.api.internals.Roles
 import chat.revolt.api.internals.SpecialUsers
 import chat.revolt.api.internals.ULID
+import chat.revolt.api.internals.has
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.channel.react
 import chat.revolt.api.routes.channel.unreact
@@ -262,7 +264,11 @@ fun Message(
         } else {
             Column(
                 modifier = Modifier.then(
-                    if ((message.mentions?.contains(RevoltAPI.selfId) == true) || mentionsSelfRole) {
+                    if ((message.mentions?.contains(RevoltAPI.selfId) == true)
+                        || mentionsSelfRole
+                        || message.flags has MessageFlag.MentionsOnline
+                        || message.flags has MessageFlag.MentionsEveryone
+                    ) {
                         Modifier.background(
                             MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                         )

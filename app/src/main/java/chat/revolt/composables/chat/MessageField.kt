@@ -135,6 +135,10 @@ sealed class AutocompleteSuggestion {
         val id: String,
         val query: String
     ) : AutocompleteSuggestion()
+
+    data class MassMention(
+        val content: String
+    ) : AutocompleteSuggestion()
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -289,6 +293,7 @@ fun MessageField(
                         is AutocompleteSuggestion.Channel -> item.channel.id!!
                         is AutocompleteSuggestion.Emoji -> item.shortcode
                         is AutocompleteSuggestion.Role -> item.id
+                        is AutocompleteSuggestion.MassMention -> item.content
                     }
                 }) {
                     when (val item = autocompleteSuggestions[it]) {
@@ -449,6 +454,35 @@ fun MessageField(
                                                 .align(Alignment.CenterHorizontally)
                                         )
                                     }
+                                },
+                                modifier = Modifier.animateItem()
+                            )
+                        }
+
+                        is AutocompleteSuggestion.MassMention -> {
+                            SuggestionChip(
+                                onClick = {
+                                    textFieldState.edit {
+                                        val lastWordStartsAt =
+                                            textFieldState.text
+                                                .substring(0, textFieldState.selection.max)
+                                                .lastWordStartsAt()
+                                        replace(
+                                            if (lastWordStartsAt == -1) 0 else (lastWordStartsAt + 1),
+                                            textFieldState.selection.max,
+                                            "@${item.content} "
+                                        )
+                                    }
+                                },
+                                label = { Text("@${item.content}") },
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(R.drawable.icn_campaign_24dp),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(SuggestionChipDefaults.IconSize)
+                                            .align(Alignment.CenterHorizontally)
+                                    )
                                 },
                                 modifier = Modifier.animateItem()
                             )
