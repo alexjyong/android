@@ -45,6 +45,7 @@ import chat.revolt.api.internals.ULID
 import chat.revolt.api.internals.solidColor
 import chat.revolt.api.routes.user.fetchUserProfile
 import chat.revolt.api.schemas.Profile
+import chat.revolt.api.settings.Experiments
 import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.composables.chat.RoleListEntry
 import chat.revolt.composables.chat.UserBadgeList
@@ -120,6 +121,19 @@ fun UserInfoSheet(
         }
     }
 
+    var showServerIdentityOptions by remember { mutableStateOf(false) }
+    if (showServerIdentityOptions) {
+        val sheetState = rememberModalBottomSheetState(true)
+        ModalBottomSheet(
+            sheetState = sheetState,
+            onDismissRequest = { showServerIdentityOptions = false }
+        ) {
+            ServerIdentityOptionsSheet(
+                userId = user.id!!
+            )
+        }
+    }
+
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -129,17 +143,31 @@ fun UserInfoSheet(
         item(key = "overview", span = StaggeredGridItemSpan.FullLine) {
             Box {
                 RawUserOverview(user, profile, internalPadding = false)
-                if (FeatureFlags.userCardsGranted) {
-                    SmallFloatingActionButton(
-                        onClick = { showUserCard = true },
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(top = 8.dp, end = 8.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_badge_account_horizontal_24dp),
-                            contentDescription = null
-                        )
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 8.dp, end = 8.dp)
+                ) {
+                    if (Experiments.enableServerIdentityOptions.isEnabled) {
+                        SmallFloatingActionButton(
+                            onClick = { showServerIdentityOptions = true },
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.icn_psychology_alt_24dp),
+                                contentDescription = null
+                            )
+                        }
+                    }
+
+                    if (FeatureFlags.userCardsGranted) {
+                        SmallFloatingActionButton(
+                            onClick = { showUserCard = true },
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_badge_account_horizontal_24dp),
+                                contentDescription = null
+                            )
+                        }
                     }
                 }
             }

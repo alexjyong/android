@@ -37,6 +37,8 @@ class ExperimentsSettingsScreenViewModel : ViewModel() {
         viewModelScope.launch {
             useKotlinMdRendererChecked.value = Experiments.useKotlinBasedMarkdownRenderer.isEnabled
             usePolarChecked.value = Experiments.usePolar.isEnabled
+            enableServerIdentityOptionsChecked.value =
+                Experiments.enableServerIdentityOptions.isEnabled
         }
     }
 
@@ -82,6 +84,16 @@ class ExperimentsSettingsScreenViewModel : ViewModel() {
             Experiments.usePolar.setEnabled(value)
             showNeedsRestartAlert.value = true
             usePolarChecked.value = value
+        }
+    }
+
+    val enableServerIdentityOptionsChecked = mutableStateOf(false)
+
+    fun setEnableServerIdentityOptionsChecked(value: Boolean) {
+        viewModelScope.launch {
+            kv.set("exp/enableServerIdentityOptions", value)
+            Experiments.enableServerIdentityOptions.setEnabled(value)
+            enableServerIdentityOptionsChecked.value = value
         }
     }
 }
@@ -165,6 +177,22 @@ fun ExperimentsSettingsScreen(
                 )
             },
             modifier = Modifier.clickable { viewModel.setUsePolarChecked(!viewModel.usePolarChecked.value) }
+        )
+
+        ListItem(
+            headlineContent = {
+                Text("Server Identity Options")
+            },
+            supportingContent = {
+                Text("Enable options to control what parts of others' server identities you want to see.")
+            },
+            trailingContent = {
+                Switch(
+                    checked = viewModel.enableServerIdentityOptionsChecked.value,
+                    onCheckedChange = null
+                )
+            },
+            modifier = Modifier.clickable { viewModel.setEnableServerIdentityOptionsChecked(!viewModel.enableServerIdentityOptionsChecked.value) }
         )
 
         Subcategory(

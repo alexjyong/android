@@ -53,8 +53,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -90,6 +93,7 @@ import chat.revolt.internals.text.MessageProcessor
 import chat.revolt.markdown.jbm.JBM
 import chat.revolt.markdown.jbm.JBMRenderer
 import chat.revolt.markdown.jbm.LocalJBMarkdownTreeState
+import chat.revolt.persistence.KVStorage
 import kotlinx.coroutines.launch
 import chat.revolt.api.schemas.Message as MessageSchema
 
@@ -200,6 +204,21 @@ fun Message(
     val context = LocalContext.current
 
     val scope = rememberCoroutineScope()
+    var kv by remember { mutableStateOf<KVStorage?>(null) }
+    var showUsernameDiscriminator by remember { mutableStateOf(false) }
+    var ignoreServerAvatar by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        if (Experiments.enableServerIdentityOptions.isEnabled) {
+            val userId = author.id ?: return@LaunchedEffect
+            kv = KVStorage(context)
+            kv?.let {
+                showUsernameDiscriminator =
+                    it.getBoolean("exp/serverIdentityOptions/$userId/showUsernameDiscriminator") == true
+                ignoreServerAvatar =
+                    it.getBoolean("exp/serverIdentityOptions/$userId/ignoreServerAvatar") == true
+            }
+        }
+    }
 
     val attachmentView = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
@@ -321,7 +340,7 @@ fun Message(
                                 username = User.resolveDefaultName(author),
                                 userId = author.id ?: message.id ?: ULID.makeSpecial(0),
                                 avatar = author.avatar,
-                                rawUrl = authorAvatarUrl(message),
+                                rawUrl = if (ignoreServerAvatar) null else authorAvatarUrl(message),
                                 onClick = onAvatarClick
                             )
                         }
@@ -333,7 +352,24 @@ fun Message(
                         if (message.tail == false) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    text = webhookName ?: authorName(message),
+                                    text = buildAnnotatedString {
+                                        if (showUsernameDiscriminator) {
+                                            pushStyle(
+                                                SpanStyle(
+                                                    color = LocalContentColor.current.copy(
+                                                        alpha = 0.5f
+                                                    ),
+                                                    fontWeight = FontWeight.Bold,
+                                                    textDecoration = TextDecoration.LineThrough
+                                                )
+                                            )
+                                        }
+                                        append(webhookName ?: authorName(message))
+                                        if (showUsernameDiscriminator) {
+                                            pop()
+                                            append(" ${author.username ?: "<?>"}#${author.discriminator ?: "0000"}")
+                                        }
+                                    },
                                     style = LocalTextStyle.current.copy(
                                         fontWeight = FontWeight.Bold,
                                         brush = authorColour(message)

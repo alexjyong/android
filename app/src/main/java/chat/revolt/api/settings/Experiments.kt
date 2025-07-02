@@ -28,6 +28,7 @@ class ExperimentInstance(default: Boolean) {
 object Experiments {
     val useKotlinBasedMarkdownRenderer = ExperimentInstance(false)
     val usePolar = ExperimentInstance(false)
+    val enableServerIdentityOptions = ExperimentInstance(false)
 
     suspend fun hydrateWithKv() {
         val kvStorage = KVStorage(RevoltApplication.instance)
@@ -35,7 +36,7 @@ object Experiments {
         if (BuildConfig.DEBUG) {
             LoadedSettings.experimentsEnabled = true
         } else {
-            LoadedSettings.experimentsEnabled = kvStorage.getBoolean("experimentsEnabled") ?: false
+            LoadedSettings.experimentsEnabled = kvStorage.getBoolean("experimentsEnabled") == true
         }
 
         useKotlinBasedMarkdownRenderer.setEnabled(
@@ -43,6 +44,9 @@ object Experiments {
         )
         usePolar.setEnabled(
             kvStorage.getBoolean("exp/usePolar") == true
+        )
+        enableServerIdentityOptions.setEnabled(
+            kvStorage.getBoolean("exp/enableServerIdentityOptions") == true
         )
     }
 }
