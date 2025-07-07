@@ -71,8 +71,6 @@ fun buildUserAgent(accessMethod: String = "Ktor"): String {
     return "$accessMethod RevoltAndroid/${BuildConfig.VERSION_NAME} ${BuildConfig.APPLICATION_ID} (Android ${android.os.Build.VERSION.SDK_INT}; ${android.os.Build.MANUFACTURER} ${android.os.Build.DEVICE}; (Kotlin ${KotlinVersion.CURRENT})"
 }
 
-private const val BACKEND_IS_STABLE = false
-
 @OptIn(ExperimentalSerializationApi::class)
 val RevoltJson = Json {
     ignoreUnknownKeys = true
@@ -92,17 +90,15 @@ val RevoltHttp = HttpClient(OkHttp) {
 
     install(WebSockets)
 
-    if (BACKEND_IS_STABLE) {
-        install(HttpRequestRetry) {
-            retryOnServerErrors(maxRetries = 5)
-            retryOnException(maxRetries = 5)
+    install(HttpRequestRetry) {
+        retryOnServerErrors(maxRetries = 5)
+        retryOnException(maxRetries = 5)
 
-            modifyRequest { request ->
-                request.headers.append("x-retry-count", retryCount.toString())
-            }
-
-            exponentialDelay()
+        modifyRequest { request ->
+            request.headers.append("x-retry-count", retryCount.toString())
         }
+
+        exponentialDelay()
     }
 
     install(Logging) { level = LogLevel.INFO }
