@@ -29,6 +29,10 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
+object NotificationID {
+    const val NEW_MESSAGE = 0
+}
+
 class HandlerService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
@@ -72,18 +76,13 @@ class HandlerService : FirebaseMessagingService() {
             return
         }
 
-        val notificationId = message.channel?.let { ULID.asInteger(it) } ?: run {
-            Log.e("HandlerService", "No channel in message, abort")
-            return
-        }
-
         if (authorIcon == null) {
             authorIcon =
                 "$REVOLT_BASE/users/${message.author?.ifBlank { "0".repeat(26) }}/default_avatar"
         }
 
         val db = Database(SqlStorage.driver)
-        val channelName = message.channel.let {
+        val channelName = message.channel?.let {
             db.channelQueries.findById(it).executeAsOneOrNull()
         }?.let {
             when (it.channelType) {
@@ -122,6 +121,11 @@ class HandlerService : FirebaseMessagingService() {
                 .setIcon(IconCompat.createWithBitmap(bitmap))
                 .setName(user.displayName ?: user.username)
                 .build()
+
+        if (message.channel == null) {
+            Log.e("HandlerService", "No channel in message, abort")
+            return
+        }
 
         val remoteInput = RemoteInput.Builder("content").run {
             setLabel(getString(R.string.message_context_sheet_actions_reply))
@@ -167,7 +171,7 @@ class HandlerService : FirebaseMessagingService() {
             ) {
                 return
             }
-            notify(notificationId, builder.build())
+            notify(message.channel, NotificationID.NEW_MESSAGE, builder.build())
         }
         /// END TEMPORARY CODE
     }
