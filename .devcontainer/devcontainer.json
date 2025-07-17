@@ -1,16 +1,16 @@
 {
     "image": "mcr.microsoft.com/devcontainers/universal:2",
     "features": {
-      "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+      "ghcr.io/devcontainers-community/features/deno:1": {},
+      "ghcr.io/nordcominc/devcontainer-features/android-sdk:1": {
+          "extra_packages": "ndk;28.1.13356709"
+      },
       "ghcr.io/devcontainers/features/java:1": {
         "version": "21",
         "jdkDistro": "oracle"
-      },
-      "ghcr.io/nordcominc/devcontainer-features/android-sdk:1": {
-          "extra_packages": "ndk"
       }
     },
-    "postCreateCommand": "chmod +x gradlew && cp revoltbuild.properties.example revoltbuild.properties && cp sentry.properties.example sentry.properties",
+    "postCreateCommand": "chmod +x gradlew && cp revoltbuild.properties.example revoltbuild.properties && cp sentry.properties.example sentry.properties && git submodule update --init --recursive",
     "customizations": {
       "vscode": {
         "extensions": [
