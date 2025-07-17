@@ -89,6 +89,10 @@ android {
                 cppFlags("")
             }
         }
+
+        ndk {
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
+        }
     }
 
     buildTypes {
@@ -318,7 +322,7 @@ dependencies {
 }
 
 aboutLibraries {
-    additionalLicenses += listOf("ofl")
+    additionalLicenses += listOf("ofl", "bsd", "mlkit")
     includePlatform = true
     strictMode = StrictMode.FAIL
     allowedLicenses += listOf(
@@ -329,7 +333,11 @@ aboutLibraries {
         "BSD-2-Clause",
         "cmark",
         "EPL-1.0",
-        "BSD-3-Clause"
+        "BSD-3-Clause",
+        "BSD",
+        "MLKIT",
+        "BSD License",
+        "ML Kit Terms of Service"
     )
     configPath = "compliance"
 }

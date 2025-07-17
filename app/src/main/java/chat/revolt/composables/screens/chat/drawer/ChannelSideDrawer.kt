@@ -332,12 +332,17 @@ fun ChannelSideDrawer(
                         Modifier
                             .padding(8.dp)
                             .clip(CircleShape)
-                            .clickable {
-                                serverInList.id?.let { srvId -> navigateToServer(srvId) }
-                                scope.launch {
-                                    drawerState?.close()
+                            .combinedClickable(
+                                onClick = {
+                                    serverInList.id?.let { srvId -> navigateToServer(srvId) }
+                                    scope.launch {
+                                        drawerState?.close()
+                                    }
+                                },
+                                onLongClick = {
+                                    serverInList.id?.let { srvId -> onShowServerContextSheet(srvId) }
                                 }
-                            }) {
+                            )) {
                         val icon = serverInList.icon?.id?.let { iconId ->
                             "$REVOLT_FILES/icons/$iconId"
                         }

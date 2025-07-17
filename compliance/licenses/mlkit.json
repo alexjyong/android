@@ -1,0 +1,6 @@
+{
+  "content": "These terms govern your use of ML Kit and the features you access. By using ML Kit, you agree to these terms.\n\nML Kit enables you to build machine learning features into your mobile apps. ML Kit provides easy-to-use SDKs that bring Google's machine learning expertise to your apps in a powerful yet easy-to-use package.\n\nYour use of ML Kit is subject to the Google APIs Terms of Service and Google's Privacy Policy. You may not use ML Kit if you are a person barred from receiving the software under the laws of the United States or other countries, including the country in which you are resident or from which you use the software.\n\nML Kit APIs are provided under the terms described here. Additional terms may apply to certain ML Kit APIs as described in the documentation for those APIs.",
+  "hash": "MLKIT",
+  "url": "https://developers.google.com/ml-kit/terms",
+  "name": "ML Kit Terms of Service"
+}

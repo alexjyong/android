@@ -137,11 +137,23 @@ import { Tabs, TabItem, Steps } from "@astrojs/starlight/components"
 
     You can get these values from the Sentry dashboard.
 
-10. Build the project.
+10. Copy the `google-services.json.example` file within the `app` directory to `google-services.json`.
+
+    Firebase services are integrated into the project, so we need a `google-services.json` file for the build to succeed. For development purposes, use the provided example file:
+
+    ```sh
+    cp app/google-services.json.example app/google-services.json
+    ```
+
+    :::note
+    This is a mock configuration file for development purposes only. In a production environment, you would use a real Firebase project configuration.
+    :::
+
+11. Build the project.
 
     You can build the project by clicking on the 'Run' button in Android Studio.  
     If asked, build the `:app` module.
 
-11. **You're all set!** You can now start contributing to Revolt on Android.
+12. **You're all set!** You can now start contributing to Revolt on Android.
 
 </Steps>
