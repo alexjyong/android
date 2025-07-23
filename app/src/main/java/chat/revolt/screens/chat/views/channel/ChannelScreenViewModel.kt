@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.util.fastDistinctBy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import chat.revolt.R
@@ -876,7 +877,14 @@ class ChannelScreenViewModel @Inject constructor(
 
         withContext(Dispatchers.Main) {
             items.clear()
-            items.addAll(groupedItems)
+            items.addAll(groupedItems.fastDistinctBy {
+                when (it) {
+                    is ChannelScreenItem.RegularMessage -> it.message.id
+                    is ChannelScreenItem.SystemMessage -> it.message.id
+                    is ChannelScreenItem.DateDivider -> it.instant.toString()
+                    else -> it.toString() // Fallback for other item types
+                }
+            })
         }
     }
 

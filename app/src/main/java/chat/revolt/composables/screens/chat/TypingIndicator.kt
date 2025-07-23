@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.revolt.R
@@ -29,10 +30,16 @@ import chat.revolt.api.schemas.User
 import chat.revolt.composables.generic.UserAvatar
 
 @Composable
-fun StackedUserAvatars(users: List<String>, amount: Int = 3, serverId: String?) {
+fun StackedUserAvatars(
+    users: List<String>,
+    amount: Int = 3,
+    size: Dp = 16.dp,
+    offset: Dp = 8.dp,
+    serverId: String?
+) {
     Box(
         modifier = Modifier
-            .size(16.dp + (8.dp * minOf(users.size, amount)), 16.dp)
+            .size(size + (offset * minOf(users.size, amount)), size)
     ) {
         users.take(amount).forEachIndexed { index, userId ->
             val user = RevoltAPI.userCache[userId]
@@ -44,10 +51,10 @@ fun StackedUserAvatars(users: List<String>, amount: Int = 3, serverId: String?) 
                 username = user?.let { User.resolveDefaultName(it) }
                     ?: stringResource(id = R.string.unknown),
                 rawUrl = maybeMember?.avatar?.let { "$REVOLT_FILES/avatars/${it.id}" },
-                size = 16.dp,
+                size = size,
                 modifier = Modifier
                     .offset(
-                        x = (index * 8).dp
+                        x = (index * offset.value).dp
                     )
             )
         }
@@ -91,7 +98,7 @@ fun TypingIndicator(users: List<String>, serverId: String?) {
                         RevoltAPI.userCache[userId]?.let { u ->
                             val maybeMember =
                                 serverId?.let { RevoltAPI.members.getMember(serverId, userId) }
-                            
+
                             maybeMember?.nickname ?: User.resolveDefaultName(u)
                         } ?: userId
                     }

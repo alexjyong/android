@@ -18,34 +18,46 @@ data class Root(
 
 @Serializable
 data class Features(
-    val captcha: CAPTCHA,
+    val captcha: CAPTCHAFeature,
     val email: Boolean,
-
-    @SerialName("invite_only")
-    val inviteOnly: Boolean,
-
-    val autumn: Autumn,
-    val january: Autumn,
-    val voso: Voso
+    @SerialName("invite_only") val inviteOnly: Boolean,
+    val autumn: AutumnJanuaryFeature,
+    val january: AutumnJanuaryFeature,
+    val voso: LegacyVoiceFeature? = null,
+    val livekit: LiveKitFeature? = null,
 )
 
 @Serializable
-data class Autumn(
+data class AutumnJanuaryFeature(
     val enabled: Boolean,
     val url: String
 )
 
 @Serializable
-data class CAPTCHA(
+data class CAPTCHAFeature(
     val enabled: Boolean,
     val key: String
 )
 
 @Serializable
-data class Voso(
+data class LegacyVoiceFeature(
     val enabled: Boolean,
     val url: String,
     val ws: String
+)
+
+@Serializable
+data class LiveKitFeature(
+    val enabled: Boolean,
+    val nodes: List<LiveKitNode>
+)
+
+@Serializable
+data class LiveKitNode(
+    val name: String,
+    val lat: Double,
+    val lon: Double,
+    @SerialName("public_url") val publicUrl: String,
 )
 
 suspend fun getRootRoute(): Root {

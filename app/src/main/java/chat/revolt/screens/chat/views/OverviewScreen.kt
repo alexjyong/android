@@ -13,11 +13,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.material.icons.Icons
@@ -62,6 +64,7 @@ import chat.revolt.composables.generic.NonIdealState
 import chat.revolt.composables.screens.settings.UserOverview
 import chat.revolt.composables.skeletons.UserOverviewSkeleton
 import chat.revolt.internals.extensions.zero
+import chat.revolt.screens.chat.LocalIsConnected
 import chat.revolt.sheets.UserCardSheet
 import io.sentry.Sentry
 
@@ -110,22 +113,33 @@ fun OverviewScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.overview_screen_title)) },
-                navigationIcon = {
-                    if (useDrawer) {
-                        IconButton(onClick = {
-                            onDrawerClicked()
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = stringResource(id = R.string.menu)
+            Column {
+                AnimatedVisibility(LocalIsConnected.current) {
+                    Spacer(
+                        Modifier
+                            .height(
+                                WindowInsets.statusBars.asPaddingValues()
+                                    .calculateTopPadding()
                             )
+                    )
+                }
+                CenterAlignedTopAppBar(
+                    title = { Text(stringResource(R.string.overview_screen_title)) },
+                    navigationIcon = {
+                        if (useDrawer) {
+                            IconButton(onClick = {
+                                onDrawerClicked()
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Menu,
+                                    contentDescription = stringResource(id = R.string.menu)
+                                )
+                            }
                         }
-                    }
-                },
-                windowInsets = WindowInsets.zero
-            )
+                    },
+                    windowInsets = WindowInsets.zero
+                )
+            }
         },
         contentWindowInsets = if (includePadding) ScaffoldDefaults.contentWindowInsets else ScaffoldDefaults.contentWindowInsets.exclude(
             NavigationBarDefaults.windowInsets
