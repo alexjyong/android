@@ -1,47 +1,110 @@
 package chat.revolt.screens.chat.views
 
+import android.content.Context
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FloatingActionButtonMenu
+import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.ToggleFloatingActionButton
+import androidx.compose.material3.ToggleFloatingActionButtonDefaults.animateIcon
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.animateFloatingActionButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.fromHtml
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.internals.FriendRequests
+import chat.revolt.api.internals.UserQR
+import chat.revolt.api.internals.UserQRContents
+import chat.revolt.api.routes.user.friendUser
 import chat.revolt.api.routes.user.unfriendUser
+import chat.revolt.api.schemas.AutumnResource
+import chat.revolt.api.schemas.Metadata
+import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
+import chat.revolt.components.vectorassets.HL_TAG
+import chat.revolt.components.vectorassets.HL_USERNAME
+import chat.revolt.components.vectorassets.RevoltTagIntro
 import chat.revolt.composables.chat.MemberListItem
 import chat.revolt.composables.generic.CountableListHeader
+import chat.revolt.composables.generic.UserAvatar
 import chat.revolt.internals.extensions.zero
+import chat.revolt.markdown.jbm.asHexString
+import chat.revolt.screens.chat.LocalIsConnected
+import io.github.g00fy2.quickie.QRResult
+import io.github.g00fy2.quickie.ScanQRCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -423,65 +486,65 @@ fun FriendsScreen(topNav: NavController, useDrawer: Boolean, onDrawerClicked: ()
                             )
                     )
                 }
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.friends),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                },
-                navigationIcon = {
-                    if (useDrawer) {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(R.string.friends),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    },
+                    navigationIcon = {
+                        if (useDrawer) {
+                            IconButton(onClick = {
+                                onDrawerClicked()
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Menu,
+                                    contentDescription = stringResource(id = R.string.menu)
+                                )
+                            }
+                        }
+                    },
+                    actions = {
                         IconButton(onClick = {
-                            onDrawerClicked()
+                            overflowMenuShown = true
                         }) {
                             Icon(
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = stringResource(id = R.string.menu)
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = stringResource(R.string.menu)
                             )
                         }
-                    }
-                },
-                actions = {
-                    IconButton(onClick = {
-                        overflowMenuShown = true
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = stringResource(R.string.menu)
-                        )
-                    }
-                    DropdownMenu(
-                        expanded = overflowMenuShown,
-                        onDismissRequest = {
-                            overflowMenuShown = false
-                        }
-                    ) {
-                        DropdownMenuItem(
-                            text = {
-                                Text(stringResource(R.string.friends_deny_all_incoming))
-                            },
-                            onClick = {
-                                scope.launch {
-                                    overflowMenuShown = false
-                                }
-                                with(Dispatchers.IO) {
+                        DropdownMenu(
+                            expanded = overflowMenuShown,
+                            onDismissRequest = {
+                                overflowMenuShown = false
+                            }
+                        ) {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(stringResource(R.string.friends_deny_all_incoming))
+                                },
+                                onClick = {
                                     scope.launch {
-                                        FriendRequests.getIncoming()
-                                            .forEach { it.id?.let { id -> unfriendUser(id) } }
+                                        overflowMenuShown = false
+                                    }
+                                    with(Dispatchers.IO) {
+                                        scope.launch {
+                                            FriendRequests.getIncoming()
+                                                .forEach { it.id?.let { id -> unfriendUser(id) } }
+                                        }
                                     }
                                 }
-                            }
-                        )
-                    }
-                },
-                windowInsets = WindowInsets.zero
-            )
+                            )
+                        }
+                    },
+                    windowInsets = WindowInsets.zero
+                )
             }
         },
     ) { pv ->
-        Column(
+        Box(
             modifier = Modifier
                 .padding(pv)
                 .fillMaxHeight()
@@ -602,7 +665,7 @@ fun FriendsScreen(topNav: NavController, useDrawer: Boolean, onDrawerClicked: ()
                 items(FriendRequests.getBlocked().size) {
                     val item = FriendRequests.getBlocked().getOrNull(it)
                     if (item == null) return@items
-                    
+
                     MemberListItem(
                         member = null,
                         user = item,

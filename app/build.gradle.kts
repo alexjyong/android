@@ -28,15 +28,12 @@ val glideVersion = "4.16.0"
 val ktorVersion = "3.0.0-beta-2"
 val media3Version = "1.7.1"
 val material3Version = "1.4.0-alpha15"
-val media3Version = "1.5.0"
+val androidXTestVersion = "1.6.1"
 
 object LivekitVersion {
     val core = "2.16.0"
     val componentsCompose = "1.3.1"
 }
-
-val material3Version = "1.4.0-alpha10"
-val androidXTestVersion = "1.6.1"
 
 fun property(fileName: String, propertyName: String, fallbackEnv: String? = null): String? {
     val propsFile = rootProject.file(fileName)
