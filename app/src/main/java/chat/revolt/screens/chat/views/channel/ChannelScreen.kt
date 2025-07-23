@@ -124,6 +124,7 @@ import chat.revolt.api.routes.channel.react
 import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.Message
+import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
 import chat.revolt.composables.chat.DateDivider
@@ -157,7 +158,6 @@ import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
-import logcat.logcat
 import java.io.File
 import kotlin.math.max
 
@@ -936,7 +936,9 @@ fun ChannelScreen(
                                 }
                             }
 
-                            if (viewModel.channel?.channelType == ChannelType.VoiceChannel) {
+                            if (viewModel.channel?.channelType == ChannelType.VoiceChannel
+                                && FeatureFlags.voiceChannels2_0Granted
+                            ) {
                                 JoinVoiceChannelButton(channelId)
                             }
                         }
@@ -984,7 +986,7 @@ fun ChannelScreen(
                                             onToggleSpoiler = {
                                                 val index = viewModel.draftAttachments
                                                     .indexOfFirst { a -> a.pickerIdentifier == it.pickerIdentifier }
-                                                
+
                                                 if (index != -1) {
                                                     val attachment =
                                                         viewModel.draftAttachments[index]
