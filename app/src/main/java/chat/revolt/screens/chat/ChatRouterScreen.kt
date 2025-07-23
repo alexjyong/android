@@ -10,15 +10,17 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.AlertDialog
@@ -38,15 +40,20 @@ import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
@@ -70,7 +77,6 @@ import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
 import chat.revolt.composables.chat.DisconnectedNotice
 import chat.revolt.composables.screens.chat.drawer.ChannelSideDrawer
-import chat.revolt.composables.screens.voice.VoiceChannelOverlay
 import chat.revolt.dialogs.NotificationRationaleDialog
 import chat.revolt.internals.Changelogs
 import chat.revolt.internals.extensions.zero
@@ -261,18 +267,24 @@ class ChatRouterViewModel @Inject constructor(
     }
 }
 
+val LocalIsConnected = compositionLocalOf(structuralEqualityPolicy()) { false }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatRouterScreen(
     topNav: NavController,
     windowSizeClass: WindowSizeClass,
+    disableBackHandler: Boolean,
     onNullifiedUser: () -> Unit,
+    onEnterVoiceUI: (String) -> Unit,
     viewModel: ChatRouterViewModel = hiltViewModel()
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val view = LocalView.current
+
+    var drawerWidth by remember { mutableFloatStateOf(0.0f) }
 
     var showPlatformModDMHint by remember { mutableStateOf(false) }
 
@@ -301,9 +313,6 @@ fun ChatRouterScreen(
     var reactionInfoSheetEmoji by remember { mutableStateOf("") }
 
     var useTabletAwareUI by remember { mutableStateOf(false) }
-
-    var voiceChannelOverlay by remember { mutableStateOf(false) }
-    var voiceChannelOverlayChannelId by remember { mutableStateOf("") }
 
     var showReportUser by remember { mutableStateOf(false) }
     var reportUserTarget by remember { mutableStateOf("") }
@@ -444,8 +453,7 @@ fun ChatRouterScreen(
                     }
 
                     is Action.OpenVoiceChannelOverlay -> {
-                        voiceChannelOverlayChannelId = action.channelId
-                        voiceChannelOverlay = true
+                        onEnterVoiceUI(action.channelId)
                     }
 
                     is Action.OpenWebhookSheet -> {
@@ -712,12 +720,6 @@ fun ChatRouterScreen(
         }
     }
 
-    if (voiceChannelOverlay) {
-        VoiceChannelOverlay(voiceChannelOverlayChannelId) {
-            voiceChannelOverlay = false
-        }
-    }
-
     val askNotificationsPermission =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
@@ -812,53 +814,11 @@ fun ChatRouterScreen(
             )
         }
 
-        AnimatedVisibility(
-            visible = RealtimeSocket.disconnectionState == DisconnectionState.Connected
+        CompositionLocalProvider(
+            LocalIsConnected provides (RealtimeSocket.disconnectionState == DisconnectionState.Connected)
         ) {
-            Spacer(Modifier.windowInsetsPadding(WindowInsets.statusBars))
-        }
-
-        if (useTabletAwareUI) {
-            Row {
-                DismissibleDrawerSheet(
-                    drawerContainerColor = Color.Transparent,
-                    windowInsets = WindowInsets.zero
-                ) {
-                    Sidebar(
-                        viewModel = viewModel,
-                        topNav = topNav,
-                        currentServer = currentServer,
-                        onShowStatusSheet = {
-                            showStatusSheet = true
-                        },
-                        onShowServerContextSheet = {
-                            serverContextSheetTarget = it
-                            showServerContextSheet = true
-                        },
-                        onShowAddServerSheet = {
-                            showAddServerSheet = true
-                        },
-                        showSettingsButton = isTouchExplorationEnabled,
-                        onOpenSettings = {
-                            topNav.navigate("settings")
-                        },
-                    )
-                }
-                ChannelNavigator(
-                    dest = viewModel.currentDestination,
-                    topNav = topNav,
-                    useDrawer = false,
-                    toggleDrawer = {
-                        toggleDrawerLambda()
-                    }
-                )
-            }
-        } else {
-            var useSidebarGesture by remember { mutableStateOf(true) }
-            DismissibleNavigationDrawer(
-                drawerState = drawerState,
-                gesturesEnabled = useSidebarGesture,
-                drawerContent = {
+            if (useTabletAwareUI) {
+                Row {
                     DismissibleDrawerSheet(
                         drawerContainerColor = Color.Transparent,
                         windowInsets = WindowInsets.zero
@@ -881,28 +841,104 @@ fun ChatRouterScreen(
                             onOpenSettings = {
                                 topNav.navigate("settings")
                             },
-                            drawerState = drawerState
                         )
                     }
-                },
-                content = {
-                    Row(Modifier.fillMaxSize()) {
-                        ChannelNavigator(
-                            dest = viewModel.currentDestination,
-                            topNav = topNav,
-                            useDrawer = true,
-                            toggleDrawer = {
-                                toggleDrawerLambda()
-                            },
-                            drawerState = drawerState,
-                            drawerGestureEnabled = useSidebarGesture,
-                            setDrawerGestureEnabled = {
-                                useSidebarGesture = it
-                            }
-                        )
-                    }
+                    ChannelNavigator(
+                        dest = viewModel.currentDestination,
+                        topNav = topNav,
+                        useDrawer = false,
+                        disableBackHandler = disableBackHandler,
+                        toggleDrawer = {
+                            toggleDrawerLambda()
+                        },
+                        onEnterVoiceUI = onEnterVoiceUI,
+                    )
                 }
-            )
+            } else {
+                var useSidebarGesture by remember { mutableStateOf(true) }
+                DismissibleNavigationDrawer(
+                    drawerState = drawerState,
+                    gesturesEnabled = useSidebarGesture,
+                    drawerContent = {
+                        DismissibleDrawerSheet(
+                            drawerContainerColor = Color.Transparent,
+                            windowInsets = WindowInsets.zero,
+                            modifier = Modifier.onSizeChanged {
+                                drawerWidth = it.width.toFloat()
+                            }
+                        ) {
+                            Sidebar(
+                                viewModel = viewModel,
+                                topNav = topNav,
+                                currentServer = currentServer,
+                                onShowStatusSheet = {
+                                    showStatusSheet = true
+                                },
+                                onShowServerContextSheet = {
+                                    serverContextSheetTarget = it
+                                    showServerContextSheet = true
+                                },
+                                onShowAddServerSheet = {
+                                    showAddServerSheet = true
+                                },
+                                showSettingsButton = isTouchExplorationEnabled,
+                                onOpenSettings = {
+                                    topNav.navigate("settings")
+                                },
+                                drawerState = drawerState
+                            )
+                        }
+                    },
+                    content = {
+                        Box(Modifier.fillMaxSize()) {
+                            ChannelNavigator(
+                                dest = viewModel.currentDestination,
+                                topNav = topNav,
+                                useDrawer = true,
+                                disableBackHandler = disableBackHandler,
+                                toggleDrawer = {
+                                    toggleDrawerLambda()
+                                },
+                                drawerState = drawerState,
+                                drawerGestureEnabled = useSidebarGesture,
+                                setDrawerGestureEnabled = {
+                                    useSidebarGesture = it
+                                },
+                                onEnterVoiceUI = onEnterVoiceUI,
+                            )
+
+                            // This is the overlay on the main content when the drawer is open
+                            val interactionSource = remember { MutableInteractionSource() }
+                            Box(
+                                Modifier
+                                    .then(
+                                        if (drawerState.isOpen) {
+                                            Modifier.clickable(
+                                                interactionSource = interactionSource,
+                                                indication = null,
+                                                enabled = drawerState.isOpen,
+                                                onClick = {
+                                                    scope.launch {
+                                                        drawerState.close()
+                                                    }
+                                                }
+                                            )
+                                        } else Modifier
+                                    )
+                                    .fillMaxSize()
+                                    .background(
+                                        MaterialTheme
+                                            .colorScheme
+                                            .surfaceContainerLowest
+                                            .copy(
+                                                alpha = (1.0f + (drawerState.currentOffset / drawerWidth)) * 0.7f
+                                            )
+                                    )
+                            )
+                        }
+                    }
+                )
+            }
         }
     }
 }
@@ -942,11 +978,13 @@ fun ChannelNavigator(
     toggleDrawer: () -> Unit,
     drawerState: DrawerState? = null,
     drawerGestureEnabled: Boolean = true,
+    disableBackHandler: Boolean = false,
+    onEnterVoiceUI: (String) -> Unit = {},
     setDrawerGestureEnabled: (Boolean) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
 
-    BackHandler(enabled = useDrawer) {
+    BackHandler(useDrawer && !disableBackHandler) {
         toggleDrawer()
     }
 

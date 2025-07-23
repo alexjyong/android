@@ -8,19 +8,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -184,7 +186,7 @@ fun SystemMessageIcon(type: SystemMessageType, modifier: Modifier = Modifier, si
     when (type) {
         SystemMessageType.CHANNEL_OWNERSHIP_CHANGED -> {
             Icon(
-                painter = painterResource(R.drawable.ic_key_arrow_right_24dp),
+                painter = painterResource(R.drawable.icn_key_24dp),
                 contentDescription = stringResource(R.string.system_message_ownership_changed_alt),
                 tint = LocalContentColor.current,
                 modifier = modifier.size(size)
@@ -193,7 +195,7 @@ fun SystemMessageIcon(type: SystemMessageType, modifier: Modifier = Modifier, si
 
         SystemMessageType.CHANNEL_ICON_CHANGED -> {
             Icon(
-                painter = painterResource(R.drawable.ic_image_multiple_24dp),
+                painter = painterResource(R.drawable.icn_landscape_2_edit_24dp),
                 contentDescription = stringResource(
                     R.string.system_message_channel_icon_changed_alt
                 ),
@@ -204,7 +206,7 @@ fun SystemMessageIcon(type: SystemMessageType, modifier: Modifier = Modifier, si
 
         SystemMessageType.CHANNEL_DESCRIPTION_CHANGED -> {
             Icon(
-                painter = painterResource(R.drawable.ic_text_box_multiple_24dp),
+                painter = painterResource(R.drawable.icn_contract_edit_24dp),
                 contentDescription = stringResource(
                     R.string.system_message_channel_description_changed_alt
                 ),
@@ -215,7 +217,7 @@ fun SystemMessageIcon(type: SystemMessageType, modifier: Modifier = Modifier, si
 
         SystemMessageType.CHANNEL_RENAMED -> {
             Icon(
-                painter = painterResource(R.drawable.ic_cursor_text_24dp),
+                painter = painterResource(R.drawable.icn_ink_highlighter_move_24dp),
                 contentDescription = stringResource(R.string.system_message_channel_renamed_alt),
                 tint = LocalContentColor.current,
                 modifier = modifier.size(size)
@@ -224,7 +226,7 @@ fun SystemMessageIcon(type: SystemMessageType, modifier: Modifier = Modifier, si
 
         SystemMessageType.USER_REMOVE -> {
             Icon(
-                painter = painterResource(R.drawable.ic_account_cancel_24dp),
+                painter = painterResource(R.drawable.icn_group_remove_24dp),
                 contentDescription = stringResource(R.string.system_message_user_removed_alt),
                 tint = LocalContentColor.current,
                 modifier = modifier.size(size)
@@ -233,7 +235,7 @@ fun SystemMessageIcon(type: SystemMessageType, modifier: Modifier = Modifier, si
 
         SystemMessageType.USER_ADDED -> {
             Icon(
-                painter = painterResource(R.drawable.ic_account_plus_24dp),
+                painter = painterResource(R.drawable.icn_group_add_24dp),
                 contentDescription = stringResource(R.string.system_message_user_added_alt),
                 tint = LocalContentColor.current,
                 modifier = modifier.size(size)
@@ -242,7 +244,7 @@ fun SystemMessageIcon(type: SystemMessageType, modifier: Modifier = Modifier, si
 
         SystemMessageType.USER_BANNED -> {
             Icon(
-                painter = painterResource(R.drawable.ic_gavel_24dp),
+                painter = painterResource(R.drawable.icn_gavel_24dp),
                 contentDescription = stringResource(R.string.system_message_user_banned_alt),
                 tint = LocalContentColor.current,
                 modifier = modifier.size(size)
@@ -251,7 +253,7 @@ fun SystemMessageIcon(type: SystemMessageType, modifier: Modifier = Modifier, si
 
         SystemMessageType.USER_KICKED -> {
             Icon(
-                painter = painterResource(R.drawable.ic_shield_24dp),
+                painter = painterResource(R.drawable.icn_sports_and_outdoors_24dp),
                 contentDescription = stringResource(R.string.system_message_user_kicked_alt),
                 tint = LocalContentColor.current,
                 modifier = modifier.size(size)
@@ -260,7 +262,7 @@ fun SystemMessageIcon(type: SystemMessageType, modifier: Modifier = Modifier, si
 
         SystemMessageType.USER_LEFT -> {
             Icon(
-                painter = painterResource(R.drawable.ic_account_arrow_left_24dp),
+                painter = painterResource(R.drawable.icn_door_open_24dp),
                 contentDescription = stringResource(R.string.system_message_user_left_alt),
                 tint = LocalContentColor.current,
                 modifier = modifier.size(size)
@@ -269,16 +271,16 @@ fun SystemMessageIcon(type: SystemMessageType, modifier: Modifier = Modifier, si
 
         SystemMessageType.USER_JOINED -> {
             Icon(
-                painter = painterResource(R.drawable.ic_account_arrow_right_24dp),
+                painter = painterResource(R.drawable.icn_waving_hand_24dp),
                 contentDescription = stringResource(R.string.system_message_user_joined_alt),
                 tint = LocalContentColor.current,
-                modifier = modifier.size(size)
+                modifier = modifier.size(size),
             )
         }
 
         SystemMessageType.TEXT -> {
             Icon(
-                imageVector = Icons.Default.Info,
+                painter = painterResource(R.drawable.icn_info_24dp),
                 contentDescription = stringResource(R.string.system_message_text_alt),
                 tint = LocalContentColor.current,
                 modifier = modifier.size(size)
@@ -287,6 +289,36 @@ fun SystemMessageIcon(type: SystemMessageType, modifier: Modifier = Modifier, si
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun shapeForType(type: SystemMessageType): Shape {
+    return when (type) {
+        SystemMessageType.CHANNEL_OWNERSHIP_CHANGED -> MaterialShapes.Slanted
+        SystemMessageType.CHANNEL_ICON_CHANGED -> MaterialShapes.Pentagon
+        SystemMessageType.CHANNEL_DESCRIPTION_CHANGED -> MaterialShapes.Gem
+        SystemMessageType.CHANNEL_RENAMED -> MaterialShapes.Pill
+        SystemMessageType.USER_REMOVE -> MaterialShapes.Flower
+        SystemMessageType.USER_ADDED -> MaterialShapes.Sunny
+        SystemMessageType.USER_BANNED -> MaterialShapes.Burst
+        SystemMessageType.USER_KICKED -> MaterialShapes.SoftBurst
+        SystemMessageType.USER_LEFT -> MaterialShapes.Cookie4Sided
+        SystemMessageType.USER_JOINED -> MaterialShapes.Cookie9Sided
+        SystemMessageType.TEXT -> MaterialShapes.Square
+    }.toShape()
+}
+
+// TODO - find the best colours for each type
+@Composable
+private fun backgroundColourForType(type: SystemMessageType): Color {
+    return MaterialTheme.colorScheme.primaryContainer
+}
+
+@Composable
+private fun contentColourForType(type: SystemMessageType): Color {
+    return MaterialTheme.colorScheme.onPrimaryContainer
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SystemMessageIconWithBackground(
     type: SystemMessageType,
@@ -296,10 +328,16 @@ fun SystemMessageIconWithBackground(
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
+            .clip(shapeForType(type))
+            .background(
+                color = backgroundColourForType(type),
+            )
             .size(size)
     ) {
-        SystemMessageIcon(type = type)
+        CompositionLocalProvider(
+            LocalContentColor provides contentColourForType(type),
+        ) {
+            SystemMessageIcon(type = type)
+        }
     }
 }

@@ -27,9 +27,13 @@ val hiltVersion = "2.52"
 val glideVersion = "4.16.0"
 val ktorVersion = "3.0.0-beta-2"
 val media3Version = "1.7.1"
-val livekitVersion = "2.2.0"
 val material3Version = "1.4.0-alpha15"
 val androidXTestVersion = "1.6.1"
+
+object LivekitVersion {
+    val core = "2.16.0"
+    val componentsCompose = "1.3.1"
+}
 
 fun property(fileName: String, propertyName: String, fallbackEnv: String? = null): String? {
     val propsFile = rootProject.file(fileName)
@@ -294,9 +298,9 @@ dependencies {
     implementation("org.jetbrains:markdown:0.7.3")
     implementation("dev.snipme:highlights:1.0.0")
 
-    // Livekit
-    // FIXME temporarily not included, re-add when realtime media is to be implemented
-    // implementation "io.livekit:livekit-android:$livekit_version"
+    // Livekit - Commented out for now to not inflate the app size.
+    /*implementation("io.livekit:livekit-android:${LivekitVersion.core}")
+    implementation("io.livekit:livekit-android-compose-components:${LivekitVersion.componentsCompose}")*/
 
     // Firebase - Cloud Messaging
     implementation(platform("com.google.firebase:firebase-bom:33.15.0"))

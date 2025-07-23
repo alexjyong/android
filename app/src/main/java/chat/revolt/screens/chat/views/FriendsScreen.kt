@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -11,10 +12,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -97,6 +102,7 @@ import chat.revolt.composables.generic.CountableListHeader
 import chat.revolt.composables.generic.UserAvatar
 import chat.revolt.internals.extensions.zero
 import chat.revolt.markdown.jbm.asHexString
+import chat.revolt.screens.chat.LocalIsConnected
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanQRCode
 import kotlinx.coroutines.Dispatchers
@@ -470,69 +476,80 @@ fun FriendsScreen(topNav: NavController, useDrawer: Boolean, onDrawerClicked: ()
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.friends),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+            Column {
+                AnimatedVisibility(LocalIsConnected.current) {
+                    Spacer(
+                        Modifier
+                            .height(
+                                WindowInsets.statusBars.asPaddingValues()
+                                    .calculateTopPadding()
+                            )
                     )
-                },
-                navigationIcon = {
-                    if (useDrawer) {
+                }
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(R.string.friends),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    },
+                    navigationIcon = {
+                        if (useDrawer) {
+                            IconButton(onClick = {
+                                onDrawerClicked()
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Menu,
+                                    contentDescription = stringResource(id = R.string.menu)
+                                )
+                            }
+                        }
+                    },
+                    actions = {
                         IconButton(onClick = {
-                            onDrawerClicked()
+                            overflowMenuShown = true
                         }) {
                             Icon(
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = stringResource(id = R.string.menu)
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = stringResource(R.string.menu)
                             )
                         }
-                    }
-                },
-                actions = {
-                    IconButton(onClick = {
-                        overflowMenuShown = true
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = stringResource(R.string.menu)
-                        )
-                    }
-                    DropdownMenu(
-                        expanded = overflowMenuShown,
-                        onDismissRequest = {
-                            overflowMenuShown = false
-                        }
-                    ) {
-                        DropdownMenuItem(
-                            text = {
-                                Text(stringResource(R.string.friends_deny_all_incoming))
-                            },
-                            onClick = {
-                                scope.launch {
-                                    overflowMenuShown = false
-                                }
-                                with(Dispatchers.IO) {
+                        DropdownMenu(
+                            expanded = overflowMenuShown,
+                            onDismissRequest = {
+                                overflowMenuShown = false
+                            }
+                        ) {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(stringResource(R.string.friends_deny_all_incoming))
+                                },
+                                onClick = {
                                     scope.launch {
-                                        FriendRequests.getIncoming()
-                                            .forEach { it.id?.let { id -> unfriendUser(id) } }
+                                        overflowMenuShown = false
+                                    }
+                                    with(Dispatchers.IO) {
+                                        scope.launch {
+                                            FriendRequests.getIncoming()
+                                                .forEach { it.id?.let { id -> unfriendUser(id) } }
+                                        }
                                     }
                                 }
-                            }
-                        )
-                    }
-                },
-                windowInsets = WindowInsets.zero
-            )
-        }
+                            )
+                        }
+                    },
+                    windowInsets = WindowInsets.zero
+                )
+            }
+        },
     ) { pv ->
         Box(
             modifier = Modifier
                 .padding(pv)
                 .fillMaxHeight()
         ) {
-            LazyColumn(state = listState) {
+            LazyColumn {
                 stickyHeader(key = "incoming") {
                     CountableListHeader(
                         text = stringResource(id = R.string.friends_incoming_requests),
