@@ -13,18 +13,32 @@ import android.view.Menu
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseInOutExpo
 import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -33,14 +47,25 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -61,6 +86,8 @@ import chat.revolt.api.settings.Experiments
 import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.composables.generic.HealthAlert
+import chat.revolt.composables.voice.VoicePermissionSwitch
+import chat.revolt.composables.voice.VoiceSheet
 import chat.revolt.material.EasingTokens
 import chat.revolt.ndk.NativeLibraries
 import chat.revolt.persistence.KVStorage
@@ -394,6 +421,8 @@ val RevoltTweenColour: FiniteAnimationSpec<Color> = tween(400, easing = EaseInOu
 val NavTweenInt: FiniteAnimationSpec<IntOffset> = tween(350, easing = EaseInOutExpo)
 val NavTweenFloat: FiniteAnimationSpec<Float> = tween(350, easing = EaseInOutExpo)
 
+// This composable handles the main compose entrypoint of the app, provides the main navigation
+// graph, and handles the animation and layout for the voice chat UI.
 @Composable
 fun AppEntrypoint(
     windowSizeClass: WindowSizeClass,
@@ -408,251 +437,350 @@ fun AppEntrypoint(
     onRetryConnection: () -> Unit,
     onUpdateNextDestination: (String) -> Unit = {}
 ) {
+    var showVoiceUI by rememberSaveable { mutableStateOf(false) }
+    var voiceChannelId by rememberSaveable { mutableStateOf<String?>(null) }
+
+    val chatUIScale by animateFloatAsState(
+        if (showVoiceUI) 0.8f else 1.0f,
+        animationSpec = tween(
+            durationMillis = 300,
+            easing = EasingTokens.EmphasizedDecelerate
+        )
+    )
+    val chatUIOpacity by animateFloatAsState(
+        if (showVoiceUI) 0.8f else 1.0f,
+        animationSpec = tween(
+            durationMillis = 300,
+            easing = EasingTokens.EmphasizedDecelerate
+        )
+    )
+
+    BackHandler(showVoiceUI) {
+        showVoiceUI = false
+    }
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+    LaunchedEffect(showVoiceUI) {
+        if (showVoiceUI) keyboardController?.hide()
+    }
+
     val navController = rememberNavController()
 
     RevoltTheme(
         requestedTheme = LoadedSettings.theme,
         colourOverrides = SyncedSettings.android.colourOverrides
     ) {
-        Surface(
-            modifier = Modifier
-                .fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
         ) {
-            if (isHealthAlertActive) {
-                healthNotice?.let {
-                    HealthAlert(notice = healthNotice, onDismiss = onDismissHealthAlert)
-                }
-            }
-
-            if (couldNotLogIn) {
-                AlertDialog(
-                    onDismissRequest = {
-                        // no-op
-                    },
-                    title = {
-                        Text(stringResource(R.string.could_not_log_in_heading))
-                    },
-                    text = {
-                        Text(stringResource(R.string.could_not_log_in_body))
-                    },
-                    confirmButton = {
-                        TextButton(
-                            onClick = {
-                                onDismissLoginError()
-                                onRetryConnection()
-                            }
-                        ) {
-                            Text(stringResource(R.string.could_not_log_in_cta_try_again))
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(
-                            onClick = {
-                                onDismissLoginError()
-                                onLogout()
-                            }
-                        ) {
-                            Text(stringResource(R.string.could_not_log_in_cta_logout))
-                        }
-                    }
-                )
-            }
-
-            NavHost(
-                navController = navController,
-                startDestination = "default",
-                enterTransition = {
-                    slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Left,
-                        animationSpec = NavTweenInt,
-                        initialOffset = { it / 3 }
-                    ) + fadeIn(animationSpec = NavTweenFloat)
-                },
-                exitTransition = {
-                    slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Left,
-                        animationSpec = NavTweenInt,
-                        targetOffset = { it / 3 }
-                    ) + fadeOut(animationSpec = NavTweenFloat)
-                },
-                popEnterTransition = {
-                    slideIntoContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Right,
-                        animationSpec = NavTweenInt,
-                        initialOffset = { it / 3 }
-                    ) + fadeIn(animationSpec = NavTweenFloat)
-                },
-                popExitTransition = {
-                    slideOutOfContainer(
-                        AnimatedContentTransitionScope.SlideDirection.Right,
-                        animationSpec = NavTweenInt,
-                        targetOffset = { it / 2 }
-                    ) + fadeOut(animationSpec = NavTweenFloat)
-                }
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .scale(chatUIScale)
+                    .alpha(chatUIOpacity),
+                color = MaterialTheme.colorScheme.background
             ) {
-                composable("default") {
-                    DefaultDestinationScreen(
-                        navController,
-                        nextDestination,
-                        isConnected,
-                        onRetryConnection
-                    )
+                if (isHealthAlertActive) {
+                    healthNotice?.let {
+                        HealthAlert(notice = healthNotice, onDismiss = onDismissHealthAlert)
+                    }
                 }
 
-                composable("login/greeting") { LoginGreetingScreen(navController) }
-                composable("login/login") { LoginScreen(navController) }
-                composable("login/mfa/{mfaTicket}/{allowedAuthTypes}") { backStackEntry ->
-                    val mfaTicket = backStackEntry.arguments?.getString("mfaTicket") ?: ""
-                    val allowedAuthTypes =
-                        backStackEntry.arguments?.getString("allowedAuthTypes") ?: ""
-
-                    MfaScreen(navController, allowedAuthTypes, mfaTicket)
-                }
-
-                composable("register/greeting") { RegisterGreetingScreen(navController) }
-                composable("register/details") { RegisterDetailsScreen(navController) }
-                composable("register/verify/{email}") { backStackEntry ->
-                    val email = backStackEntry.arguments?.getString("email") ?: ""
-
-                    RegisterVerifyScreen(navController, email)
-                }
-                composable("register/onboarding") {
-                    OnboardingScreen(
-                        navController,
-                        onOnboardingComplete = {
-                            onUpdateNextDestination("chat")
-                            navController.popBackStack(
-                                navController.graph.startDestinationRoute!!,
-                                inclusive = true
-                            )
-                            navController.navigate("default")
+                if (couldNotLogIn) {
+                    AlertDialog(
+                        onDismissRequest = {
+                            // no-op
+                        },
+                        title = {
+                            Text(stringResource(R.string.could_not_log_in_heading))
+                        },
+                        text = {
+                            Text(stringResource(R.string.could_not_log_in_body))
+                        },
+                        confirmButton = {
+                            TextButton(
+                                onClick = {
+                                    onDismissLoginError()
+                                    onRetryConnection()
+                                }
+                            ) {
+                                Text(stringResource(R.string.could_not_log_in_cta_try_again))
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(
+                                onClick = {
+                                    onDismissLoginError()
+                                    onLogout()
+                                }
+                            ) {
+                                Text(stringResource(R.string.could_not_log_in_cta_logout))
+                            }
                         }
                     )
                 }
 
-                composable("login2/init") { InitScreen(navController, windowSizeClass) }
-
-                // This is only used outside of Polar mode
-                // Otherwise you may be looking for "main" right below
-                composable(
-                    "chat",
-                    enterTransition = {
-                        slideIntoContainer(
-                            AnimatedContentTransitionScope.SlideDirection.Up,
-                            animationSpec = tween(
-                                400,
-                                easing = EasingTokens.EmphasizedDecelerate
-                            ),
-                            initialOffset = { it / 3 }
-                        ) + fadeIn(animationSpec = RevoltTweenFloat)
-                    }
-                ) {
-                    ChatRouterScreen(
-                        navController,
-                        windowSizeClass,
-                        onNullifiedUser = {
-                            onRetryConnection()
-                            navController.popBackStack(
-                                navController.graph.startDestinationRoute!!,
-                                inclusive = true
-                            )
-                            navController.navigate("default")
-                        }
-                    )
-                }
-
-                // This is only the main screen in Polar mode
-                // Otherwise you may be looking for "chat" right above
-                composable(
-                    "main",
-                    enterTransition = {
-                        slideIntoContainer(
-                            AnimatedContentTransitionScope.SlideDirection.Up,
-                            animationSpec = tween(
-                                400,
-                                easing = EasingTokens.EmphasizedDecelerate
-                            ),
-                            initialOffset = { it / 3 }
-                        ) + fadeIn(animationSpec = RevoltTweenFloat) + scaleIn(
-                            animationSpec = tween(
-                                400,
-                                easing = EasingTokens.EmphasizedDecelerate
-                            ),
-                            initialScale = 0.8f,
-                            transformOrigin = TransformOrigin.Center
-                        )
-                    }
-                ) {
-                    MainScreen(navController)
-                }
-                composable(
-                    "main/conversation/{channelId}",
+                NavHost(
+                    navController = navController,
+                    startDestination = "default",
                     enterTransition = {
                         slideIntoContainer(
                             AnimatedContentTransitionScope.SlideDirection.Left,
-                            animationSpec = tween(
-                                600,
-                                easing = EasingTokens.EmphasizedDecelerate
-                            ),
-                            initialOffset = { it }
-                        ) + fadeIn(animationSpec = RevoltTweenFloat)
+                            animationSpec = NavTweenInt,
+                            initialOffset = { it / 3 }
+                        ) + fadeIn(animationSpec = NavTweenFloat)
                     },
                     exitTransition = {
                         slideOutOfContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Left,
+                            animationSpec = NavTweenInt,
+                            targetOffset = { it / 3 }
+                        ) + fadeOut(animationSpec = NavTweenFloat)
+                    },
+                    popEnterTransition = {
+                        slideIntoContainer(
                             AnimatedContentTransitionScope.SlideDirection.Right,
-                            animationSpec = tween(
-                                600,
-                                easing = EasingTokens.EmphasizedDecelerate
-                            ),
-                            targetOffset = { it }
-                        ) + fadeOut(animationSpec = RevoltTweenFloat)
+                            animationSpec = NavTweenInt,
+                            initialOffset = { it / 3 }
+                        ) + fadeIn(animationSpec = NavTweenFloat)
+                    },
+                    popExitTransition = {
+                        slideOutOfContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Right,
+                            animationSpec = NavTweenInt,
+                            targetOffset = { it / 2 }
+                        ) + fadeOut(animationSpec = NavTweenFloat)
                     }
-                ) { backStackEntry ->
-                    val channelId = backStackEntry.arguments?.getString("channelId") ?: ""
-                    ChannelScreen(
-                        channelId = channelId,
-                        onToggleDrawer = {},
-                        useDrawer = false,
-                        useBackButton = true,
-                        backButtonAction = {
-                            navController.popBackStack()
+                ) {
+                    composable("default") {
+                        DefaultDestinationScreen(
+                            navController,
+                            nextDestination,
+                            isConnected,
+                            onRetryConnection
+                        )
+                    }
+
+                    composable("login/greeting") { LoginGreetingScreen(navController) }
+                    composable("login/login") { LoginScreen(navController) }
+                    composable("login/mfa/{mfaTicket}/{allowedAuthTypes}") { backStackEntry ->
+                        val mfaTicket = backStackEntry.arguments?.getString("mfaTicket") ?: ""
+                        val allowedAuthTypes =
+                            backStackEntry.arguments?.getString("allowedAuthTypes") ?: ""
+
+                        MfaScreen(navController, allowedAuthTypes, mfaTicket)
+                    }
+
+                    composable("register/greeting") { RegisterGreetingScreen(navController) }
+                    composable("register/details") { RegisterDetailsScreen(navController) }
+                    composable("register/verify/{email}") { backStackEntry ->
+                        val email = backStackEntry.arguments?.getString("email") ?: ""
+
+                        RegisterVerifyScreen(navController, email)
+                    }
+                    composable("register/onboarding") {
+                        OnboardingScreen(
+                            navController,
+                            onOnboardingComplete = {
+                                onUpdateNextDestination("chat")
+                                navController.popBackStack(
+                                    navController.graph.startDestinationRoute!!,
+                                    inclusive = true
+                                )
+                                navController.navigate("default")
+                            }
+                        )
+                    }
+
+                    composable("login2/init") { InitScreen(navController, windowSizeClass) }
+
+                    // This is only used outside of Polar mode
+                    // Otherwise you may be looking for "main" right below
+                    composable(
+                        "chat",
+                        enterTransition = {
+                            slideIntoContainer(
+                                AnimatedContentTransitionScope.SlideDirection.Up,
+                                animationSpec = tween(
+                                    400,
+                                    easing = EasingTokens.EmphasizedDecelerate
+                                ),
+                                initialOffset = { it / 3 }
+                            ) + fadeIn(animationSpec = RevoltTweenFloat)
+                        }
+                    ) {
+                        ChatRouterScreen(
+                            navController,
+                            windowSizeClass,
+                            disableBackHandler = showVoiceUI,
+                            onNullifiedUser = {
+                                onRetryConnection()
+                                navController.popBackStack(
+                                    navController.graph.startDestinationRoute!!,
+                                    inclusive = true
+                                )
+                                navController.navigate("default")
+                            },
+                            onEnterVoiceUI = { channelId ->
+                                showVoiceUI = true
+                                voiceChannelId = channelId
+                            },
+                        )
+                    }
+
+                    // This is only the main screen in Polar mode
+                    // Otherwise you may be looking for "chat" right above
+                    composable(
+                        "main",
+                        enterTransition = {
+                            slideIntoContainer(
+                                AnimatedContentTransitionScope.SlideDirection.Up,
+                                animationSpec = tween(
+                                    400,
+                                    easing = EasingTokens.EmphasizedDecelerate
+                                ),
+                                initialOffset = { it / 3 }
+                            ) + fadeIn(animationSpec = RevoltTweenFloat) + scaleIn(
+                                animationSpec = tween(
+                                    400,
+                                    easing = EasingTokens.EmphasizedDecelerate
+                                ),
+                                initialScale = 0.8f,
+                                transformOrigin = TransformOrigin.Center
+                            )
+                        }
+                    ) {
+                        MainScreen(navController)
+                    }
+                    composable(
+                        "main/conversation/{channelId}",
+                        enterTransition = {
+                            slideIntoContainer(
+                                AnimatedContentTransitionScope.SlideDirection.Left,
+                                animationSpec = tween(
+                                    600,
+                                    easing = EasingTokens.EmphasizedDecelerate
+                                ),
+                                initialOffset = { it }
+                            ) + fadeIn(animationSpec = RevoltTweenFloat)
                         },
-                        useChatUI = true
+                        exitTransition = {
+                            slideOutOfContainer(
+                                AnimatedContentTransitionScope.SlideDirection.Right,
+                                animationSpec = tween(
+                                    600,
+                                    easing = EasingTokens.EmphasizedDecelerate
+                                ),
+                                targetOffset = { it }
+                            ) + fadeOut(animationSpec = RevoltTweenFloat)
+                        }
+                    ) { backStackEntry ->
+                        val channelId = backStackEntry.arguments?.getString("channelId") ?: ""
+                        ChannelScreen(
+                            channelId = channelId,
+                            onToggleDrawer = {},
+                            useDrawer = false,
+                            useBackButton = true,
+                            backButtonAction = {
+                                navController.popBackStack()
+                            },
+                            useChatUI = true
+                        )
+                    }
+
+                    composable("create/group") { CreateGroupScreen(navController) }
+
+                    composable("discover") { DiscoverScreen(navController) }
+
+                    composable("settings") { SettingsScreen(navController) }
+                    composable("settings/profile") { ProfileSettingsScreen(navController) }
+                    composable("settings/sessions") { SessionSettingsScreen(navController) }
+                    composable("settings/appearance") { AppearanceSettingsScreen(navController) }
+                    composable("settings/chat") { ChatSettingsScreen(navController) }
+                    composable("settings/debug") { DebugSettingsScreen(navController) }
+                    composable("settings/experiments") { ExperimentsSettingsScreen(navController) }
+                    composable("settings/changelogs") { ChangelogsSettingsScreen(navController) }
+                    composable("settings/language") { LanguagePickerSettingsScreen(navController) }
+
+                    composable("settings/channel/{channelId}") { backStackEntry ->
+                        val channelId = backStackEntry.arguments?.getString("channelId") ?: ""
+                        ChannelSettingsHome(navController, channelId)
+                    }
+                    composable("settings/channel/{channelId}/overview") { backStackEntry ->
+                        val channelId = backStackEntry.arguments?.getString("channelId") ?: ""
+                        ChannelSettingsOverview(navController, channelId)
+                    }
+                    composable("settings/channel/{channelId}/permissions") { backStackEntry ->
+                        val channelId = backStackEntry.arguments?.getString("channelId") ?: ""
+                        ChannelSettingsPermissions(navController, channelId)
+                    }
+
+                    composable("about") { AboutScreen(navController) }
+                    composable("about/oss") { AttributionScreen(navController) }
+
+                    composable("labs") { LabsRootScreen(navController) }
+                }
+            }
+
+            if (showVoiceUI) { // if tapped outside the voice UI, close it
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) {
+                            showVoiceUI = false
+                        }
+                )
+            }
+
+            AnimatedVisibility(
+                visible = showVoiceUI,
+                modifier = Modifier.align(Alignment.BottomCenter),
+                enter = slideInVertically(
+                    initialOffsetY = { it -> it },
+                    animationSpec = tween(
+                        durationMillis = 300,
+                        easing = EasingTokens.EmphasizedDecelerate
                     )
+                ),
+                exit = slideOutVertically(
+                    targetOffsetY = { it -> it },
+                    animationSpec = tween(
+                        durationMillis = 300,
+                        easing = EasingTokens.EmphasizedDecelerate
+                    )
+                )
+            ) {
+                // We need a box as applying the padding elsewhere leads to either
+                // janky animation or layout
+                Box(Modifier.safeDrawingPadding()) {
+                    Card(
+                        Modifier
+                            .fillMaxWidth()
+                            .widthIn(max = 600.dp)
+                            .padding(8.dp)
+                    ) {
+                        VoicePermissionSwitch(
+                            onCancel = {
+                                showVoiceUI = false
+                            }
+                        ) {
+                            voiceChannelId?.let {
+                                VoiceSheet(
+                                    it,
+                                    onDisconnect = {
+                                        showVoiceUI = false
+                                        voiceChannelId = null
+                                    }
+                                )
+                            }
+                        }
+                    }
                 }
-
-                composable("create/group") { CreateGroupScreen(navController) }
-
-                composable("discover") { DiscoverScreen(navController) }
-
-                composable("settings") { SettingsScreen(navController) }
-                composable("settings/profile") { ProfileSettingsScreen(navController) }
-                composable("settings/sessions") { SessionSettingsScreen(navController) }
-                composable("settings/appearance") { AppearanceSettingsScreen(navController) }
-                composable("settings/chat") { ChatSettingsScreen(navController) }
-                composable("settings/debug") { DebugSettingsScreen(navController) }
-                composable("settings/experiments") { ExperimentsSettingsScreen(navController) }
-                composable("settings/changelogs") { ChangelogsSettingsScreen(navController) }
-                composable("settings/language") { LanguagePickerSettingsScreen(navController) }
-
-                composable("settings/channel/{channelId}") { backStackEntry ->
-                    val channelId = backStackEntry.arguments?.getString("channelId") ?: ""
-                    ChannelSettingsHome(navController, channelId)
-                }
-                composable("settings/channel/{channelId}/overview") { backStackEntry ->
-                    val channelId = backStackEntry.arguments?.getString("channelId") ?: ""
-                    ChannelSettingsOverview(navController, channelId)
-                }
-                composable("settings/channel/{channelId}/permissions") { backStackEntry ->
-                    val channelId = backStackEntry.arguments?.getString("channelId") ?: ""
-                    ChannelSettingsPermissions(navController, channelId)
-                }
-
-                composable("about") { AboutScreen(navController) }
-                composable("about/oss") { AttributionScreen(navController) }
-
-                composable("labs") { LabsRootScreen(navController) }
             }
         }
     }

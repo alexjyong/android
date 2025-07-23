@@ -2,3 +2,4 @@ sentry.dsn=
 sentry.upload_mappings=true
 build.debug.app_name=
 build.flavour_id=ZZUU
+dev.use_alpha_api=false

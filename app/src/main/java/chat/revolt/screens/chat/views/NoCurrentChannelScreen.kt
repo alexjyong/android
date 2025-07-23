@@ -1,10 +1,15 @@
 package chat.revolt.screens.chat.views
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,28 +28,40 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.revolt.R
 import chat.revolt.internals.extensions.zero
+import chat.revolt.screens.chat.LocalIsConnected
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoCurrentChannelScreen(useDrawer: Boolean, onDrawerClicked: () -> Unit) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {},
-                navigationIcon = {
-                    if (useDrawer) {
-                        IconButton(onClick = {
-                            onDrawerClicked()
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = stringResource(id = R.string.menu)
+            Column {
+                AnimatedVisibility(LocalIsConnected.current) {
+                    Spacer(
+                        Modifier
+                            .height(
+                                WindowInsets.statusBars.asPaddingValues()
+                                    .calculateTopPadding()
                             )
+                    )
+                }
+                TopAppBar(
+                    title = {},
+                    navigationIcon = {
+                        if (useDrawer) {
+                            IconButton(onClick = {
+                                onDrawerClicked()
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Menu,
+                                    contentDescription = stringResource(id = R.string.menu)
+                                )
+                            }
                         }
-                    }
-                },
-                windowInsets = WindowInsets.zero
-            )
+                    },
+                    windowInsets = WindowInsets.zero
+                )
+            }
         },
     ) { pv ->
         Column(

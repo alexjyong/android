@@ -1,7 +1,9 @@
 package chat.revolt.composables.screens.chat.drawer
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -28,6 +30,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -71,6 +74,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -96,6 +100,7 @@ import chat.revolt.composables.generic.UserAvatar
 import chat.revolt.composables.generic.presenceFromStatus
 import chat.revolt.composables.screens.chat.ChannelIcon
 import chat.revolt.screens.chat.ChatRouterDestination
+import chat.revolt.screens.chat.LocalIsConnected
 import chat.revolt.sheets.ChannelContextSheet
 import kotlinx.coroutines.launch
 
@@ -154,6 +159,17 @@ fun ChannelSideDrawer(
         ), label = "Server banner height"
     )
 
+    val serverInfoOffset by animateDpAsState(
+        if (LocalIsConnected.current)
+            WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+        else
+            0.dp,
+        animationSpec = spring(
+            stiffness = Spring.StiffnessMediumLow,
+            visibilityThreshold = Dp.VisibilityThreshold
+        )
+    )
+
     // - Take the list of servers and filter them by the ones that are in the ordering.
     // - Sort the servers that are in the ordering using the ordering.
     // - Add the servers that aren't in the ordering to the end of the list.
@@ -202,30 +218,40 @@ fun ChannelSideDrawer(
             )
         ) {
             stickyHeader(key = "self") {
-                UserAvatar(
-                    username = RevoltAPI.userCache[RevoltAPI.selfId]?.let {
-                        User.resolveDefaultName(
-                            it
+                Column(Modifier.background(MaterialTheme.colorScheme.background)) {
+                    AnimatedVisibility(LocalIsConnected.current) {
+                        Spacer(
+                            Modifier
+                                .height(
+                                    WindowInsets.statusBars.asPaddingValues()
+                                        .calculateTopPadding()
+                                )
                         )
                     }
-                        ?: "",
-                    presence = presenceFromStatus(
-                        RevoltAPI.userCache[RevoltAPI.selfId]?.status?.presence,
-                        RevoltAPI.userCache[RevoltAPI.selfId]?.online ?: false
-                    ),
-                    userId = RevoltAPI.selfId ?: "",
-                    avatar = RevoltAPI.userCache[RevoltAPI.selfId]?.avatar,
-                    size = 48.dp,
-                    presenceSize = 16.dp,
-                    onClick = {
-                        onDestinationChanged(ChatRouterDestination.defaultForDMList)
-                    },
-                    onLongClick = onLongPressAvatar,
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.background)
-                        .padding(8.dp)
-                        .size(48.dp)
-                )
+                    UserAvatar(
+                        username = RevoltAPI.userCache[RevoltAPI.selfId]?.let {
+                            User.resolveDefaultName(
+                                it
+                            )
+                        }
+                            ?: "",
+                        presence = presenceFromStatus(
+                            RevoltAPI.userCache[RevoltAPI.selfId]?.status?.presence,
+                            RevoltAPI.userCache[RevoltAPI.selfId]?.online ?: false
+                        ),
+                        userId = RevoltAPI.selfId ?: "",
+                        avatar = RevoltAPI.userCache[RevoltAPI.selfId]?.avatar,
+                        size = 48.dp,
+                        presenceSize = 16.dp,
+                        onClick = {
+                            onDestinationChanged(ChatRouterDestination.defaultForDMList)
+                        },
+                        onLongClick = onLongPressAvatar,
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .size(48.dp)
+                    )
+                }
             }
 
             items(
@@ -314,12 +340,12 @@ fun ChannelSideDrawer(
                 )
                 val leftIndicatorColour = animateColorAsState(
                     targetValue =
-                    if (serverInList.id == currentServer)
-                        MaterialTheme.colorScheme.primary
-                    else if (serverHasUnread)
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    else
-                        Color.Transparent,
+                        if (serverInList.id == currentServer)
+                            MaterialTheme.colorScheme.primary
+                        else if (serverHasUnread)
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        else
+                            Color.Transparent,
                     animationSpec = spring(
                         dampingRatio = Spring.DampingRatioMediumBouncy,
                         stiffness = Spring.StiffnessLow
@@ -433,27 +459,30 @@ fun ChannelSideDrawer(
         }
         Column(
             Modifier
-                .clip(
-                    MaterialTheme.shapes.extraLarge.copy(
-                        bottomEnd = CornerSize(0)
-                    )
-                )
                 .background(MaterialTheme.colorScheme.surfaceContainer)
                 .weight(1f)
                 .fillMaxHeight()
         ) {
-            Box(Modifier.height(serverBannerHeight)) {
+            Box(
+                Modifier
+                    .clip(
+                        MaterialTheme.shapes.medium.copy(
+                            topStart = CornerSize(0.dp),
+                            topEnd = CornerSize(0.dp)
+                        )
+                    )
+                    .height(
+                        serverBannerHeight + WindowInsets.statusBars.asPaddingValues()
+                            .calculateTopPadding()
+                    )
+                //.offset(y = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
+            ) {
                 if (server?.banner != null) {
                     RemoteImage(
                         url = "$REVOLT_FILES/banners/${server.banner.id}",
                         description = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .clip(
-                                MaterialTheme.shapes.medium.copy(
-                                    topStart = CornerSize(0), topEnd = CornerSize(0)
-                                )
-                            )
                             .fillMaxSize()
                     )
 
@@ -465,7 +494,7 @@ fun ChannelSideDrawer(
                                     drawRect(
                                         Brush.linearGradient(
                                             listOf(
-                                                surfaceContainer.copy(alpha = 0.8f),
+                                                Color.Black.copy(alpha = 0.6f),
                                                 Color.Transparent
                                             ),
                                             Offset.Zero,
@@ -477,63 +506,72 @@ fun ChannelSideDrawer(
                 }
 
                 Row(
-                    Modifier.padding(16.dp),
+                    Modifier
+                        .padding(16.dp)
+                        .offset(y = serverInfoOffset),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        Modifier.weight(1f),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    CompositionLocalProvider(
+                        LocalContentColor provides
+                                if (server?.banner != null) Color.White
+                                else LocalContentColor.current
                     ) {
-                        if (server?.flags has ServerFlags.Official) {
-                            Icon(
-                                painter = painterResource(
-                                    id = R.drawable.ic_revolt_decagram_24dp
-                                ),
-                                contentDescription = stringResource(
-                                    R.string.server_flag_official
-                                ),
-                                tint = LocalContentColor.current,
-                                modifier = Modifier
-                                    .size(24.dp)
-                            )
-                        }
-                        if (server?.flags has ServerFlags.Verified) {
-                            Icon(
-                                painter = painterResource(
-                                    id = R.drawable.ic_check_decagram_24dp
-                                ),
-                                contentDescription = stringResource(
-                                    R.string.server_flag_verified
-                                ),
-                                tint = LocalContentColor.current,
-                                modifier = Modifier
-                                    .size(24.dp)
+                        Row(
+                            Modifier.weight(1f),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            if (server?.flags has ServerFlags.Official) {
+                                Icon(
+                                    painter = painterResource(
+                                        id = R.drawable.ic_revolt_decagram_24dp
+                                    ),
+                                    contentDescription = stringResource(
+                                        R.string.server_flag_official
+                                    ),
+                                    tint = LocalContentColor.current,
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                )
+                            }
+                            if (server?.flags has ServerFlags.Verified) {
+                                Icon(
+                                    painter = painterResource(
+                                        id = R.drawable.ic_check_decagram_24dp
+                                    ),
+                                    contentDescription = stringResource(
+                                        R.string.server_flag_verified
+                                    ),
+                                    tint = LocalContentColor.current,
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                )
+                            }
+
+                            Text(
+                                text = when (currentServer) {
+                                    null -> stringResource(R.string.direct_messages)
+                                    else -> server?.name ?: stringResource(R.string.unknown)
+                                },
+                                style = MaterialTheme.typography.titleMedium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
 
-                        Text(
-                            text = when (currentServer) {
-                                null -> stringResource(R.string.direct_messages)
-                                else -> server?.name ?: stringResource(R.string.unknown)
-                            },
-                            style = MaterialTheme.typography.titleMedium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-
-                    if (currentServer != null) {
-                        IconButton(onClick = {
-                            server?.id?.let { srvId -> onShowServerContextSheet(srvId) }
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = stringResource(R.string.menu)
-                            )
+                        if (currentServer != null) {
+                            IconButton(onClick = {
+                                server?.id?.let { srvId -> onShowServerContextSheet(srvId) }
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = stringResource(R.string.menu),
+                                    tint = LocalContentColor.current
+                                )
+                            }
+                        } else {
+                            Spacer(Modifier.height(64.dp))
                         }
-                    } else {
-                        Spacer(Modifier.height(64.dp))
                     }
                 }
             }
@@ -762,7 +800,8 @@ fun ColumnScope.ServerChannelListRenderer(
         items(categorisedChannels?.size ?: 0) {
             when (val channelOrCat = categorisedChannels?.get(it)) {
                 is CategorisedChannelList.Channel -> {
-                    ChannelItem(channel = channelOrCat.channel,
+                    ChannelItem(
+                        channel = channelOrCat.channel,
                         isCurrent = when (currentDestination) {
                             is ChatRouterDestination.Channel -> {
                                 currentDestination.channelId == channelOrCat.channel.id
@@ -840,7 +879,8 @@ fun ChannelItem(
             }
         }
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
             modifier = Modifier
                 .padding(start = 8.dp, end = 8.dp)
