@@ -136,12 +136,6 @@ android {
                 "FLAVOUR_ID",
                 "\"${buildproperty("build.flavour_id", "RVX_BUILD_FLAVOUR_ID")}\""
             )
-
-            buildConfigField(
-                "boolean",
-                "USE_ALPHA_API",
-                "${buildproperty("dev.use_alpha_api", "RVX_DEV_USE_ALPHA_API")}"
-            )
         }
     }
     compileOptions {
@@ -300,9 +294,9 @@ dependencies {
     implementation("org.jetbrains:markdown:0.7.3")
     implementation("dev.snipme:highlights:1.0.0")
 
-    // Livekit
-    implementation("io.livekit:livekit-android:${LivekitVersion.core}")
-    implementation("io.livekit:livekit-android-compose-components:${LivekitVersion.componentsCompose}")
+    // Livekit - Commented out for now to not inflate the app size.
+    /*implementation("io.livekit:livekit-android:${LivekitVersion.core}")
+    implementation("io.livekit:livekit-android-compose-components:${LivekitVersion.componentsCompose}")*/
 
     // Firebase - Cloud Messaging
     implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
