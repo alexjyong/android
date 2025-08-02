@@ -11,7 +11,6 @@ plugins {
     id("com.mikepenz.aboutlibraries.plugin")
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
-    // id("org.jmailen.kotlinter")
     id("io.sentry.android.gradle") version "4.12.0"
     id("app.cash.sqldelight") version "2.0.1"
     id("kotlin-kapt")
