@@ -544,7 +544,7 @@ fun ChannelSideDrawer(
                         
                         
                         DropdownMenuItem(
-                            text = { Text("Create invite") },
+                            text = { Text(stringResource(R.string.channel_info_sheet_options_invite)) },
                             onClick = {
                                 serverInList.id?.let { serverId ->
                                     showInviteDialog = serverId
