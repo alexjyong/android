@@ -1,5 +1,6 @@
 package chat.revolt.composables.screens.chat.drawer
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
@@ -37,7 +38,12 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -46,6 +52,7 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -65,8 +72,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -81,6 +91,7 @@ import chat.revolt.api.internals.CategorisedChannelList
 import chat.revolt.api.internals.ChannelUtils
 import chat.revolt.api.internals.DirectMessages
 import chat.revolt.api.internals.FriendRequests
+import chat.revolt.api.routes.server.leaveOrDeleteServer
 import chat.revolt.api.schemas.Category
 import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.ChannelType
@@ -96,8 +107,10 @@ import chat.revolt.composables.generic.RemoteImage
 import chat.revolt.composables.generic.UserAvatar
 import chat.revolt.composables.generic.presenceFromStatus
 import chat.revolt.composables.screens.chat.ChannelIcon
+import chat.revolt.internals.Platform
 import chat.revolt.screens.chat.ChatRouterDestination
 import chat.revolt.screens.chat.LocalIsConnected
+import chat.revolt.screens.chat.dialogs.safety.ReportServerDialog
 import chat.revolt.sheets.ChannelContextSheet
 import kotlinx.coroutines.launch
 
@@ -183,6 +196,10 @@ fun ChannelSideDrawer(
     }.sortedBy { it.id }))
 
     var channelContextSheetTarget by remember { mutableStateOf<String?>(null) }
+    var serverContextMenuTarget by remember { mutableStateOf<String?>(null) }
+    var showLeaveConfirmation by remember { mutableStateOf<String?>(null) }
+    var leaveSilently by remember { mutableStateOf(false) }
+    var showReportServerDialog by remember { mutableStateOf<String?>(null) }
 
     if (channelContextSheetTarget != null) {
         val channelContextSheetState = rememberModalBottomSheetState()
@@ -204,6 +221,96 @@ fun ChannelSideDrawer(
     }
 
     val scope = rememberCoroutineScope()
+    val clipboardManager = LocalClipboardManager.current
+    val context = LocalContext.current
+
+    // Leave server confirmation dialog
+    showLeaveConfirmation?.let { serverId ->
+        val server = RevoltAPI.serverCache[serverId]
+        AlertDialog(
+            onDismissRequest = {
+                showLeaveConfirmation = null
+                leaveSilently = false
+            },
+            title = {
+                Text(
+                    text = stringResource(
+                        id = R.string.server_context_sheet_actions_leave_confirm,
+                        server?.name ?: stringResource(R.string.unknown)
+                    )
+                )
+            },
+            text = {
+                Column {
+                    Text(
+                        text = stringResource(
+                            id = R.string.server_context_sheet_actions_leave_confirm_eyebrow
+                        )
+                    )
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(start = 0.dp, end = 0.dp, top = 16.dp, bottom = 0.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = leaveSilently,
+                            onCheckedChange = { leaveSilently = it }
+                        )
+                        Text(
+                            text = stringResource(
+                                id = R.string.server_context_sheet_actions_leave_silently
+                            ),
+                            modifier = Modifier.padding(start = 4.dp)
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        scope.launch {
+                            leaveOrDeleteServer(serverId, leaveSilently)
+                        }
+                        showLeaveConfirmation = null
+                        leaveSilently = false
+                        serverContextMenuTarget = null
+                    }
+                ) {
+                    Text(
+                        text = stringResource(
+                            id = R.string.server_context_sheet_actions_leave_confirm_yes
+                        )
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showLeaveConfirmation = null
+                        leaveSilently = false
+                    }
+                ) {
+                    Text(
+                        text = stringResource(
+                            id = R.string.server_context_sheet_actions_leave_confirm_no
+                        )
+                    )
+                }
+            }
+        )
+    }
+
+    // Report server dialog
+    showReportServerDialog?.let { serverId ->
+        ReportServerDialog(
+            onDismiss = { 
+                showReportServerDialog = null
+                serverContextMenuTarget = null
+            },
+            serverId = serverId
+        )
+    }
 
     Row(modifier.fillMaxSize()) {
         LazyColumn(
@@ -363,7 +470,9 @@ fun ChannelSideDrawer(
                                     }
                                 },
                                 onLongClick = {
-                                    serverInList.id?.let { srvId -> onShowServerContextSheet(srvId) }
+                                    serverInList.id?.let { srvId -> 
+                                        serverContextMenuTarget = srvId
+                                    }
                                 }
                             )) {
                         val icon = serverInList.icon?.id?.let { iconId ->
@@ -384,6 +493,148 @@ fun ChannelSideDrawer(
                                 modifier = Modifier
                                     .size(48.dp)
                                     .clip(CircleShape)
+                            )
+                        }
+                    }
+
+                    // Server context dropdown menu
+                    DropdownMenu(
+                        expanded = serverContextMenuTarget == serverInList.id,
+                        onDismissRequest = { serverContextMenuTarget = null }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.server_context_sheet_actions_mark_read)) },
+                            onClick = {
+                                scope.launch {
+                                    serverInList.id?.let { serverId ->
+                                        RevoltAPI.unreads.markServerAsRead(serverId, sync = true)
+                                    }
+                                }
+                                serverContextMenuTarget = null
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.icn_mark_chat_read_24dp),
+                                    contentDescription = null
+                                )
+                            }
+                        )
+                        
+                        DropdownMenuItem(
+                            text = { Text("Notification options (TODO)") },
+                            onClick = {
+                                // TODO: Implement notification options
+                                serverContextMenuTarget = null
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.icn_notification_settings_24dp),
+                                    contentDescription = null
+                                )
+                            },
+                            trailingIcon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.icn_keyboard_arrow_right_24dp),
+                                    contentDescription = null
+                                )
+                            }
+                        )
+                        
+                        DropdownMenuItem(
+                            text = { Text("Create invite TODO") },
+                            onClick = {
+                                // TODO: Implement create invite
+                                serverContextMenuTarget = null
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.icn_add_24dp),
+                                    contentDescription = null
+                                )
+                            }
+                        )
+                        
+                        DropdownMenuItem(
+                            text = { Text("Edit identity TODO") },
+                            onClick = {
+                                // TODO: Implement edit identity
+                                serverContextMenuTarget = null
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.icn_edit_24dp),
+                                    contentDescription = null
+                                )
+                            }
+                        )
+                        
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.server_context_sheet_actions_copy_id)) },
+                            onClick = {
+                                serverInList.id?.let { serverId ->
+                                    clipboardManager.setText(AnnotatedString(serverId))
+                                    
+                                    if (Platform.needsShowClipboardNotification()) {
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.server_context_sheet_actions_copy_id_copied),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
+                                serverContextMenuTarget = null
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.icn_content_copy_24dp),
+                                    contentDescription = null
+                                )
+                            }
+                        )
+                        
+                        HorizontalDivider()
+                        
+                        if (serverInList.owner != RevoltAPI.selfId) {
+                            DropdownMenuItem(
+                                text = { 
+                                    Text(
+                                        stringResource(R.string.server_context_sheet_actions_report),
+                                        color = MaterialTheme.colorScheme.error
+                                    ) 
+                                },
+                                onClick = {
+                                    serverInList.id?.let { serverId ->
+                                        showReportServerDialog = serverId
+                                    }
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(R.drawable.icn_report_24dp),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
+                                }
+                            )
+                            
+                            DropdownMenuItem(
+                                text = { 
+                                    Text(
+                                        stringResource(R.string.server_context_sheet_actions_leave),
+                                        color = MaterialTheme.colorScheme.error
+                                    ) 
+                                },
+                                onClick = {
+                                    serverInList.id?.let { serverId ->
+                                        showLeaveConfirmation = serverId
+                                    }
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(R.drawable.icn_door_open_24dp),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
+                                }
                             )
                         }
                     }
