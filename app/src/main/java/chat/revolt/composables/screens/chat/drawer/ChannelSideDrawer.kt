@@ -227,7 +227,6 @@ fun ChannelSideDrawer(
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
 
-    // Leave server confirmation dialog
     showLeaveConfirmation?.let { serverId ->
         val server = RevoltAPI.serverCache[serverId]
         AlertDialog(
@@ -304,7 +303,6 @@ fun ChannelSideDrawer(
         )
     }
 
-    // Report server dialog
     showReportServerDialog?.let { serverId ->
         ReportServerDialog(
             onDismiss = { 
@@ -332,7 +330,6 @@ fun ChannelSideDrawer(
                 )
             }
         } else {
-            // No channels available, dismiss
             showInviteDialog = null
             serverContextMenuTarget = null
         }
