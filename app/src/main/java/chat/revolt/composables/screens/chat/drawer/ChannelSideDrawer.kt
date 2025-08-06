@@ -83,6 +83,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.REVOLT_FILES
@@ -110,6 +111,7 @@ import chat.revolt.composables.screens.chat.ChannelIcon
 import chat.revolt.internals.Platform
 import chat.revolt.screens.chat.ChatRouterDestination
 import chat.revolt.screens.chat.LocalIsConnected
+import chat.revolt.screens.chat.dialogs.InviteDialog
 import chat.revolt.screens.chat.dialogs.safety.ReportServerDialog
 import chat.revolt.sheets.ChannelContextSheet
 import kotlinx.coroutines.launch
@@ -200,6 +202,7 @@ fun ChannelSideDrawer(
     var showLeaveConfirmation by remember { mutableStateOf<String?>(null) }
     var leaveSilently by remember { mutableStateOf(false) }
     var showReportServerDialog by remember { mutableStateOf<String?>(null) }
+    var showInviteDialog by remember { mutableStateOf<String?>(null) }
 
     if (channelContextSheetTarget != null) {
         val channelContextSheetState = rememberModalBottomSheetState()
@@ -310,6 +313,29 @@ fun ChannelSideDrawer(
             },
             serverId = serverId
         )
+    }
+
+    showInviteDialog?.let { serverId ->
+        val server = RevoltAPI.serverCache[serverId]
+        val channelId = server?.channels?.firstOrNull()
+        if (channelId != null) {
+            Dialog(
+                onDismissRequest = {
+                    showInviteDialog = null
+                }
+            ) {
+                InviteDialog(
+                    channelId = channelId,
+                    onDismissRequest = {
+                        showInviteDialog = null
+                    }
+                )
+            }
+        } else {
+            // No channels available, dismiss
+            showInviteDialog = null
+            serverContextMenuTarget = null
+        }
     }
 
     Row(modifier.fillMaxSize()) {
@@ -497,7 +523,6 @@ fun ChannelSideDrawer(
                         }
                     }
 
-                    // Server context dropdown menu
                     DropdownMenu(
                         expanded = serverContextMenuTarget == serverInList.id,
                         onDismissRequest = { serverContextMenuTarget = null }
@@ -520,49 +545,18 @@ fun ChannelSideDrawer(
                             }
                         )
                         
-                        DropdownMenuItem(
-                            text = { Text("Notification options (TODO)") },
-                            onClick = {
-                                // TODO: Implement notification options
-                                serverContextMenuTarget = null
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    painter = painterResource(R.drawable.icn_notification_settings_24dp),
-                                    contentDescription = null
-                                )
-                            },
-                            trailingIcon = {
-                                Icon(
-                                    painter = painterResource(R.drawable.icn_keyboard_arrow_right_24dp),
-                                    contentDescription = null
-                                )
-                            }
-                        )
                         
                         DropdownMenuItem(
-                            text = { Text("Create invite TODO") },
+                            text = { Text("Create invite") },
                             onClick = {
-                                // TODO: Implement create invite
+                                serverInList.id?.let { serverId ->
+                                    showInviteDialog = serverId
+                                }
                                 serverContextMenuTarget = null
                             },
                             leadingIcon = {
                                 Icon(
                                     painter = painterResource(R.drawable.icn_add_24dp),
-                                    contentDescription = null
-                                )
-                            }
-                        )
-                        
-                        DropdownMenuItem(
-                            text = { Text("Edit identity TODO") },
-                            onClick = {
-                                // TODO: Implement edit identity
-                                serverContextMenuTarget = null
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    painter = painterResource(R.drawable.icn_edit_24dp),
                                     contentDescription = null
                                 )
                             }
@@ -592,9 +586,8 @@ fun ChannelSideDrawer(
                             }
                         )
                         
-                        HorizontalDivider()
-                        
                         if (serverInList.owner != RevoltAPI.selfId) {
+                            HorizontalDivider()
                             DropdownMenuItem(
                                 text = { 
                                     Text(
