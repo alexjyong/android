@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:123456789012:android:abcdef1234567890",
         "android_client_info": {
-          "package_name": "chat.revolt"
+          "package_name": "chat.revolt.forked"
         }
       },
       "oauth_client": [
@@ -38,7 +38,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:123456789012:android:abcdef1234567891",
         "android_client_info": {
-          "package_name": "chat.revolt.debug"
+          "package_name": "chat.revolt.forked.debug"
         }
       },
       "oauth_client": [
