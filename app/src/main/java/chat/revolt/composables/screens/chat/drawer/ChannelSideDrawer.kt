@@ -1170,7 +1170,7 @@ fun ChannelItem(
                             )
                         }
 
-                        else -> ChannelIcon(iconType.type)
+                        else -> ChannelIcon(channel = channel, size = 24.dp)
                     }
                 }
 
