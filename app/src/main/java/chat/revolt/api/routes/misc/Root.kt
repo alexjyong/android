@@ -63,3 +63,7 @@ data class LiveKitNode(
 suspend fun getRootRoute(): Root {
     return RevoltHttp.get("/".api()).body()
 }
+
+suspend fun getRootRoute(baseUrl: String): Root {
+    return RevoltHttp.get("$baseUrl/").body()
+}

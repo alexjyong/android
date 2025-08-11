@@ -55,18 +55,15 @@ import chat.revolt.api.schemas.Channel as ChannelSchema
 
 private const val USE_ALPHA_API = false
 
-val REVOLT_BASE =
-    if (USE_ALPHA_API) "https://alpha.revolt.chat/api" else "https://api.revolt.chat/0.8"
+val REVOLT_BASE get() = ServerConfiguration.current.apiBase
+val REVOLT_FILES get() = ServerConfiguration.current.filesBase
+val REVOLT_JANUARY get() = ServerConfiguration.current.januaryBase
+val REVOLT_WEBSOCKET get() = ServerConfiguration.current.websocketBase
+val REVOLT_APP get() = ServerConfiguration.current.appBase
+
 const val REVOLT_SUPPORT = "https://support.revolt.chat"
 const val REVOLT_MARKETING = "https://revolt.chat"
-val REVOLT_FILES =
-    if (USE_ALPHA_API) "https://alpha.revolt.chat/autumn" else "https://cdn.revoltusercontent.com"
-val REVOLT_JANUARY =
-    if (USE_ALPHA_API) "https://alpha.revolt.chat/january" else "https://jan.revolt.chat"
-const val REVOLT_APP = "https://app.revolt.chat"
 const val REVOLT_INVITES = "https://rvlt.gg"
-val REVOLT_WEBSOCKET =
-    if (USE_ALPHA_API) "wss://alpha.revolt.chat/ws" else "wss://ws.revolt.chat"
 const val REVOLT_KJBOOK = "https://revoltchat.github.io/android"
 
 fun String.api(): String {
@@ -188,6 +185,13 @@ object RevoltAPI {
         fetchSelf()
         startSocketOps()
         unreads.sync()
+    }
+
+    suspend fun reconnectWS() {
+        if (sessionToken.isNotEmpty()) {
+            socketCoroutine?.cancel()
+            startSocketOps()
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

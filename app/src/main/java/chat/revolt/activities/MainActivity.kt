@@ -103,6 +103,7 @@ import chat.revolt.screens.labs.LabsRootScreen
 import chat.revolt.screens.login.LoginGreetingScreen
 import chat.revolt.screens.login.LoginScreen
 import chat.revolt.screens.login.MfaScreen
+import chat.revolt.screens.login.ServerSelectionScreen
 import chat.revolt.screens.login2.InitScreen
 import chat.revolt.screens.main.MainScreen
 import chat.revolt.screens.register.OnboardingScreen
@@ -577,6 +578,7 @@ fun AppEntrypoint(
                     }
 
                     composable("login/greeting") { LoginGreetingScreen(navController) }
+                    composable("login/server") { ServerSelectionScreen(navController) }
                     composable("login/login") { LoginScreen(navController) }
                     composable("login/mfa/{mfaTicket}/{allowedAuthTypes}") { backStackEntry ->
                         val mfaTicket = backStackEntry.arguments?.getString("mfaTicket") ?: ""

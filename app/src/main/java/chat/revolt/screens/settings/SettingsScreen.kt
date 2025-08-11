@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import chat.revolt.api.ServerConfiguration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -380,6 +381,12 @@ fun SettingsScreen(
                                     text = stringResource(id = R.string.logout)
                                 )
                             }
+                        },
+                        supportingContent = {
+                            Text(
+                                text = "Connected to: ${ServerConfiguration.current.name}",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         },
                         leadingContent = {
                             SettingsIcon(danger = true) {

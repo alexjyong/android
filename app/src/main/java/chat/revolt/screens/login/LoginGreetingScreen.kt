@@ -45,6 +45,7 @@ import androidx.navigation.NavController
 import chat.revolt.BuildConfig
 import chat.revolt.R
 import chat.revolt.api.REVOLT_MARKETING
+import chat.revolt.api.ServerConfiguration
 import chat.revolt.composables.generic.AnyLink
 import chat.revolt.composables.generic.Weblink
 import com.chuckerteam.chucker.api.Chucker
@@ -135,6 +136,14 @@ fun LoginGreetingScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(
+                text = "Server: ${ServerConfiguration.current.name}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            
             Button(
                 onClick = { navController.navigate("login/login") },
                 modifier = Modifier
@@ -153,6 +162,15 @@ fun LoginGreetingScreen(navController: NavController) {
                     .testTag("view_signup_page_button")
             ) {
                 Text(text = stringResource(R.string.signup))
+            }
+            
+            Spacer(modifier = Modifier.height(5.dp))
+            
+            TextButton(
+                onClick = { navController.navigate("login/server") },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = "Change Server")
             }
 
             AnimatedVisibility(showBoringButton) {
