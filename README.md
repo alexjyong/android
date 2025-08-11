@@ -1,12 +1,34 @@
 # Revolt on Android
 
-# NOTE this is a forked version I made for some QOL changes that aren't present in the current version at the time of writing.
-
-Feel free to use this for whatever, but note that this is NOT the official Revolt android app. :)
 
 ## Description
 
-This is the official Android app for the [Revolt](https://revolt.chat) chat platform.  
+NOTE: This is a forked version of the Android app for the [Revolt](https://revolt.chat) chat platform.  I made for some QOL changes that aren't present in the current version at the time of writing.
+
+Feel free to use this for whatever, but note that this is NOT the official Revolt android app. :)
+
+## Features Added
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Emojis next to channel names</strong><br>
+      <img src="https://github.com/user-attachments/assets/6c37f059-47ef-4028-aac9-ef233f7a85e4" width="300" alt="Channel Emojis">
+    </td>
+    <td width="50%" valign="top">
+      <strong>Jump to replied message</strong><br>
+      <img src="https://github.com/user-attachments/assets/1dc0fb6b-521d-40e2-a833-1ada19bd207b" width="220" alt="Jump to Reply">
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center" valign="top">
+      <strong>Server context menu on long press</strong><br>
+      <img src="https://github.com/user-attachments/assets/29270bb0-1bf6-4a00-90f8-ff0168f62cf4" width="300" alt="Server Context Menu">
+    </td>
+  </tr>
+</table>
+
+
+
 The codebase includes the app itself, as well as an internal library for interacting with the Revolt
 API.
 
