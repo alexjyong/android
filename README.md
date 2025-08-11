@@ -84,15 +84,17 @@ After the instance fires up run
 ```sh
 ./gradlew assembledebug --no-daemon
 ``` 
-For a debug version of the application. 
+To generate a debug version of the application. 
 
 It will be located in `app/build/outputs/apk/debug/` under the name `app-debug.apk`
 
 Download it to your system by right clicking on the file like so:
 
+<img width="455" height="596" alt="image" src="https://github.com/user-attachments/assets/2fdffb6b-0fdc-4131-97b4-3360ae8871d8" />
+
 Send it to your phone, and install and run it!
 
-Alternatively, you can send it to your phone using magic wormhole (installed on this codespace instance by default)
+Alternatively, you can send it to your phone right from Codespaces using magic wormhole (installed on this codespace instance by default)
 
 `wormhole send app/build/outputs/apk/debug/app-debug.apk`
 
