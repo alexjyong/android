@@ -1,5 +1,9 @@
 # Revolt on Android
 
+# NOTE this is a forked version I made for some QOL changes that aren't present in the current version at the time of writing.
+
+Feel free to use this for whatever, but note that this is NOT the official Revolt android app. :)
+
 ## Description
 
 This is the official Android app for the [Revolt](https://revolt.chat) chat platform.  
