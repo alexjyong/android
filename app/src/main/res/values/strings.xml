@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Revolt</string>
+    <string name="app_name" translatable="false">Revolt Forked</string>
 
     <string name="back">← Back</string>
     <string name="next">Next →</string>
@@ -476,7 +476,6 @@
     <string name="add_server_sheet_step_1c_error">An error occurred while creating your server. Please try again later.</string>
     <string name="add_server_sheet_step_1c_create">Create</string>
 
-    <!-- New simplified add server sheet strings -->
     <string name="add_server_sheet_title">Add Server</string>
     <string name="add_server_sheet_join_by_invite">Join by invite code or link</string>
     <string name="add_server_sheet_join_by_invite_modal_title">Invite code or link</string>

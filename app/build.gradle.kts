@@ -76,11 +76,11 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "chat.revolt"
+        applicationId = "chat.revolt.forked"
         minSdk = 24
         targetSdk = 35
         versionCode = Integer.parseInt("001_003_206".replace("_", ""), 10)
-        versionName = "1.3.6b"
+        versionName = "1.3.6b-forked"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -92,6 +92,15 @@ android {
                 arguments += listOf("-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON")
                 cppFlags("")
             }
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file(buildproperty("signing.store_file", "SIGNING_STORE_FILE") ?: "release-key.keystore")
+            storePassword = buildproperty("signing.store_password", "SIGNING_STORE_PASSWORD")
+            keyAlias = buildproperty("signing.key_alias", "SIGNING_KEY_ALIAS")
+            keyPassword = buildproperty("signing.key_password", "SIGNING_KEY_PASSWORD")
         }
     }
 
@@ -113,6 +122,7 @@ android {
                 "FLAVOUR_ID",
                 "\"${buildproperty("build.flavour_id", "RVX_BUILD_FLAVOUR_ID")}\""
             )
+            signingConfig = signingConfigs.getByName("release")
         }
 
         debug {
