@@ -78,12 +78,12 @@ of the art for Android UI development.
 
 If you don't want to download the apks in the releases section and rather build yourself, follow these steps:
 
-Fire up a Github Codespaces instance at this link[here](https://github.com/codespaces/new?hide_repo_select=true&ref=combined-pr&repo=1020437871&skip_quickstart=true&machine=premiumLinux&devcontainer_path=.devcontainer%2Fdevcontainer.json&geo=UsEast)
+Fire up a Github Codespaces instance at this link [here](https://github.com/codespaces/new?hide_repo_select=true&ref=combined-pr&repo=1020437871&skip_quickstart=true&machine=premiumLinux&devcontainer_path=.devcontainer%2Fdevcontainer.json&geo=UsEast)
 
 The URL should have it selected for you automatically, but be sure to use this branch for your instance!
 
 Note that this url will have an 8-core instance selected by default. Feel free to use a smaller instance, but I've ran into build errors with that.
-At the time of writing, Github offers a number of free hours for personal accounts, but note that this bigger instance will use more of your free hours than a smaller one. **For just building the apk and downloading it to whatever device, this should be fine though.** [See the billing page for more details.](https://docs.github.com/en/billing/concepts/product-billing/github-codespaces#pricing-for-paid-usage)
+At the time of writing, Github offers a number of free hours for personal accounts, but note that this bigger instance will use more of your free hours than a smaller one. **For just building the apk and downloading it to whatever device, this should be fine though**. Be sure to delete the instance when you are done. **It won't cost you $$ if you don't have payment set up with Github or have budget limits.** [See the billing page for more details.](https://docs.github.com/en/billing/concepts/product-billing/github-codespaces#pricing-for-paid-usage)
 
 After the instance fires up run
 
