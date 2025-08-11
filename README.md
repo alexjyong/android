@@ -11,7 +11,7 @@ Feel free to use this for whatever, but note that this is NOT the official Revol
 
 You can download the latest APK [here](https://github.com/alexjyong/android/releases/download/1.3.6b-forked/app-release.apk).
 
-Or the latest debug APK [here](https://github.com/alexjyong/android/releases/download/1.3.6b-forked/app-debug.apk)/
+Or the latest debug APK [here](https://github.com/alexjyong/android/releases/download/1.3.6b-forked/app-debug.apk).
 
 ## Features Added
 <table>
