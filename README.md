@@ -9,6 +9,8 @@ NOTE: This is a forked version of the Android app for the [Revolt](https://revol
 
 Feel free to use this for whatever, but note that this is NOT the official Revolt android app. :)
 
+You can download the latest APK [here](https://github.com/alexjyong/android/releases/download/1.3.6b-forked/app-release.apk).
+
 ## Features Added
 <table>
   <tr>
