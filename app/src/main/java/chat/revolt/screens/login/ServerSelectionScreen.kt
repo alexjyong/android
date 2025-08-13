@@ -28,6 +28,12 @@ class ServerSelectionViewModel : ViewModel() {
     var isDiscovering by mutableStateOf(false)
     var discoveryError by mutableStateOf<String?>(null)
     var discoveredConfig by mutableStateOf<ServerConfig?>(null)
+    var showAdvancedMode by mutableStateOf(false)
+    
+    var apiUrl by mutableStateOf("")
+    var filesUrl by mutableStateOf("")
+    var websocketUrl by mutableStateOf("")
+    var serverName by mutableStateOf("")
     
     fun discoverServer() {
         if (serverUrl.isBlank()) return
@@ -43,19 +49,25 @@ class ServerSelectionViewModel : ViewModel() {
                     cleanUrl = "https://$cleanUrl"
                 }
                 
-                val apiUrl = if (cleanUrl.endsWith("/api")) {
-                    cleanUrl
-                } else {
-                    "$cleanUrl/api"
+                val potentialEndpoints = listOf(
+                    cleanUrl,
+                    if (cleanUrl.endsWith("/api")) cleanUrl else "$cleanUrl/api", 
+                    cleanUrl.replace("://", "://api.")
+                )
+                
+                var success = false
+                for (endpoint in potentialEndpoints) {
+                    val result = discoverServerConfig(endpoint)
+                    if (result.isSuccess) {
+                        discoveredConfig = result.getOrNull()
+                        discoveryError = null
+                        success = true
+                        break
+                    }
                 }
                 
-                val result = discoverServerConfig(apiUrl)
-                
-                if (result.isSuccess) {
-                    discoveredConfig = result.getOrNull()
-                    discoveryError = null
-                } else {
-                    discoveryError = result.exceptionOrNull()?.message ?: "Failed to discover server"
+                if (!success) {
+                    discoveryError = "Could not discover server configuration. Try advanced mode for manual setup."
                     discoveredConfig = null
                 }
             } catch (e: Exception) {
@@ -65,6 +77,29 @@ class ServerSelectionViewModel : ViewModel() {
                 isDiscovering = false
             }
         }
+    }
+    
+    fun populateAdvancedFromDiscovered() {
+        discoveredConfig?.let { config ->
+            serverName = config.name
+            apiUrl = config.apiBase
+            filesUrl = config.filesBase
+            websocketUrl = config.websocketBase
+        }
+    }
+    
+    fun createManualConfig(): ServerConfig? {
+        if (apiUrl.isBlank()) return null
+        
+        return ServerConfig(
+            name = serverName.ifBlank { "Custom Server" },
+            apiBase = apiUrl.trim(),
+            filesBase = filesUrl.ifBlank { "$apiUrl/files" },
+            websocketBase = websocketUrl.ifBlank { apiUrl.replace("http", "ws") },
+            appBase = serverUrl.trim(),
+            januaryBase = "",
+            vapidKey = ""
+        )
     }
     
     fun applyServerConfig(): Boolean {
@@ -163,6 +198,86 @@ fun ServerSelectionScreen(
                     Spacer(Modifier.width(8.dp))
                 }
                 Text("Discover Server")
+            }
+            
+            TextButton(
+                onClick = { viewModel.showAdvancedMode = !viewModel.showAdvancedMode },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(if (viewModel.showAdvancedMode) "Hide Advanced Options" else "Advanced Options")
+            }
+            
+            if (viewModel.showAdvancedMode) {
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "Manual Configuration",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        
+                        viewModel.discoveredConfig?.let {
+                            OutlinedButton(
+                                onClick = { viewModel.populateAdvancedFromDiscovered() },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Populate from Discovered Configuration")
+                            }
+                        }
+                        
+                        OutlinedTextField(
+                            value = viewModel.serverName,
+                            onValueChange = { viewModel.serverName = it },
+                            label = { Text("Server Name") },
+                            placeholder = { Text("My Revolt Server") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        
+                        OutlinedTextField(
+                            value = viewModel.apiUrl,
+                            onValueChange = { viewModel.apiUrl = it },
+                            label = { Text("API URL *") },
+                            placeholder = { Text("https://api.revolt.example.com") },
+                            modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri)
+                        )
+                        
+                        OutlinedTextField(
+                            value = viewModel.filesUrl,
+                            onValueChange = { viewModel.filesUrl = it },
+                            label = { Text("Files URL (optional)") },
+                            placeholder = { Text("https://files.revolt.example.com") },
+                            modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri)
+                        )
+                        
+                        OutlinedTextField(
+                            value = viewModel.websocketUrl,
+                            onValueChange = { viewModel.websocketUrl = it },
+                            label = { Text("WebSocket URL (optional)") },
+                            placeholder = { Text("wss://ws.revolt.example.com") },
+                            modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri)
+                        )
+                        
+                        Button(
+                            onClick = {
+                                viewModel.createManualConfig()?.let { config ->
+                                    viewModel.discoveredConfig = config
+                                    viewModel.discoveryError = null
+                                }
+                            },
+                            enabled = viewModel.apiUrl.isNotBlank(),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Use Manual Configuration")
+                        }
+                    }
+                }
             }
             
             viewModel.discoveredConfig?.let { config ->
