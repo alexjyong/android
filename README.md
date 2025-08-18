@@ -9,9 +9,9 @@ NOTE: This is a forked version of the Android app for the [Revolt](https://revol
 
 Feel free to use this for whatever, but note that this is NOT the official Revolt android app. :)
 
-You can download the latest APK [here](https://github.com/alexjyong/android/releases/download/1.3.6b-forked/app-release.apk).
+You can download the latest APK [here](https://github.com/alexjyong/android/releases/download/1.3.6ba-forked/app-release.apk).
 
-Or the latest debug APK [here](https://github.com/alexjyong/android/releases/download/1.3.6b-forked/app-debug.apk).
+Or the latest debug APK [here](https://github.com/alexjyong/android/releases/download/1.3.6ba-forked/app-debug.apk).
 
 ## Features Added
 <table>
@@ -91,6 +91,12 @@ After the instance fires up run
 ./gradlew assembledebug --no-daemon
 ``` 
 To generate a debug version of the application. 
+
+If you wanted a signed copy that isn't in debug mode, set up a release-key.keystore file, update revoltbuild.properties to have your passwords and run:
+
+```sh
+./gradlew assembleRelease -x app:uploadSentryProguardMappingsRelease
+```
 
 It will be located in `app/build/outputs/apk/debug/` under the name `app-debug.apk`
 
