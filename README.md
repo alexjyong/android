@@ -28,7 +28,7 @@ Or the latest debug APK [here](https://github.com/alexjyong/android/releases/dow
   <tr>
     <td colspan="2" align="center" valign="top">
       <strong>Server context menu on long press</strong><br>
-      <img src="https://github.com/user-attachments/assets/29270bb0-1bf6-4a00-90f8-ff0168f62cf4" width="300" alt="Server Context Menu">
+      <img src="https://github.com/user-attachments/assets/1450ea4c-a283-4ac3-8a0a-8e9f1adb436b" width="300" alt="Server Context Menu">
     </td>
   </tr>
 </table>
