@@ -18,6 +18,7 @@ import chat.revolt.api.schemas.Message
 import chat.revolt.api.schemas.Server
 import chat.revolt.api.schemas.User
 import chat.revolt.api.unreads.Unreads
+import chat.revolt.internals.EmojiRepository
 import chat.revolt.persistence.Database
 import chat.revolt.persistence.SqlStorage
 import com.chuckerteam.chucker.api.ChuckerCollector
@@ -263,6 +264,8 @@ object RevoltAPI {
         channelCache.clear()
         emojiCache.clear()
         messageCache.clear()
+        
+        EmojiRepository.invalidateCache()
 
         members.clear()
         unreads.clear()

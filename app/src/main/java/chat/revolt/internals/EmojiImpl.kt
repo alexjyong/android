@@ -1,13 +1,19 @@
 package chat.revolt.internals
 
 import android.content.Context
+import androidx.compose.runtime.mutableStateOf
 import chat.revolt.R
 import chat.revolt.RevoltApplication
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltJson
 import chat.revolt.api.schemas.Server
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
+import java.util.concurrent.ConcurrentHashMap
 
 @Serializable
 data class Emoji(
@@ -61,48 +67,88 @@ sealed class EmojiPickerItem {
     data class ServerEmote(val emote: chat.revolt.api.schemas.Emoji) : EmojiPickerItem()
 }
 
-class EmojiImpl {
-    private var metadata: List<EmojiGroup>
-
-    private fun initMetadata(context: Context): List<EmojiGroup> {
-        val json = context.assets.open("metadata/emoji.json").use {
-            it.reader().readText()
+object EmojiRepository {
+    private var metadata: List<EmojiGroup>? = null
+    private val serverEmojiCache = ConcurrentHashMap<String, List<EmojiPickerItem>>()
+    private val serverListCache = ConcurrentHashMap<Int, List<Server>>()
+    private var cachedPickerList: List<EmojiPickerItem>? = null
+    private var cachedCategorySpans: Map<Category, Pair<Int, Int>>? = null
+    
+    val isReady = mutableStateOf(false)
+    val isLoading = mutableStateOf(false)
+    
+    private suspend fun initMetadata(context: Context): List<EmojiGroup> {
+        return withContext(Dispatchers.IO) {
+            val json = context.assets.open("metadata/emoji.json").use {
+                it.reader().readText()
+            }
+            RevoltJson.decodeFromString(ListSerializer(EmojiGroup.serializer()), json)
         }
-        return RevoltJson.decodeFromString(ListSerializer(EmojiGroup.serializer()), json)
+    }
+    
+    fun initialize(scope: CoroutineScope) {
+        if (isReady.value || isLoading.value) return
+        
+        scope.launch {
+            isLoading.value = true
+            try {
+                metadata = initMetadata(RevoltApplication.instance.applicationContext)
+                isReady.value = true
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                isLoading.value = false
+            }
+        }
     }
 
     fun serversWithEmotes(): List<Server> {
-        return RevoltAPI
-            .emojiCache
-            .values
-            .asSequence()
-            .map { it.parent }
-            .filterNotNull()
-            .filter { it.type == "Server" }
-            .map { it.id }
-            .distinct()
-            .mapNotNull { RevoltAPI.serverCache[it] }
-            .toList()
+        val cacheKey = RevoltAPI.emojiCache.values.size
+        return serverListCache.getOrPut(cacheKey) {
+            RevoltAPI
+                .emojiCache
+                .values
+                .asSequence()
+                .map { it.parent }
+                .filterNotNull()
+                .filter { it.type == "Server" }
+                .map { it.id }
+                .distinct()
+                .mapNotNull { RevoltAPI.serverCache[it] }
+                .toList()
+        }
     }
 
     fun serverEmoteList(server: Server): List<EmojiPickerItem> {
-        val list = mutableListOf<EmojiPickerItem>()
-        val emotes = RevoltAPI.emojiCache.values.filter { it.parent?.id == server.id }
+        val cacheKey = "${server.id}_${RevoltAPI.emojiCache.values.size}"
+        return serverEmojiCache.getOrPut(cacheKey) {
+            val list = mutableListOf<EmojiPickerItem>()
+            val emotes = RevoltAPI.emojiCache.values.filter { it.parent?.id == server.id }
 
-        list.add(EmojiPickerItem.Section(Category.ServerEmoteCategory(server)))
-        list.addAll(emotes.map { EmojiPickerItem.ServerEmote(it) })
+            list.add(EmojiPickerItem.Section(Category.ServerEmoteCategory(server)))
+            list.addAll(emotes.map { EmojiPickerItem.ServerEmote(it) })
 
-        return list
+            list
+        }
     }
 
     fun flatPickerList(): List<EmojiPickerItem> {
+        val currentMetadata = metadata ?: return emptyList()
+        
+        // Check if we can use cached version
+        val cacheKey = "${serversWithEmotes().size}_${RevoltAPI.emojiCache.values.size}"
+        cachedPickerList?.let { cached ->
+            // Simple cache validation - if server count/emoji count hasn't changed
+            if (cacheKey == lastCacheKey) return cached
+        }
+        
         val list = mutableListOf<EmojiPickerItem>()
 
         for (server in serversWithEmotes()) {
             list.addAll(serverEmoteList(server))
         }
 
-        for (group in metadata) {
+        for (group in currentMetadata) {
             val category =
                 UnicodeEmojiSection.entries.find { it.googleName == group.group } ?: continue
             list.add(EmojiPickerItem.Section(Category.UnicodeEmojiCategory(category)))
@@ -121,26 +167,22 @@ class EmojiImpl {
             )
         }
 
+        cachedPickerList = list
+        lastCacheKey = cacheKey
         return list
     }
+    
+    private var lastCacheKey: String? = null
 
     /**
      * Returns a map of category to start and end index of the category in the flat picker list
-     * Impl
-     * ====
-     * 1. Iterate through servers that have emotes. Get the index of the server emote category.
-     * 2. Get all emotes in that server. Add the size of that list to the index of the server emote category.
-     * 3. Push Pair(index, index + size) to the map.
-     * 4. Iterate through all unicode emoji categories. Get the index of the category.
-     * Unless it's the last category {
-     * 5.1. Get the index of the next category. Subtract 1 from that index.
-     * 5.2. Push Pair(index, lastIndex) to the map.
-     * } Otherwise {
-     * 5. Push Pair(index, Int.MAX_VALUE) to the map.
-     * }
-     * 6. Return the map.
      */
     fun categorySpans(flatPickerList: List<EmojiPickerItem>): Map<Category, Pair<Int, Int>> {
+        // Use cached version if available and still valid
+        cachedCategorySpans?.let { cached ->
+            if (lastCacheKey != null) return cached
+        }
+        
         val output = mutableMapOf<Category, Pair<Int, Int>>()
 
         for (server in serversWithEmotes()) {
@@ -170,6 +212,7 @@ class EmojiImpl {
             output[Category.UnicodeEmojiCategory(section)] = Pair(index, lastIndex)
         }
 
+        cachedCategorySpans = output
         return output
     }
 
@@ -203,6 +246,9 @@ class EmojiImpl {
      * query.
      */
     fun searchForEmoji(query: String): List<EmojiPickerItem> {
+        val currentMetadata = metadata ?: return emptyList()
+        if (query.isBlank()) return emptyList()
+        
         val list = mutableListOf<EmojiPickerItem>()
 
         for (server in serversWithEmotes()) {
@@ -215,7 +261,7 @@ class EmojiImpl {
             }
         }
 
-        for (group in metadata) {
+        for (group in currentMetadata) {
             val matchingEmoji = group.emoji.filter {
                 it.shortcodes.any { code ->
                     code.contains(
@@ -248,7 +294,8 @@ class EmojiImpl {
     }
 
     fun unicodeByShortcode(shortcode: String): String? {
-        return metadata.asSequence().mapNotNull { group ->
+        val currentMetadata = metadata ?: return null
+        return currentMetadata.asSequence().mapNotNull { group ->
             group.emoji.find { emoji ->
                 emoji.shortcodes.any { code ->
                     code == ":${shortcode}:"
@@ -260,7 +307,8 @@ class EmojiImpl {
     }
 
     fun shortcodeContains(query: String): List<Emoji> {
-        return metadata.asSequence().map { group ->
+        val currentMetadata = metadata ?: return emptyList()
+        return currentMetadata.asSequence().map { group ->
             group.emoji.filter { emoji ->
                 emoji.shortcodes.any { code ->
                     code.contains(query, ignoreCase = true)
@@ -270,7 +318,8 @@ class EmojiImpl {
     }
 
     fun unicodeAsShortcode(unicode: String): String? {
-        return metadata.asSequence().mapNotNull { group ->
+        val currentMetadata = metadata ?: return null
+        return currentMetadata.asSequence().mapNotNull { group ->
             group.emoji.find { emoji ->
                 emoji.base.joinToString("") { String(Character.toChars(it.toInt())) } == unicode
             }
@@ -280,7 +329,8 @@ class EmojiImpl {
     }
 
     fun codepointIsEmoji(codepoint: Int): Boolean {
-        return metadata.any { group ->
+        val currentMetadata = metadata ?: return false
+        return currentMetadata.any { group ->
             group.emoji.any { emoji ->
                 emoji.base.contains(codepoint.toLong()) || emoji.alternates.any { alternate ->
                     alternate.contains(codepoint.toLong())
@@ -288,8 +338,15 @@ class EmojiImpl {
             }
         }
     }
-
-    init {
-        metadata = initMetadata(RevoltApplication.instance.applicationContext)
+    
+    fun invalidateCache() {
+        serverEmojiCache.clear()
+        serverListCache.clear()
+        cachedPickerList = null
+        cachedCategorySpans = null
+        lastCacheKey = null
     }
 }
+
+// Backward compatibility - create a function that returns the singleton
+fun EmojiImpl(): EmojiRepository = EmojiRepository
