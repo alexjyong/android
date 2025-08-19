@@ -1,6 +1,7 @@
 package chat.revolt.composables.markdown
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -10,11 +11,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -127,8 +134,35 @@ fun MarkdownTree(node: AstNode) {
             }
         }
 
+        "spoiler" -> {
+            SpoilerText(node)
+        }
+
         else -> {
             Children(node)
+        }
+    }
+}
+
+@Composable
+fun SpoilerText(node: AstNode) {
+    var isRevealed by remember { mutableStateOf(false) }
+    
+    if (isRevealed) {
+        MarkdownText(node)
+    } else {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(4.dp))
+                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f))
+                .clickable { isRevealed = true }
+                .padding(horizontal = 2.dp)
+        ) {
+            Text(
+                text = "█".repeat((node.text?.length ?: 7).coerceAtMost(20)),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                style = LocalTextStyle.current
+            )
         }
     }
 }

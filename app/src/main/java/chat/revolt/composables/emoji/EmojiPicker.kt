@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
@@ -71,6 +72,7 @@ import chat.revolt.composables.generic.RemoteImage
 import chat.revolt.internals.Category
 import chat.revolt.internals.EmojiRepository
 import chat.revolt.internals.EmojiPickerItem
+import chat.revolt.internals.EmojiUsageTracker
 import chat.revolt.internals.FitzpatrickSkinTone
 import chat.revolt.internals.UnicodeEmojiSection
 import kotlinx.coroutines.delay
@@ -205,14 +207,16 @@ fun EmojiPicker(
     val onEmojiClick: (EmojiPickerItem) -> Unit = {
         view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
         when (it) {
-            is EmojiPickerItem.UnicodeEmoji -> onEmojiSelected(
-                EmojiRepository.applyFitzpatrickSkinTone(
-                    it,
-                    currentSkinTone
-                )
-            )
-
-            is EmojiPickerItem.ServerEmote -> onEmojiSelected(":${it.emote.id}:")
+            is EmojiPickerItem.UnicodeEmoji -> {
+                val emojiChar = EmojiRepository.applyFitzpatrickSkinTone(it, currentSkinTone)
+                EmojiUsageTracker.recordUsage(emojiChar)
+                onEmojiSelected(emojiChar)
+            }
+            is EmojiPickerItem.ServerEmote -> {
+                val emojiCode = ":${it.emote.id}:"
+                EmojiUsageTracker.recordUsage(emojiCode)
+                onEmojiSelected(emojiCode)
+            }
             else -> {}
         }
     }
@@ -225,6 +229,7 @@ fun EmojiPicker(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .heightIn(min = 400.dp)
     ) {
         if (isLoading) {
             Box(
@@ -407,6 +412,66 @@ fun EmojiPicker(
         }
 
         Spacer(Modifier.height(4.dp))
+
+        val recentEmojis = remember(isReady) { 
+            if (isReady) EmojiUsageTracker.getRecentlyUsed() else emptyList() 
+        }
+
+        AnimatedVisibility(searchResults.isEmpty() && recentEmojis.isNotEmpty()) {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Recently Used",
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
+                )
+                
+                Row(
+                    modifier = Modifier
+                        .horizontalScroll(rememberScrollState())
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    recentEmojis.forEach { emoji ->
+                        if (emoji.matches(Regex(":[0-9A-Z]{26}:"))) {
+                            val emojiId = emoji.removeSurrounding(":", ":")
+                            RemoteImage(
+                                url = "$REVOLT_FILES/emojis/$emojiId",
+                                description = emoji,
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .clickable {
+                                        view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                                        EmojiUsageTracker.recordUsage(emoji)
+                                        onEmojiSelected(emoji)
+                                    }
+                                    .padding(4.dp)
+                                    .size(32.dp)
+                            )
+                        } else {
+                            Text(
+                                text = emoji,
+                                fontSize = 24.sp,
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .clickable {
+                                        view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                                        EmojiUsageTracker.recordUsage(emoji)
+                                        onEmojiSelected(emoji)
+                                    }
+                                    .padding(4.dp)
+                                    .size(32.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
+                
+                Spacer(Modifier.height(8.dp))
+            }
+        }
 
         AnimatedVisibility(searchResults.isEmpty()) {
             Row(
