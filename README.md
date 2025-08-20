@@ -122,6 +122,51 @@ Or get the apk [directly from here](https://github.com/psanford/wormhole-william
 Or install [Termux](https://termux.dev/en/), then install `wormhole-rs` on Termux with `pkg install magic-wormhole-rs` and fetch the apk with
 `wormhole-rs receive YOUR_CODE_HERE`
 
+## Quick Build
+
+If you don't want to download the apks in the releases section and rather build yourself, follow these steps:
+
+Fire up a Github Codespaces instance at this link [here](https://github.com/codespaces/new?hide_repo_select=true&ref=combined-pr&repo=1020437871&skip_quickstart=true&machine=premiumLinux&devcontainer_path=.devcontainer%2Fdevcontainer.json&geo=UsEast)
+
+The URL should have it selected for you automatically, but be sure to use this branch for your instance!
+
+Note that this url will have an 8-core instance selected by default. Feel free to use a smaller instance, but I've ran into build errors with that.
+At the time of writing, Github offers a number of free hours for personal accounts, but note that this bigger instance will use more of your free hours than a smaller one. **For just building the apk and downloading it to whatever device, this should be fine though**. Be sure to delete the instance when you are done. **It won't cost you $$ if you don't have payment set up with Github or have budget limits.** [See the billing page for more details.](https://docs.github.com/en/billing/concepts/product-billing/github-codespaces#pricing-for-paid-usage)
+
+After the instance fires up run
+
+```sh
+./gradlew assembledebug --no-daemon
+``` 
+To generate a debug version of the application. 
+
+If you wanted a signed copy that isn't in debug mode, set up a release-key.keystore file, update revoltbuild.properties to have your passwords and run:
+
+```sh
+./gradlew assembleRelease -x app:uploadSentryProguardMappingsRelease
+```
+
+It will be located in `app/build/outputs/apk/debug/` under the name `app-debug.apk`
+
+Download it to your system by right clicking on the file like so:
+
+<img width="455" height="596" alt="image" src="https://github.com/user-attachments/assets/2fdffb6b-0fdc-4131-97b4-3360ae8871d8" />
+
+Send it to your phone, and install and run it!
+
+Alternatively, you can send it to your phone right from Codespaces using magic wormhole (installed on this codespace instance by default)
+
+`wormhole send app/build/outputs/apk/debug/app-debug.apk`
+
+It will give you a code that you can punch into your phone. 
+
+Either use the [Wormhole William app from the Google Playstore](https://play.google.com/store/apps/details?id=io.sanford.wormhole_william&hl=en_US)
+
+Or get the apk [directly from here](https://github.com/psanford/wormhole-william-mobile/releases/tag/v1.0.13)
+
+Or install [Termux](https://termux.dev/en/), then install `wormhole-rs` on Termux with `pkg install magic-wormhole-rs` and fetch the apk with
+`wormhole-rs receive YOUR_CODE_HERE`
+
 ## Quick Start
 
 Open the project in Android Studio. You can then run the app on an emulator or a physical device by
