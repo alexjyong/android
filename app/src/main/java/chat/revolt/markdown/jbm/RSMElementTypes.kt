@@ -21,4 +21,7 @@ object RSMElementTypes {
 
     @JvmField
     val TIMESTAMP: IElementType = MarkdownElementType("TIMESTAMP")
+
+    @JvmField
+    val SPOILER: IElementType = MarkdownElementType("SPOILER")
 }

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
@@ -30,6 +31,7 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
@@ -68,10 +70,12 @@ import chat.revolt.callbacks.ActionChannel
 import chat.revolt.composables.generic.IconPlaceholder
 import chat.revolt.composables.generic.RemoteImage
 import chat.revolt.internals.Category
-import chat.revolt.internals.EmojiImpl
+import chat.revolt.internals.EmojiRepository
 import chat.revolt.internals.EmojiPickerItem
+import chat.revolt.internals.EmojiUsageTracker
 import chat.revolt.internals.FitzpatrickSkinTone
 import chat.revolt.internals.UnicodeEmojiSection
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -82,16 +86,27 @@ fun EmojiPicker(
 ) {
     val view = LocalView.current
     val focusManager = LocalFocusManager.current
+    val scope = rememberCoroutineScope()
 
-    val emojiImpl = remember { EmojiImpl() }
-    val pickerList = remember(emojiImpl) { emojiImpl.flatPickerList() }
-    val servers = remember(emojiImpl) { emojiImpl.serversWithEmotes() }
-    val categorySpans = remember(pickerList) { emojiImpl.categorySpans(pickerList) }
+    LaunchedEffect(Unit) {
+        EmojiRepository.initialize(scope)
+    }
+
+    val isReady by EmojiRepository.isReady
+    val isLoading by EmojiRepository.isLoading
+    
+    val pickerList = remember(isReady) { 
+        if (isReady) EmojiRepository.flatPickerList() else emptyList() 
+    }
+    val servers = remember(isReady) { 
+        if (isReady) EmojiRepository.serversWithEmotes() else emptyList() 
+    }
+    val categorySpans = remember(pickerList) { 
+        if (isReady && pickerList.isNotEmpty()) EmojiRepository.categorySpans(pickerList) else emptyMap() 
+    }
 
     val gridState = rememberLazyGridState()
     val categoryRowScrollState = rememberScrollState()
-
-    val scope = rememberCoroutineScope()
 
     val spanCount = 9 // https://github.com/googlefonts/emoji-metadata/#readme
 
@@ -144,7 +159,7 @@ fun EmojiPicker(
     val skinSample = remember(pickerList) {
         pickerList
             .filterIsInstance<EmojiPickerItem.UnicodeEmoji>()
-            .first { it.character == "\uD83E\uDEF0" }
+            .firstOrNull { it.character == "\uD83E\uDEF0" }
     }
 
     var searchQuery by remember { mutableStateOf("") }
@@ -155,11 +170,28 @@ fun EmojiPicker(
     )
 
     val searchResults = remember { mutableStateListOf<EmojiPickerItem>() }
-    LaunchedEffect(searchQuery) {
+    var isSearching by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(searchQuery, isReady) {
         searchResults.clear()
-        if (searchQuery.isBlank()) return@LaunchedEffect
-        searchResults.addAll(emojiImpl.searchForEmoji(searchQuery))
-        gridState.scrollToItem(0)
+        if (searchQuery.isBlank() || !isReady) {
+            isSearching = false
+            return@LaunchedEffect
+        }
+        
+        isSearching = true
+        delay(300)
+        
+        try {
+            val results = EmojiRepository.searchForEmoji(searchQuery)
+            searchResults.clear()
+            searchResults.addAll(results)
+            if (results.isNotEmpty()) {
+                gridState.scrollToItem(0)
+            }
+        } finally {
+            isSearching = false
+        }
     }
 
     val onServerEmoteInfo: (String) -> Unit = {
@@ -175,14 +207,16 @@ fun EmojiPicker(
     val onEmojiClick: (EmojiPickerItem) -> Unit = {
         view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
         when (it) {
-            is EmojiPickerItem.UnicodeEmoji -> onEmojiSelected(
-                emojiImpl.applyFitzpatrickSkinTone(
-                    it,
-                    currentSkinTone
-                )
-            )
-
-            is EmojiPickerItem.ServerEmote -> onEmojiSelected(":${it.emote.id}:")
+            is EmojiPickerItem.UnicodeEmoji -> {
+                val emojiChar = EmojiRepository.applyFitzpatrickSkinTone(it, currentSkinTone)
+                EmojiUsageTracker.recordUsage(emojiChar)
+                onEmojiSelected(emojiChar)
+            }
+            is EmojiPickerItem.ServerEmote -> {
+                val emojiCode = ":${it.emote.id}:"
+                EmojiUsageTracker.recordUsage(emojiCode)
+                onEmojiSelected(emojiCode)
+            }
             else -> {}
         }
     }
@@ -195,7 +229,28 @@ fun EmojiPicker(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .heightIn(min = 400.dp)
     ) {
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    CircularProgressIndicator()
+                    Text(
+                        text = stringResource(R.string.loading),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+            return
+        }
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -268,10 +323,12 @@ fun EmojiPicker(
                     ) {
                         FitzpatrickSkinTone.entries.forEach { skinTone ->
                             Text(
-                                emojiImpl.applyFitzpatrickSkinTone(
-                                    skinSample,
-                                    skinTone
-                                ),
+                                skinSample?.let { sample ->
+                                    EmojiRepository.applyFitzpatrickSkinTone(
+                                        sample,
+                                        skinTone
+                                    )
+                                } ?: "",
                                 modifier = Modifier
                                     .padding(4.dp)
                                     .requiredSize(24.dp)
@@ -327,10 +384,12 @@ fun EmojiPicker(
                         .aspectRatio(1f)
                 ) {
                     Text(
-                        emojiImpl.applyFitzpatrickSkinTone(
-                            skinSample,
-                            currentSkinTone
-                        ),
+                        skinSample?.let { sample ->
+                            EmojiRepository.applyFitzpatrickSkinTone(
+                                sample,
+                                currentSkinTone
+                            )
+                        } ?: "",
                         modifier = Modifier
                             .padding(4.dp)
                             .requiredSize(24.dp)
@@ -353,6 +412,66 @@ fun EmojiPicker(
         }
 
         Spacer(Modifier.height(4.dp))
+
+        val recentEmojis = remember(isReady) { 
+            if (isReady) EmojiUsageTracker.getRecentlyUsed() else emptyList() 
+        }
+
+        AnimatedVisibility(searchResults.isEmpty() && recentEmojis.isNotEmpty()) {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Recently Used",
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
+                )
+                
+                Row(
+                    modifier = Modifier
+                        .horizontalScroll(rememberScrollState())
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    recentEmojis.forEach { emoji ->
+                        if (emoji.matches(Regex(":[0-9A-Z]{26}:"))) {
+                            val emojiId = emoji.removeSurrounding(":", ":")
+                            RemoteImage(
+                                url = "$REVOLT_FILES/emojis/$emojiId",
+                                description = emoji,
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .clickable {
+                                        view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                                        EmojiUsageTracker.recordUsage(emoji)
+                                        onEmojiSelected(emoji)
+                                    }
+                                    .padding(4.dp)
+                                    .size(32.dp)
+                            )
+                        } else {
+                            Text(
+                                text = emoji,
+                                fontSize = 24.sp,
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .clickable {
+                                        view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                                        EmojiUsageTracker.recordUsage(emoji)
+                                        onEmojiSelected(emoji)
+                                    }
+                                    .padding(4.dp)
+                                    .size(32.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
+                
+                Spacer(Modifier.height(8.dp))
+            }
+        }
 
         AnimatedVisibility(searchResults.isEmpty()) {
             Row(
@@ -513,9 +632,16 @@ fun EmojiPicker(
                 }
             }
 
-            // Search results do not get a key, this is intentional.
             items(
                 searchResults.size,
+                key = { index ->
+                    val item = searchResults[index]
+                    when (item) {
+                        is EmojiPickerItem.UnicodeEmoji -> "search_unicode_${item.character}"
+                        is EmojiPickerItem.ServerEmote -> "search_server_${item.emote.id}"
+                        is EmojiPickerItem.Section -> "search_section_${item.category.hashCode()}"
+                    }
+                },
                 span = {
                     val item = searchResults[it]
                     when (item) {
@@ -527,7 +653,7 @@ fun EmojiPicker(
             ) { index ->
                 PickerItem(
                     item = searchResults[index],
-                    skinToneFactory = { emojiImpl.applyFitzpatrickSkinTone(it, currentSkinTone) },
+                    skinToneFactory = { EmojiRepository.applyFitzpatrickSkinTone(it, currentSkinTone) },
                     onClick = onEmojiClick,
                     onServerEmoteInfo = onServerEmoteInfo,
                     lesserHeaders = true
@@ -547,6 +673,14 @@ fun EmojiPicker(
 
             items(
                 pickerList.size,
+                key = { index ->
+                    val item = pickerList[index]
+                    when (item) {
+                        is EmojiPickerItem.UnicodeEmoji -> "unicode_${item.character}"
+                        is EmojiPickerItem.ServerEmote -> "server_${item.emote.id}"
+                        is EmojiPickerItem.Section -> "section_${item.category.hashCode()}"
+                    }
+                },
                 span = {
                     val item = pickerList[it]
                     when (item) {
@@ -558,7 +692,7 @@ fun EmojiPicker(
             ) { index ->
                 PickerItem(
                     item = pickerList[index],
-                    skinToneFactory = { emojiImpl.applyFitzpatrickSkinTone(it, currentSkinTone) },
+                    skinToneFactory = { EmojiRepository.applyFitzpatrickSkinTone(it, currentSkinTone) },
                     onClick = onEmojiClick,
                     onServerEmoteInfo = onServerEmoteInfo
                 )
