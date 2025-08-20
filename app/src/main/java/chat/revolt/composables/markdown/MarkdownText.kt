@@ -32,6 +32,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.core.net.toUri
 import chat.revolt.R
 import chat.revolt.activities.InviteActivity
@@ -43,6 +44,7 @@ import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
 import chat.revolt.composables.generic.RemoteImage
 import chat.revolt.composables.utils.detectTapGesturesConditionalConsume
+import chat.revolt.internals.EmojiRepository
 import chat.revolt.internals.resolveTimestamp
 import chat.revolt.ndk.AstNode
 import chat.revolt.ui.theme.FragmentMono
@@ -61,6 +63,7 @@ object MarkdownTextRegularExpressions {
     val Mention = Regex("<@([0-9A-Z]{26})>")
     val Channel = Regex("<#([0-9A-Z]{26})>")
     val CustomEmote = Regex(":([0-9A-Z]{26}):")
+    val UnicodeEmote = Regex(":([a-zA-Z0-9_+-]+):")
     val Timestamp = Regex("<t:([0-9]+?)(:[tTDfFR])?>")
     val UrlFallback =
         Regex("<?https?://(www\\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\\.[a-z]{2,4}\\b([-a-zA-Z0-9@:%_+.~#?&/=]*)>?")
@@ -74,7 +77,12 @@ fun annotateText(node: AstNode): AnnotatedString {
     return buildAnnotatedString {
         when (node.stringType) {
             "text" -> {
-                val text = node.text ?: ""
+                var text = node.text ?: ""
+                
+                text = MarkdownTextRegularExpressions.UnicodeEmote.replace(text) { matchResult ->
+                    val shortcodeName = matchResult.groupValues[1]
+                    EmojiRepository.unicodeByShortcode(shortcodeName) ?: matchResult.value
+                }
 
                 val mentions = MarkdownTextRegularExpressions.Mention.findAll(text)
                 val channels = MarkdownTextRegularExpressions.Channel.findAll(text)
@@ -235,6 +243,18 @@ fun annotateText(node: AstNode): AnnotatedString {
                 pop()
             }
 
+            "del" -> {
+                pushStyle(
+                    LocalTextStyle.current.toSpanStyle()
+                        .copy(
+                            textDecoration = TextDecoration.LineThrough,
+                            fontSynthesis = FontSynthesis.All
+                        )
+                )
+                node.children?.forEach { append(annotateText(it)) }
+                pop()
+            }
+
             "link" -> {
                 pushStringAnnotation(
                     tag = Annotations.URL.tag,
@@ -261,6 +281,17 @@ fun annotateText(node: AstNode): AnnotatedString {
                         )
                 )
                 append(node.text ?: "")
+                pop()
+            }
+
+            "spoiler" -> {
+                pushStyle(
+                    LocalTextStyle.current.toSpanStyle().copy(
+                        background = LocalContentColor.current.copy(alpha = 0.8f),
+                        color = LocalContentColor.current.copy(alpha = 0.8f)
+                    )
+                )
+                node.children?.forEach { append(annotateText(it)) }
                 pop()
             }
 

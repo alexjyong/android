@@ -79,10 +79,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import chat.revolt.R
 import chat.revolt.activities.RevoltTweenFloat
 import chat.revolt.activities.RevoltTweenInt
 import chat.revolt.api.REVOLT_FILES
+import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.BrushCompat
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.Member
@@ -137,6 +139,15 @@ sealed class AutocompleteSuggestion {
     data class MassMention(
         val content: String
     ) : AutocompleteSuggestion()
+}
+
+private fun makeTextReadable(text: String): String {
+    val customEmojiRegex = Regex(":([0-9A-Z]{26}):")
+    return customEmojiRegex.replace(text) { matchResult ->
+        val emojiId = matchResult.groupValues[1]
+        val emojiName = RevoltAPI.emojiCache[emojiId]?.name
+        if (emojiName != null) ":$emojiName:" else matchResult.value
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -203,6 +214,7 @@ fun MessageField(
     }
 
     val scope = rememberCoroutineScope()
+    var isFocused by remember { mutableStateOf(false) }
 
     LaunchedEffect(textFieldState.text) {
         onValueChange(textFieldState.text.toString())
@@ -536,6 +548,7 @@ fun MessageField(
                     .heightIn(max = 128.dp)
                     .verticalScroll(rememberScrollState())
                     .onFocusChanged {
+                        isFocused = it.isFocused
                         onFocusChange(it.isFocused)
                     }
                     .focusRequester(focusRequester)
@@ -575,8 +588,20 @@ fun MessageField(
                                 ),
                                 modifier = Modifier.align(Alignment.CenterStart)
                             )
+                        } else if (!isFocused) {
+                            Text(
+                                text = makeTextReadable(textFieldState.text.toString()),
+                                style = LocalTextStyle.current.copy(
+                                    color = if (failedValidation) {
+                                        MaterialTheme.colorScheme.error
+                                    } else LocalContentColor.current
+                                ),
+                                modifier = Modifier.align(Alignment.CenterStart)
+                            )
                         }
-                        innerTextField()
+                        if (isFocused || textFieldState.text.isEmptyOrOnlyNewlines()) {
+                            innerTextField()
+                        }
                     }
                 }
             )

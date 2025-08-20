@@ -7,6 +7,7 @@ import chat.revolt.api.REVOLT_WEBSOCKET
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.RevoltHttp
 import chat.revolt.api.RevoltJson
+import chat.revolt.internals.EmojiRepository
 import chat.revolt.api.realtime.frames.receivable.AnyFrame
 import chat.revolt.api.realtime.frames.receivable.BulkFrame
 import chat.revolt.api.realtime.frames.receivable.ChannelAckFrame
@@ -243,6 +244,8 @@ object RealtimeSocket {
                 Log.d("RealtimeSocket", "Adding emojis to cache.")
                 val emojiMap = readyFrame.emojis.associateBy { it.id!! }
                 RevoltAPI.emojiCache.putAll(emojiMap)
+                
+                EmojiRepository.invalidateCache()
 
                 Log.d("RealtimeSocket", "Registering push notification channels.")
                 channelRegistrator.register()

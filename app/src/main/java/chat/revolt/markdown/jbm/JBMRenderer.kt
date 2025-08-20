@@ -87,6 +87,7 @@ import chat.revolt.composables.generic.RemoteImage
 import chat.revolt.composables.generic.UserAvatar
 import chat.revolt.composables.markdown.Annotations
 import chat.revolt.composables.utils.detectTapGesturesConditionalConsume
+import chat.revolt.markdown.jbm.RSMElementTypes
 import chat.revolt.ui.theme.FragmentMono
 import chat.revolt.ui.theme.isThemeDark
 import dev.snipme.highlights.Highlights
@@ -318,6 +319,19 @@ private fun annotateText(
                         )
                         appendInlineContent(JBMAnnotations.CustomEmote.tag, emoteId)
                         pop()
+                    }
+                }
+
+                RSMElementTypes.SPOILER -> {
+                    withStyle(
+                        SpanStyle(
+                            background = Color.Gray,
+                            color = Color.Gray
+                        )
+                    ) {
+                        for (child in node.children) {
+                            append(annotateText(state, child))
+                        }
                     }
                 }
 
