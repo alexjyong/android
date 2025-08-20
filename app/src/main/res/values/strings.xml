@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Revolt</string>
+    <string name="app_name" translatable="false">Revolt Forked</string>
 
     <string name="back">← Back</string>
     <string name="next">Next →</string>
@@ -475,6 +475,16 @@
     <string name="add_server_sheet_step_1c_name_error_range">Server name can be up to %1$d characters in length.</string>
     <string name="add_server_sheet_step_1c_error">An error occurred while creating your server. Please try again later.</string>
     <string name="add_server_sheet_step_1c_create">Create</string>
+
+    <string name="add_server_sheet_title">Add Server</string>
+    <string name="add_server_sheet_join_by_invite">Join by invite code or link</string>
+    <string name="add_server_sheet_join_by_invite_modal_title">Invite code or link</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Enter a link like rvlt.gg/Testers or an invite code like Testers</string>
+    <string name="add_server_sheet_join_by_invite_modal_hint">Invite code or link</string>
+    <string name="add_server_sheet_join_by_invite_modal_join">Join</string>
+    <string name="add_server_sheet_create_new">Create a new server</string>
+    <string name="add_server_sheet_create_new_modal_title">Create a new server</string>
+    <string name="add_server_sheet_create_new_modal_under_construction">This feature is currently under construction.</string>
 
     <string name="discover">Discover Revolt</string>
 

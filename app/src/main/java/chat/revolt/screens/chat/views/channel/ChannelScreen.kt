@@ -551,6 +551,14 @@ fun ChannelScreen(
                                         )
                                     }
 
+                                    ChannelType.TextChannel, ChannelType.VoiceChannel -> {
+                                        ChannelIcon(
+                                            channel = it,
+                                            size = 24.dp,
+                                            modifier = Modifier.alpha(0.8f)
+                                        )
+                                    }
+
                                     else -> {
                                         ChannelIcon(
                                             channelType = it.channelType ?: ChannelType.TextChannel,
@@ -677,6 +685,16 @@ fun ChannelScreen(
                             modifier = Modifier.weight(1f),
                             contentAlignment = Alignment.BottomCenter
                         ) {
+                            val jumpToMessage: (String) -> Unit = { messageId ->
+                                viewModel.setHighlightedMessage(messageId)
+                                val messageIndex = viewModel.findMessageIndex(messageId)
+                                if (messageIndex >= 0) {
+                                    scope.launch {
+                                        lazyListState.animateScrollToItem(messageIndex)
+                                    }
+                                }
+                            }
+                            
                             LazyColumn(
                                 state = lazyListState,
                                 userScrollEnabled = !disableScroll,
@@ -748,6 +766,8 @@ fun ChannelScreen(
                                                 },
                                                 putTextAtCursorPosition = viewModel::putAtCursorPosition,
                                                 replyToMessage = viewModel::addReplyTo,
+                                                jumpToMessage = jumpToMessage,
+                                                highlightedMessageId = viewModel.highlightedMessageId,
                                                 scope = scope
                                             )
                                         }
