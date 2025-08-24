@@ -1,21 +1,20 @@
-# Revolt on Android
+<div align="center">
+    <h1>Revolt for Android</h1>
+    <p>Official <a href="https://revolt.chat">Revolt</a> Android app.</p>
+    <br/><br/>
+    <div>
+        <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" width="200">
+        <br/>
+    </div>
+    <small>Google Play is a trademark of Google LLC.</small>
+    <br/><br/><br/>
+</div>
 
 ## Description
 
-This is the official Android app for the [Revolt](https://revolt.chat) chat platform.  
 The codebase includes the app itself, as well as an internal library for interacting with the Revolt
-API.
-
-| Module | Package       | Description          |
-|--------|---------------|----------------------|
-| `:app` | `chat.revolt` | The main app module. |
-
-The API library is part of the `app` module, and is not intended to be used as a standalone library,
-as it makes liberal use of Android-specific APIs for reactivity.
-
-The app is written in Kotlin, and uses
-the [Jetpack Compose](https://developer.android.com/jetpack/compose) UI toolkit, the current state
-of the art for Android UI development.
+API. The app is written in Kotlin, and wholly
+uses [Jetpack Compose](https://developer.android.com/jetpack/compose).
 
 ## Stack
 
@@ -29,9 +28,10 @@ of the art for Android UI development.
 
 ## Resources
 
-### Revolt on Android
+### Revolt for Android
 
-- [Revolt on Android Technical Documentation](https://revoltchat.github.io/android/)
+- [Roadmap](https://op.revolt.wtf/projects/revolt-for-android/work_packages)
+- [Revolt for Android Technical Documentation](https://revoltchat.github.io/android/)
 - [Android-specific Contribution Guide](https://revoltchat.github.io/android/contributing/guidelines/)
   &mdash;**read carefully before contributing!**
 
@@ -39,8 +39,9 @@ of the art for Android UI development.
 
 - [Revolt Project Board](https://github.com/revoltchat/revolt/discussions) (Submit feature requests
   here)
-- [Revolt Testers Server](https://app.revolt.chat/invite/Testers)
-- [General Revolt Contribution Guide](https://developers.revolt.chat/contributing)
+- [Revolt Development Server](https://app.revolt.chat/invite/API)
+- [Revolt Server](https://app.revolt.chat/invite/Testers)
+- [General Revolt Contribution Guide](https://developers.revolt.chat/contrib.html)
 
 ## Quick Start
 
