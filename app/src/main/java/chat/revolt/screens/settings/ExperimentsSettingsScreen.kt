@@ -2,21 +2,36 @@ package chat.revolt.screens.settings
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.ToggleButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -24,18 +39,35 @@ import androidx.navigation.NavController
 import chat.revolt.BuildConfig
 import chat.revolt.RevoltApplication
 import chat.revolt.api.settings.Experiments
+import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.persistence.KVStorage
 import chat.revolt.settings.dsl.SettingsPage
 import chat.revolt.settings.dsl.SubcategoryContentInsets
 import kotlinx.coroutines.launch
 
+enum class MarkdownRenderer {
+    Stendal, JetBrains, FinalMarkdown
+}
+
 class ExperimentsSettingsScreenViewModel : ViewModel() {
     private val kv = KVStorage(RevoltApplication.instance)
 
     fun init() {
         viewModelScope.launch {
-            useKotlinMdRendererChecked.value = Experiments.useKotlinBasedMarkdownRenderer.isEnabled
+            when {
+                Experiments.useKotlinBasedMarkdownRenderer.isEnabled -> {
+                    mdRenderer.value = MarkdownRenderer.JetBrains
+                }
+
+                Experiments.useFinalMarkdownRenderer.isEnabled -> {
+                    mdRenderer.value = MarkdownRenderer.FinalMarkdown
+                }
+
+                else -> {
+                    mdRenderer.value = MarkdownRenderer.Stendal
+                }
+            }
             usePolarChecked.value = Experiments.usePolar.isEnabled
             enableServerIdentityOptionsChecked.value =
                 Experiments.enableServerIdentityOptions.isEnabled
@@ -66,13 +98,33 @@ class ExperimentsSettingsScreenViewModel : ViewModel() {
         }
     }
 
-    val useKotlinMdRendererChecked = mutableStateOf(false)
+    val mdRenderer = mutableStateOf(MarkdownRenderer.Stendal)
 
-    fun setUseKotlinMdRendererChecked(value: Boolean) {
+    fun setMdRenderer(value: MarkdownRenderer) {
         viewModelScope.launch {
-            kv.set("exp/useKotlinBasedMarkdownRenderer", value)
-            Experiments.useKotlinBasedMarkdownRenderer.setEnabled(value)
-            useKotlinMdRendererChecked.value = value
+            when (value) {
+                MarkdownRenderer.Stendal -> {
+                    kv.set("exp/useKotlinBasedMarkdownRenderer", false)
+                    Experiments.useKotlinBasedMarkdownRenderer.setEnabled(false)
+                    kv.set("exp/useFinalMarkdownRenderer", false)
+                    Experiments.useFinalMarkdownRenderer.setEnabled(false)
+                }
+
+                MarkdownRenderer.JetBrains -> {
+                    kv.set("exp/useKotlinBasedMarkdownRenderer", true)
+                    Experiments.useKotlinBasedMarkdownRenderer.setEnabled(true)
+                    kv.set("exp/useFinalMarkdownRenderer", false)
+                    Experiments.useFinalMarkdownRenderer.setEnabled(false)
+                }
+
+                MarkdownRenderer.FinalMarkdown -> {
+                    kv.set("exp/useKotlinBasedMarkdownRenderer", false)
+                    Experiments.useKotlinBasedMarkdownRenderer.setEnabled(false)
+                    kv.set("exp/useFinalMarkdownRenderer", true)
+                    Experiments.useFinalMarkdownRenderer.setEnabled(true)
+                }
+            }
+            mdRenderer.value = value
         }
     }
 
@@ -98,6 +150,7 @@ class ExperimentsSettingsScreenViewModel : ViewModel() {
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ExperimentsSettingsScreen(
     navController: NavController,
@@ -147,21 +200,63 @@ fun ExperimentsSettingsScreen(
             Text("Experiments", maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     ) {
-        ListItem(
-            headlineContent = {
-                Text("New Message Markdown Renderer")
-            },
-            supportingContent = {
-                Text("Use a Kotlin-based Markdown renderer for messages rather than the C++ one. Missing features may be present.")
-            },
-            trailingContent = {
-                Switch(
-                    checked = viewModel.useKotlinMdRendererChecked.value,
-                    onCheckedChange = null
-                )
-            },
-            modifier = Modifier.clickable { viewModel.setUseKotlinMdRendererChecked(!viewModel.useKotlinMdRendererChecked.value) }
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            ListItem(
+                headlineContent = {
+                    Text("Markdown Renderer")
+                },
+                supportingContent = {
+                    when (viewModel.mdRenderer.value) {
+                        MarkdownRenderer.Stendal -> Text("Use the original C++ Markdown renderer for messages.")
+                        MarkdownRenderer.JetBrains -> Text("Use the Kotlin-based JetBrains Markdown renderer for messages. This renderer is more feature-complete and has better results.")
+                        MarkdownRenderer.FinalMarkdown -> Text("Use a new. blazingly fast markdown renderer for messages. This renderer is experimental and may have missing features.")
+                    }
+                },
+                modifier = Modifier
+                    .animateContentSize()
+                    .weight(1f)
+            )
+            Column(
+                modifier = Modifier
+                    .width(IntrinsicSize.Max)
+                    .padding(end = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+            ) {
+                ToggleButton(
+                    checked = viewModel.mdRenderer.value == MarkdownRenderer.Stendal,
+                    onCheckedChange = { viewModel.setMdRenderer(MarkdownRenderer.Stendal) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .semantics { role = Role.RadioButton }
+                ) {
+                    Text("Default")
+                }
+                ToggleButton(
+                    checked = viewModel.mdRenderer.value == MarkdownRenderer.JetBrains,
+                    onCheckedChange = { viewModel.setMdRenderer(MarkdownRenderer.JetBrains) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .semantics { role = Role.RadioButton }
+                ) {
+                    Text("Kotlin")
+                }
+                if (FeatureFlags.finalMarkdownGranted || viewModel.mdRenderer.value == MarkdownRenderer.FinalMarkdown) {
+                    ToggleButton(
+                        checked = viewModel.mdRenderer.value == MarkdownRenderer.FinalMarkdown,
+                        onCheckedChange = { viewModel.setMdRenderer(MarkdownRenderer.FinalMarkdown) },
+                        enabled = FeatureFlags.finalMarkdownGranted,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .semantics { role = Role.RadioButton }
+                    ) {
+                        Text("Final")
+                    }
+                }
+            }
+        }
 
         ListItem(
             headlineContent = {

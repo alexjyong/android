@@ -29,6 +29,7 @@ object Experiments {
     val useKotlinBasedMarkdownRenderer = ExperimentInstance(false)
     val usePolar = ExperimentInstance(false)
     val enableServerIdentityOptions = ExperimentInstance(false)
+    val useFinalMarkdownRenderer = ExperimentInstance(false)
 
     suspend fun hydrateWithKv() {
         val kvStorage = KVStorage(RevoltApplication.instance)
@@ -48,5 +49,14 @@ object Experiments {
         enableServerIdentityOptions.setEnabled(
             kvStorage.getBoolean("exp/enableServerIdentityOptions") == true
         )
+        useFinalMarkdownRenderer.setEnabled(
+            kvStorage.getBoolean("exp/useFinalMarkdownRenderer") == true
+        )
+
+        if (useFinalMarkdownRenderer.isEnabled && useKotlinBasedMarkdownRenderer.isEnabled) {
+            // if jbm and fm are enabled, fm takes precedence. this should not be possible in practice
+            useKotlinBasedMarkdownRenderer.setEnabled(false)
+            kvStorage.set("exp/useKotlinBasedMarkdownRenderer", false)
+        }
     }
 }

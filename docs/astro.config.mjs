@@ -26,20 +26,7 @@ export default defineConfig({
                             link: "/contributing/setup",
                         }
                     ],
-                },
-                {
-                    label: "Beta Test",
-                    items: [
-                        {
-                            label: "Geographic Availability",
-                            link: "/beta/availability-regions",
-                        },
-                        {
-                            label: "Join the Beta Test",
-                            link: "/beta/joining-the-public-beta-test",
-                        }
-                    ],
-                },
+                }
                 /* {
                     label: "Reference",
                     autogenerate: { directory: "reference" },
