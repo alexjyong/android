@@ -107,6 +107,18 @@ import { Tabs, TabItem, Steps } from "@astrojs/starlight/components"
     deno run -A scripts/download_deps.ts
     ```
 
+    :::tip
+    You can run this script with the `-y` flag to skip confirmation prompts.
+    :::
+
+    :::note
+    This script will query the Revolt version control server for the latest version of the
+    final-markdown native library and download it. If you do not wish to use pre-built libraries,
+    you can build final-markdown yourself from the source code at https://git.revolt.chat/android/final-markdown,
+    and copy the files to the `app/src/main/jniLibs` folder. Note the files that are downloaded are
+    exactly the same as the ones we use for the app on Google Play, so you can be sure they are safe to use.
+    :::
+
 8.  Copy the `revoltbuild.properties.example` file to `revoltbuild.properties` and fill in the required values.
 
     ```sh

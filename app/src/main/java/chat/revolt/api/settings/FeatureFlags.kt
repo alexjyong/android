@@ -56,6 +56,19 @@ sealed class VoiceChannels2_0Variates {
     object Disabled : VoiceChannels2_0Variates()
 }
 
+@FeatureFlag("FinalMarkdown")
+sealed class FinalMarkdownVariates {
+    @Treatment(
+        "Enable the new FinalMarkdown library for all users"
+    )
+    object Enabled : FinalMarkdownVariates()
+
+    @Treatment(
+        "Disable the new FinalMarkdown library for all users"
+    )
+    object Disabled : FinalMarkdownVariates()
+}
+
 object FeatureFlags {
     @FeatureFlag("LabsAccessControl")
     var labsAccessControl by mutableStateOf<LabsAccessControlVariates>(
@@ -100,5 +113,15 @@ object FeatureFlags {
         get() = when (voiceChannels2_0) {
             is VoiceChannels2_0Variates.Enabled -> true
             is VoiceChannels2_0Variates.Disabled -> false
+        }
+
+    @FeatureFlag("FinalMarkdown")
+    var finalMarkdown by mutableStateOf<FinalMarkdownVariates>(
+        FinalMarkdownVariates.Disabled
+    )
+    val finalMarkdownGranted: Boolean
+        get() = when (finalMarkdown) {
+            is FinalMarkdownVariates.Enabled -> true
+            is FinalMarkdownVariates.Disabled -> false
         }
 }
