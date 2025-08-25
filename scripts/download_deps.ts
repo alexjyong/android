@@ -1,5 +1,6 @@
 import { resolve } from "jsr:@std/path"
 import { parseArgs } from "jsr:@std/cli/parse-args"
+import { ZipReader, Uint8ArrayReader, Uint8ArrayWriter } from "jsr:@zip-js/zip-js"
 
 const args = parseArgs(Deno.args, {
     boolean: ["yes", "y", "auto-accept"],
@@ -408,4 +409,3 @@ await Promise.all(writeFilePromises)
 
 // Close the zip reader
 await zipReader.close()
-
