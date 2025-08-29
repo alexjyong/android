@@ -18,18 +18,35 @@ class SpoilerParser : SequentialParser {
         while (iterator.type != null) {
             if (iterator.type == MarkdownTokenTypes.TEXT) {
                 val text = iterator.toString()
-                val startIndex = text.indexOf("||")
-                if (startIndex != -1) {
-                    val endIndex = text.indexOf("||", startIndex + 2)
-                    if (endIndex != -1) {
-                        // Found complete spoiler within single text token
+                
+                // Look for opening ||
+                if (text.contains("||")) {
+                    // Find the closing || by scanning ahead
+                    var searchIterator = iterator
+                    var foundClosing = false
+                    var endPosition = iterator.index
+                    
+                    // Scan forward to find closing ||
+                    while (searchIterator.type != null) {
+                        val searchText = searchIterator.toString()
+                        if (searchText.contains("||") && searchIterator.index > iterator.index) {
+                            foundClosing = true
+                            endPosition = searchIterator.index
+                            break
+                        }
+                        searchIterator = searchIterator.advance()
+                    }
+                    
+                    if (foundClosing) {
+                        // Create spoiler node spanning from start to end
                         result.withNode(
                             SequentialParser.Node(
-                                iterator.index..iterator.index + 1,
+                                iterator.index..endPosition,
                                 RSMElementTypes.SPOILER
                             )
                         )
-                        iterator = iterator.advance()
+                        // Skip to after the closing token
+                        iterator = searchIterator.advance()
                         continue
                     }
                 }

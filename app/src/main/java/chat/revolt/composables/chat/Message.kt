@@ -432,36 +432,20 @@ fun Message(
                             message.content?.let {
                                 if (message.content.isBlank()) return@let // if only an attachment is sent
 
-                                if (Experiments.useKotlinBasedMarkdownRenderer.isEnabled) {
-                                    CompositionLocalProvider(
-                                        LocalJBMarkdownTreeState provides LocalJBMarkdownTreeState.current.copy(
-                                            currentServer = RevoltAPI.channelCache[message.channel]?.server,
-                                            fontSizeMultiplier = Gigamoji.useGigamojiForMessage(
-                                                message.content
-                                            )
-                                                .let {
-                                                    if (it) 2f else 1f
-                                                }
+                                // Always use JBM renderer (via RichMarkdown)
+                                CompositionLocalProvider(
+                                    LocalJBMarkdownTreeState provides LocalJBMarkdownTreeState.current.copy(
+                                        currentServer = RevoltAPI.channelCache[message.channel]?.server,
+                                        fontSizeMultiplier = Gigamoji.useGigamojiForMessage(
+                                            message.content
                                         )
-                                    ) {
-                                        Spacer(modifier = Modifier.height(2.dp))
-                                        JBMRenderer(message.content)
-                                    }
-                                } else {
-                                    CompositionLocalProvider(
-                                        LocalMarkdownTreeConfig provides LocalMarkdownTreeConfig.current.copy(
-                                            currentServer = RevoltAPI.channelCache[message.channel]?.server,
-                                            fontSizeMultiplier = Gigamoji.useGigamojiForMessage(
-                                                message.content
-                                            )
-                                                .let {
-                                                    if (it) 2f else 1f
-                                                }
-                                        )
-                                    ) {
-                                        Spacer(modifier = Modifier.height(2.dp))
-                                        RichMarkdown(input = message.content)
-                                    }
+                                            .let {
+                                                if (it) 2f else 1f
+                                            }
+                                    )
+                                ) {
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    RichMarkdown(input = message.content)
                                 }
                             }
                         }

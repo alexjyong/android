@@ -47,7 +47,7 @@ import chat.revolt.settings.dsl.SubcategoryContentInsets
 import kotlinx.coroutines.launch
 
 enum class MarkdownRenderer {
-    Stendal, JetBrains, FinalMarkdown
+    JetBrains, FinalMarkdown  // Stendal (C++) removed
 }
 
 class ExperimentsSettingsScreenViewModel : ViewModel() {
@@ -65,7 +65,7 @@ class ExperimentsSettingsScreenViewModel : ViewModel() {
                 }
 
                 else -> {
-                    mdRenderer.value = MarkdownRenderer.Stendal
+                    mdRenderer.value = MarkdownRenderer.JetBrains
                 }
             }
             usePolarChecked.value = Experiments.usePolar.isEnabled
@@ -98,18 +98,11 @@ class ExperimentsSettingsScreenViewModel : ViewModel() {
         }
     }
 
-    val mdRenderer = mutableStateOf(MarkdownRenderer.Stendal)
+    val mdRenderer = mutableStateOf(MarkdownRenderer.JetBrains)
 
     fun setMdRenderer(value: MarkdownRenderer) {
         viewModelScope.launch {
             when (value) {
-                MarkdownRenderer.Stendal -> {
-                    kv.set("exp/useKotlinBasedMarkdownRenderer", false)
-                    Experiments.useKotlinBasedMarkdownRenderer.setEnabled(false)
-                    kv.set("exp/useFinalMarkdownRenderer", false)
-                    Experiments.useFinalMarkdownRenderer.setEnabled(false)
-                }
-
                 MarkdownRenderer.JetBrains -> {
                     kv.set("exp/useKotlinBasedMarkdownRenderer", true)
                     Experiments.useKotlinBasedMarkdownRenderer.setEnabled(true)
@@ -210,9 +203,8 @@ fun ExperimentsSettingsScreen(
                 },
                 supportingContent = {
                     when (viewModel.mdRenderer.value) {
-                        MarkdownRenderer.Stendal -> Text("Use the original C++ Markdown renderer for messages.")
-                        MarkdownRenderer.JetBrains -> Text("Use the Kotlin-based JetBrains Markdown renderer for messages. This renderer is more feature-complete and has better results.")
-                        MarkdownRenderer.FinalMarkdown -> Text("Use a new. blazingly fast markdown renderer for messages. This renderer is experimental and may have missing features.")
+                        MarkdownRenderer.JetBrains -> Text("Use the Kotlin-based JetBrains Markdown renderer for messages. This renderer is feature-complete with support for strikethrough, spoilers, and more. (Default)")
+                        MarkdownRenderer.FinalMarkdown -> Text("Use a new blazingly fast markdown renderer for messages. This renderer is experimental and may have missing features.")
                     }
                 },
                 modifier = Modifier
@@ -226,22 +218,13 @@ fun ExperimentsSettingsScreen(
                 verticalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
             ) {
                 ToggleButton(
-                    checked = viewModel.mdRenderer.value == MarkdownRenderer.Stendal,
-                    onCheckedChange = { viewModel.setMdRenderer(MarkdownRenderer.Stendal) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .semantics { role = Role.RadioButton }
-                ) {
-                    Text("Default")
-                }
-                ToggleButton(
                     checked = viewModel.mdRenderer.value == MarkdownRenderer.JetBrains,
                     onCheckedChange = { viewModel.setMdRenderer(MarkdownRenderer.JetBrains) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .semantics { role = Role.RadioButton }
                 ) {
-                    Text("Kotlin")
+                    Text("JetBrains")
                 }
                 if (FeatureFlags.finalMarkdownGranted || viewModel.mdRenderer.value == MarkdownRenderer.FinalMarkdown) {
                     ToggleButton(

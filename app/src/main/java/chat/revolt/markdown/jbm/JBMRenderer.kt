@@ -208,8 +208,10 @@ private fun annotateText(
     val sourceText = state.sourceText
 
     return buildAnnotatedString {
-            // Debug: log ALL node types to see what's happening
-            android.util.Log.d("JBMRenderer", "Processing node: ${node.type}")
+            if (node.type.toString().contains("SPOILER", ignoreCase = true) || 
+                sourceText.contains("||")) {
+                android.util.Log.d("JBMRenderer", "Processing node: ${node.type}, text contains spoilers: ${sourceText.contains("||")}") 
+            }
             when (node.type) {
                 MarkdownTokenTypes.TEXT -> {
                     val source = if (state.embedded) {
@@ -341,9 +343,11 @@ private fun annotateText(
                 }
 
                 RSMElementTypes.SPOILER -> {
+                    android.util.Log.d("JBMRenderer", "Found SPOILER node with ${node.children.size} children")
                     val spoilerContent = node.children.joinToString("") { it.getTextInNode(sourceText).toString() }
                     val spoilerId = "spoiler_${System.identityHashCode(node)}"
                     val isRevealed = revealedSpoilers.contains(spoilerId)
+                    android.util.Log.d("JBMRenderer", "Spoiler content: '$spoilerContent', ID: $spoilerId, revealed: $isRevealed")
                     
                     pushStringAnnotation(
                         tag = JBMAnnotations.Spoiler.tag,

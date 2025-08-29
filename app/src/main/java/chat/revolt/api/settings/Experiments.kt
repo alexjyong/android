@@ -26,7 +26,7 @@ class ExperimentInstance(default: Boolean) {
  *  - All experiments can be disabled at once with a single toggle.
  */
 object Experiments {
-    val useKotlinBasedMarkdownRenderer = ExperimentInstance(false)
+    val useKotlinBasedMarkdownRenderer = ExperimentInstance(true)
     val usePolar = ExperimentInstance(false)
     val enableServerIdentityOptions = ExperimentInstance(false)
     val useFinalMarkdownRenderer = ExperimentInstance(false)

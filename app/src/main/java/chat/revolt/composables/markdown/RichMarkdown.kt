@@ -12,10 +12,20 @@ import chat.revolt.ndk.Stendal
 @Composable
 fun RichMarkdown(input: String, modifier: Modifier = Modifier) {
     Column(modifier) {
-        if (Experiments.useKotlinBasedMarkdownRenderer.isEnabled) {
-            JBMRenderer(input)
-        } else {
-            MarkdownTree(node = Stendal.render(input))
+        when {
+            // Future: FinalMarkdown renderer (when available)
+            Experiments.useFinalMarkdownRenderer.isEnabled -> {
+                // TODO: Implement FinalMarkdown rendering when ready
+                // For now, fallback to JBM
+                JBMRenderer(input)
+            }
+            // Default: Always use JBM renderer (Stendal/C++ path removed)
+            else -> {
+                JBMRenderer(input)
+            }
         }
+        
+        // Stendal C++ path completely removed - unreachable:
+        // MarkdownTree(node = Stendal.render(input))
     }
 }
