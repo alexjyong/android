@@ -2,6 +2,7 @@
 #include <jni.h>
 #include <string>
 #include <vector>
+#include <regex>
 #include <cmark.h>
 
 #define STENDAL_ASTNODE_CONSTRUCTOR_SIGNATURE "(ILjava/lang/String;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V"
@@ -24,6 +25,19 @@ namespace Stendal {
     inline bool string_ends_with(std::string const &value, std::string const &suffix) {
         if (suffix.size() > value.size()) return false;
         return std::equal(suffix.rbegin(), suffix.rend(), value.rbegin());
+    }
+
+    std::string preprocess_markdown(const std::string& input) {
+        std::string result = input;
+        
+        // Removed strikethrough preprocessing - let JBM handle ~~text~~ directly
+        // std::regex strikethrough_regex(R"(~~(.+?)~~)");
+        // result = std::regex_replace(result, strikethrough_regex, "<del>$1</del>");
+        
+        std::regex spoiler_regex(R"(\|\|(.+?)\|\|)");
+        result = std::regex_replace(result, spoiler_regex, "<spoiler>$1</spoiler>");
+        
+        return result;
     }
 
     void init(JNIEnv *env) {
@@ -148,7 +162,10 @@ Java_chat_revolt_ndk_Stendal_init(JNIEnv *env, [[maybe_unused]] jobject thiz) {
 extern "C" JNIEXPORT jobject JNICALL
 Java_chat_revolt_ndk_Stendal_render(JNIEnv *env, [[maybe_unused]] jobject thiz, jstring input) {
     const char *inputStr = env->GetStringUTFChars(input, nullptr);
-    cmark_node *doc = cmark_parse_document(inputStr, strlen(inputStr),
+    
+    std::string preprocessed = Stendal::preprocess_markdown(std::string(inputStr));
+    
+    cmark_node *doc = cmark_parse_document(preprocessed.c_str(), preprocessed.length(),
                                            CMARK_OPT_DEFAULT | CMARK_OPT_HARDBREAKS |
                                            CMARK_OPT_VALIDATE_UTF8);
 

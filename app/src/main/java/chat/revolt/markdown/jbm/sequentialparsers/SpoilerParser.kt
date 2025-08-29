@@ -16,19 +16,20 @@ class SpoilerParser : SequentialParser {
         var iterator: TokensCache.Iterator = tokens.RangesListIterator(rangesToGlue)
 
         while (iterator.type != null) {
-            if (iterator.type == MarkdownTokenTypes.TEXT && iterator.charLookup(0) == '|') {
-                val nextIterator = iterator.advance()
-                if (nextIterator.type == MarkdownTokenTypes.TEXT && nextIterator.charLookup(0) == '|') {
-                    val endIterator = findClosingSpoiler(nextIterator.advance())
-
-                    if (endIterator != null) {
+            if (iterator.type == MarkdownTokenTypes.TEXT) {
+                val text = iterator.toString()
+                val startIndex = text.indexOf("||")
+                if (startIndex != -1) {
+                    val endIndex = text.indexOf("||", startIndex + 2)
+                    if (endIndex != -1) {
+                        // Found complete spoiler within single text token
                         result.withNode(
                             SequentialParser.Node(
-                                iterator.index..endIterator.index + 1,
+                                iterator.index..iterator.index + 1,
                                 RSMElementTypes.SPOILER
                             )
                         )
-                        iterator = endIterator.advance()
+                        iterator = iterator.advance()
                         continue
                     }
                 }
@@ -38,19 +39,5 @@ class SpoilerParser : SequentialParser {
         }
 
         return result.withFurtherProcessing(delegateIndices.get())
-    }
-
-    private fun findClosingSpoiler(it: TokensCache.Iterator): TokensCache.Iterator? {
-        var iterator = it
-        while (iterator.type != null) {
-            if (iterator.type == MarkdownTokenTypes.TEXT && iterator.charLookup(0) == '|') {
-                val nextIterator = iterator.advance()
-                if (nextIterator.type == MarkdownTokenTypes.TEXT && nextIterator.charLookup(0) == '|') {
-                    return nextIterator
-                }
-            }
-            iterator = iterator.advance()
-        }
-        return null
     }
 }

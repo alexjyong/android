@@ -448,7 +448,7 @@ fun EmojiPicker(
                                         onEmojiSelected(emoji)
                                     }
                                     .padding(4.dp)
-                                    .size(32.dp)
+                                    .size(24.dp)
                             )
                         } else {
                             Text(
@@ -462,7 +462,7 @@ fun EmojiPicker(
                                         onEmojiSelected(emoji)
                                     }
                                     .padding(4.dp)
-                                    .size(32.dp),
+                                    .size(24.dp),
                                 textAlign = TextAlign.Center
                             )
                         }
