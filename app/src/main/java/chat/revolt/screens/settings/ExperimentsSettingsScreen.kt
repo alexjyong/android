@@ -47,7 +47,7 @@ import chat.revolt.settings.dsl.SubcategoryContentInsets
 import kotlinx.coroutines.launch
 
 enum class MarkdownRenderer {
-    JetBrains, FinalMarkdown  // Stendal (C++) removed
+    JetBrains, FinalMarkdown
 }
 
 class ExperimentsSettingsScreenViewModel : ViewModel() {
