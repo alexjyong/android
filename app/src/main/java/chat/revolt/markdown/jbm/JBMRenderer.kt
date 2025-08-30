@@ -459,11 +459,9 @@ private fun annotateText(
                 }
 
                 MarkdownElementTypes.PARAGRAPH -> {
-                    // Check if this paragraph contains spoiler syntax
                     val paragraphText = node.getTextInNode(sourceText).toString()
                     if (paragraphText.contains("||")) {
                         android.util.Log.d("JBMRenderer", "Paragraph contains spoilers: '$paragraphText'")
-                        // Process spoilers using regex approach
                         val spoilerRegex = Regex("\\|\\|(.+?)\\|\\|")
                         if (spoilerRegex.containsMatchIn(paragraphText)) {
                             processSpoilerParagraph(paragraphText, state, revealedSpoilers, surfaceContainer, onSurface, contentColor)
@@ -615,7 +613,6 @@ private fun AnnotatedString.Builder.processSpoilerParagraph(
         lastIndex = match.range.last + 1
     }
     
-    // Append remaining text after last spoiler
     append(text.substring(lastIndex))
 }
 

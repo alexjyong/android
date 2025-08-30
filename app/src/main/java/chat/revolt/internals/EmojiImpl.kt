@@ -135,10 +135,8 @@ object EmojiRepository {
     fun flatPickerList(): List<EmojiPickerItem> {
         val currentMetadata = metadata ?: return emptyList()
         
-        // Check if we can use cached version
         val cacheKey = "${serversWithEmotes().size}_${RevoltAPI.emojiCache.values.size}"
         cachedPickerList?.let { cached ->
-            // Simple cache validation - if server count/emoji count hasn't changed
             if (cacheKey == lastCacheKey) return cached
         }
         
@@ -178,7 +176,6 @@ object EmojiRepository {
      * Returns a map of category to start and end index of the category in the flat picker list
      */
     fun categorySpans(flatPickerList: List<EmojiPickerItem>): Map<Category, Pair<Int, Int>> {
-        // Use cached version if available and still valid
         cachedCategorySpans?.let { cached ->
             if (lastCacheKey != null) return cached
         }
@@ -348,5 +345,4 @@ object EmojiRepository {
     }
 }
 
-// Backward compatibility - create a function that returns the singleton
 fun EmojiImpl(): EmojiRepository = EmojiRepository

@@ -19,11 +19,9 @@ class SpoilerParser : SequentialParser {
         while (iterator.type != null) {
             android.util.Log.d("SpoilerParser", "Processing token: ${iterator.type}, text: '${iterator.toString()}'")
             
-            // Look for || pattern: TEXT token containing || or sequence of | characters
             if (iterator.type == MarkdownTokenTypes.TEXT) {
                 val text = iterator.toString()
                 
-                // Check if this text token contains || spoiler markers
                 if (text == "||" || text.startsWith("||") || text.contains("||")) {
                     android.util.Log.d("SpoilerParser", "Found potential spoiler start: '$text'")
                     
@@ -32,7 +30,6 @@ class SpoilerParser : SequentialParser {
                     var foundContent = false
                     var foundEnd = false
                     
-                    // Scan forward looking for closing ||
                     while (searchIterator.type != null) {
                         val searchText = searchIterator.toString()
                         android.util.Log.d("SpoilerParser", "Scanning: '${searchText}' (${searchIterator.type})")

@@ -432,7 +432,6 @@ fun Message(
                             message.content?.let {
                                 if (message.content.isBlank()) return@let // if only an attachment is sent
 
-                                // Always use JBM renderer (via RichMarkdown)
                                 CompositionLocalProvider(
                                     LocalJBMarkdownTreeState provides LocalJBMarkdownTreeState.current.copy(
                                         currentServer = RevoltAPI.channelCache[message.channel]?.server,

@@ -30,10 +30,6 @@ namespace Stendal {
     std::string preprocess_markdown(const std::string& input) {
         std::string result = input;
         
-        // Removed strikethrough preprocessing - let JBM handle ~~text~~ directly
-        // std::regex strikethrough_regex(R"(~~(.+?)~~)");
-        // result = std::regex_replace(result, strikethrough_regex, "<del>$1</del>");
-        
         std::regex spoiler_regex(R"(\|\|(.+?)\|\|)");
         result = std::regex_replace(result, spoiler_regex, "<spoiler>$1</spoiler>");
         
