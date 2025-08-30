@@ -11,43 +11,58 @@ class SpoilerParser : SequentialParser {
         tokens: TokensCache,
         rangesToGlue: List<IntRange>
     ): SequentialParser.ParsingResult {
+        android.util.Log.d("SpoilerParser", "SpoilerParser.parse() called with ${rangesToGlue.size} ranges")
         val result = SequentialParser.ParsingResultBuilder()
         val delegateIndices = RangesListBuilder()
         var iterator: TokensCache.Iterator = tokens.RangesListIterator(rangesToGlue)
 
         while (iterator.type != null) {
+            android.util.Log.d("SpoilerParser", "Processing token: ${iterator.type}, text: '${iterator.toString()}'")
+            
+            // Look for || pattern: TEXT token containing || or sequence of | characters
             if (iterator.type == MarkdownTokenTypes.TEXT) {
                 val text = iterator.toString()
                 
-                // Look for opening ||
-                if (text.contains("||")) {
-                    // Find the closing || by scanning ahead
-                    var searchIterator = iterator
-                    var foundClosing = false
-                    var endPosition = iterator.index
+                // Check if this text token contains || spoiler markers
+                if (text == "||" || text.startsWith("||") || text.contains("||")) {
+                    android.util.Log.d("SpoilerParser", "Found potential spoiler start: '$text'")
                     
-                    // Scan forward to find closing ||
+                    val start = iterator.index
+                    var searchIterator = iterator.advance()
+                    var foundContent = false
+                    var foundEnd = false
+                    
+                    // Scan forward looking for closing ||
                     while (searchIterator.type != null) {
                         val searchText = searchIterator.toString()
-                        if (searchText.contains("||") && searchIterator.index > iterator.index) {
-                            foundClosing = true
-                            endPosition = searchIterator.index
+                        android.util.Log.d("SpoilerParser", "Scanning: '${searchText}' (${searchIterator.type})")
+                        
+                        if (searchText == "||" || searchText.endsWith("||") || searchText.contains("||")) {
+                            android.util.Log.d("SpoilerParser", "Found potential spoiler end: '$searchText'")
+                            foundEnd = true
+                            
+                            result.withNode(
+                                SequentialParser.Node(
+                                    start..searchIterator.index,
+                                    RSMElementTypes.SPOILER
+                                )
+                            )
+                            android.util.Log.d("SpoilerParser", "Created SPOILER node from $start to ${searchIterator.index}")
+                            iterator = searchIterator.advance()
                             break
                         }
+                        
+                        if (searchIterator.type == MarkdownTokenTypes.TEXT || searchIterator.type.toString() == "WHITE_SPACE") {
+                            foundContent = true
+                        }
+                        
                         searchIterator = searchIterator.advance()
                     }
                     
-                    if (foundClosing) {
-                        // Create spoiler node spanning from start to end
-                        result.withNode(
-                            SequentialParser.Node(
-                                iterator.index..endPosition,
-                                RSMElementTypes.SPOILER
-                            )
-                        )
-                        // Skip to after the closing token
-                        iterator = searchIterator.advance()
+                    if (foundEnd) {
                         continue
+                    } else {
+                        android.util.Log.d("SpoilerParser", "No closing || found")
                     }
                 }
             }

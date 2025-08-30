@@ -458,7 +458,27 @@ private fun annotateText(
                     append(" ")
                 }
 
-                MarkdownElementTypes.PARAGRAPH,
+                MarkdownElementTypes.PARAGRAPH -> {
+                    // Check if this paragraph contains spoiler syntax
+                    val paragraphText = node.getTextInNode(sourceText).toString()
+                    if (paragraphText.contains("||")) {
+                        android.util.Log.d("JBMRenderer", "Paragraph contains spoilers: '$paragraphText'")
+                        // Process spoilers using regex approach
+                        val spoilerRegex = Regex("\\|\\|(.+?)\\|\\|")
+                        if (spoilerRegex.containsMatchIn(paragraphText)) {
+                            processSpoilerParagraph(paragraphText, state, revealedSpoilers, surfaceContainer, onSurface, contentColor)
+                        } else {
+                            for (child in node.children) {
+                                append(annotateText(state, child, revealedSpoilers))
+                            }
+                        }
+                    } else {
+                        for (child in node.children) {
+                            append(annotateText(state, child, revealedSpoilers))
+                        }
+                    }
+                }
+
                 MarkdownElementTypes.HTML_BLOCK,
                 MarkdownTokenTypes.HTML_TAG -> {
                     for (child in node.children) {
@@ -550,6 +570,53 @@ private fun annotateText(
                 }
             }
     }
+}
+
+private fun AnnotatedString.Builder.processSpoilerParagraph(
+    text: String,
+    state: JBMarkdownTreeState,
+    revealedSpoilers: Set<String>,
+    surfaceContainer: Color,
+    onSurface: Color,
+    contentColor: Color
+) {
+    val spoilerRegex = Regex("\\|\\|(.+?)\\|\\|")
+    var lastIndex = 0
+    
+    android.util.Log.d("JBMRenderer", "Processing spoiler paragraph: '$text'")
+    
+    for (match in spoilerRegex.findAll(text)) {
+        android.util.Log.d("JBMRenderer", "Found spoiler match: '${match.value}'")
+        
+        // Append text before spoiler
+        append(text.substring(lastIndex, match.range.first))
+        
+        // Handle spoiler
+        val spoilerContent = match.groupValues[1]
+        val spoilerId = "spoiler_${match.range.first}_${spoilerContent.hashCode()}"
+        val isRevealed = revealedSpoilers.contains(spoilerId)
+        
+        android.util.Log.d("JBMRenderer", "Spoiler content: '$spoilerContent', revealed: $isRevealed")
+        
+        pushStringAnnotation(
+            tag = JBMAnnotations.Spoiler.tag,
+            annotation = spoilerId
+        )
+        withStyle(
+            SpanStyle(
+                background = if (isRevealed) surfaceContainer else onSurface,
+                color = if (isRevealed) contentColor else onSurface
+            )
+        ) {
+            append(spoilerContent)
+        }
+        pop()
+        
+        lastIndex = match.range.last + 1
+    }
+    
+    // Append remaining text after last spoiler
+    append(text.substring(lastIndex))
 }
 
 @Composable
