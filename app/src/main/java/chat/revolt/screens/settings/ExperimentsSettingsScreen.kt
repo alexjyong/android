@@ -47,7 +47,7 @@ import chat.revolt.settings.dsl.SubcategoryContentInsets
 import kotlinx.coroutines.launch
 
 enum class MarkdownRenderer {
-    JetBrains, FinalMarkdown
+    JetBrains, JetBrainsEnhanced, FinalMarkdown
 }
 
 class ExperimentsSettingsScreenViewModel : ViewModel() {
@@ -56,16 +56,20 @@ class ExperimentsSettingsScreenViewModel : ViewModel() {
     fun init() {
         viewModelScope.launch {
             when {
-                Experiments.useKotlinBasedMarkdownRenderer.isEnabled -> {
-                    mdRenderer.value = MarkdownRenderer.JetBrains
-                }
-
                 Experiments.useFinalMarkdownRenderer.isEnabled -> {
                     mdRenderer.value = MarkdownRenderer.FinalMarkdown
                 }
 
-                else -> {
+                Experiments.useEnhancedMarkdownRenderer.isEnabled -> {
+                    mdRenderer.value = MarkdownRenderer.JetBrainsEnhanced
+                }
+
+                Experiments.useKotlinBasedMarkdownRenderer.isEnabled -> {
                     mdRenderer.value = MarkdownRenderer.JetBrains
+                }
+
+                else -> {
+                    mdRenderer.value = MarkdownRenderer.JetBrainsEnhanced
                 }
             }
             usePolarChecked.value = Experiments.usePolar.isEnabled
@@ -98,7 +102,7 @@ class ExperimentsSettingsScreenViewModel : ViewModel() {
         }
     }
 
-    val mdRenderer = mutableStateOf(MarkdownRenderer.JetBrains)
+    val mdRenderer = mutableStateOf(MarkdownRenderer.JetBrainsEnhanced)
 
     fun setMdRenderer(value: MarkdownRenderer) {
         viewModelScope.launch {
@@ -106,6 +110,17 @@ class ExperimentsSettingsScreenViewModel : ViewModel() {
                 MarkdownRenderer.JetBrains -> {
                     kv.set("exp/useKotlinBasedMarkdownRenderer", true)
                     Experiments.useKotlinBasedMarkdownRenderer.setEnabled(true)
+                    kv.set("exp/useEnhancedMarkdownRenderer", false)
+                    Experiments.useEnhancedMarkdownRenderer.setEnabled(false)
+                    kv.set("exp/useFinalMarkdownRenderer", false)
+                    Experiments.useFinalMarkdownRenderer.setEnabled(false)
+                }
+
+                MarkdownRenderer.JetBrainsEnhanced -> {
+                    kv.set("exp/useKotlinBasedMarkdownRenderer", false)
+                    Experiments.useKotlinBasedMarkdownRenderer.setEnabled(false)
+                    kv.set("exp/useEnhancedMarkdownRenderer", true)
+                    Experiments.useEnhancedMarkdownRenderer.setEnabled(true)
                     kv.set("exp/useFinalMarkdownRenderer", false)
                     Experiments.useFinalMarkdownRenderer.setEnabled(false)
                 }
@@ -113,6 +128,8 @@ class ExperimentsSettingsScreenViewModel : ViewModel() {
                 MarkdownRenderer.FinalMarkdown -> {
                     kv.set("exp/useKotlinBasedMarkdownRenderer", false)
                     Experiments.useKotlinBasedMarkdownRenderer.setEnabled(false)
+                    kv.set("exp/useEnhancedMarkdownRenderer", false)
+                    Experiments.useEnhancedMarkdownRenderer.setEnabled(false)
                     kv.set("exp/useFinalMarkdownRenderer", true)
                     Experiments.useFinalMarkdownRenderer.setEnabled(true)
                 }
@@ -203,7 +220,8 @@ fun ExperimentsSettingsScreen(
                 },
                 supportingContent = {
                     when (viewModel.mdRenderer.value) {
-                        MarkdownRenderer.JetBrains -> Text("Use the Kotlin-based JetBrains Markdown renderer for messages. This renderer is feature-complete with support for strikethrough, spoilers, and more. (Default)")
+                        MarkdownRenderer.JetBrains -> Text("Use the original Kotlin-based JetBrains Markdown renderer for messages. Stable but without spoiler support.")
+                        MarkdownRenderer.JetBrainsEnhanced -> Text("Use the enhanced JetBrains Markdown renderer with spoiler support and other improvements. Recommended for best experience. (Default)")
                         MarkdownRenderer.FinalMarkdown -> Text("Use a new blazingly fast markdown renderer for messages. This renderer is experimental and may have missing features.")
                     }
                 },
@@ -225,6 +243,15 @@ fun ExperimentsSettingsScreen(
                         .semantics { role = Role.RadioButton }
                 ) {
                     Text("JetBrains")
+                }
+                ToggleButton(
+                    checked = viewModel.mdRenderer.value == MarkdownRenderer.JetBrainsEnhanced,
+                    onCheckedChange = { viewModel.setMdRenderer(MarkdownRenderer.JetBrainsEnhanced) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .semantics { role = Role.RadioButton }
+                ) {
+                    Text("JetBrains Enhanced")
                 }
                 if (FeatureFlags.finalMarkdownGranted || viewModel.mdRenderer.value == MarkdownRenderer.FinalMarkdown) {
                     ToggleButton(

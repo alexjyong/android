@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import chat.revolt.api.settings.Experiments
 import chat.revolt.markdown.jbm.JBM
 import chat.revolt.markdown.jbm.JBMRenderer
+import chat.revolt.markdown.jbm.JBMEnhancedRenderer
 import chat.revolt.ndk.Stendal
 
 @OptIn(JBM::class)
@@ -16,10 +17,16 @@ fun RichMarkdown(input: String, modifier: Modifier = Modifier) {
             Experiments.useFinalMarkdownRenderer.isEnabled -> {
                 JBMRenderer(input)
             }
-            else -> {
+            Experiments.useEnhancedMarkdownRenderer.isEnabled -> {
+                JBMEnhancedRenderer(input)
+            }
+            Experiments.useKotlinBasedMarkdownRenderer.isEnabled -> {
                 JBMRenderer(input)
             }
+            else -> {
+                // Default to enhanced renderer
+                JBMEnhancedRenderer(input)
+            }
         }
-        
     }
 }

@@ -26,7 +26,8 @@ class ExperimentInstance(default: Boolean) {
  *  - All experiments can be disabled at once with a single toggle.
  */
 object Experiments {
-    val useKotlinBasedMarkdownRenderer = ExperimentInstance(true)
+    val useKotlinBasedMarkdownRenderer = ExperimentInstance(false)
+    val useEnhancedMarkdownRenderer = ExperimentInstance(true)
     val usePolar = ExperimentInstance(false)
     val enableServerIdentityOptions = ExperimentInstance(false)
     val useFinalMarkdownRenderer = ExperimentInstance(false)
@@ -43,6 +44,9 @@ object Experiments {
         useKotlinBasedMarkdownRenderer.setEnabled(
             kvStorage.getBoolean("exp/useKotlinBasedMarkdownRenderer") == true
         )
+        useEnhancedMarkdownRenderer.setEnabled(
+            kvStorage.getBoolean("exp/useEnhancedMarkdownRenderer") == true
+        )
         usePolar.setEnabled(
             kvStorage.getBoolean("exp/usePolar") == true
         )
@@ -53,8 +57,19 @@ object Experiments {
             kvStorage.getBoolean("exp/useFinalMarkdownRenderer") == true
         )
 
-        if (useFinalMarkdownRenderer.isEnabled && useKotlinBasedMarkdownRenderer.isEnabled) {
-            // if jbm and fm are enabled, fm takes precedence. this should not be possible in practice
+        // Handle markdown renderer conflicts - only one should be enabled at a time
+        // Priority: FinalMarkdown > EnhancedMarkdown > KotlinBasedMarkdown
+        if (useFinalMarkdownRenderer.isEnabled) {
+            if (useEnhancedMarkdownRenderer.isEnabled) {
+                useEnhancedMarkdownRenderer.setEnabled(false)
+                kvStorage.set("exp/useEnhancedMarkdownRenderer", false)
+            }
+            if (useKotlinBasedMarkdownRenderer.isEnabled) {
+                useKotlinBasedMarkdownRenderer.setEnabled(false)
+                kvStorage.set("exp/useKotlinBasedMarkdownRenderer", false)
+            }
+        } else if (useEnhancedMarkdownRenderer.isEnabled && useKotlinBasedMarkdownRenderer.isEnabled) {
+            // Enhanced takes precedence over basic JetBrains
             useKotlinBasedMarkdownRenderer.setEnabled(false)
             kvStorage.set("exp/useKotlinBasedMarkdownRenderer", false)
         }

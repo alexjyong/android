@@ -138,6 +138,7 @@ data class JBMarkdownTreeState(
     val currentServer: String? = null,
     val embedded: Boolean = false,
     val singleLine: Boolean = false,
+    val enhanced: Boolean = false,
     val colors: JBMColors = JBMColors(
         clickable = Color(0xFFFF00FF),
         clickableBackground = Color(0x2000FF00)
@@ -153,11 +154,14 @@ val avatarPadding = 2.dp
 @Composable
 @JBM
 fun JBMRenderer(content: String, modifier: Modifier = Modifier) {
-    var tree by remember { mutableStateOf(JBMApi.parse(content)) }
+    val state = LocalJBMarkdownTreeState.current
+    val flavor = if (state.enhanced) RSMEnhancedFlavourDescriptor() else RSMFlavourDescriptor()
+    
+    var tree by remember { mutableStateOf(JBMApi.parse(content, flavor)) }
     var revealedSpoilers by remember { mutableStateOf(setOf<String>()) }
 
-    LaunchedEffect(content) {
-        tree = JBMApi.parse(content)
+    LaunchedEffect(content, state.enhanced) {
+        tree = JBMApi.parse(content, flavor)
     }
 
     CompositionLocalProvider(
@@ -326,13 +330,18 @@ private fun annotateText(
 
                 RSMElementTypes.CUSTOM_EMOTE -> {
                     val contents = node.getTextInNode(sourceText).toString()
+                    android.util.Log.d("JBMRenderer", "Processing CUSTOM_EMOTE node: contents='$contents'")
                     val emoteId = contents.removeSurrounding(":", ":")
+                    android.util.Log.d("JBMRenderer", "Extracted emote ID: '$emoteId'")
+                    android.util.Log.d("JBMRenderer", "Is valid ULID: ${emoteId.isUlid()}")
                     if (emoteId == contents || !emoteId.isUlid()) {
+                        android.util.Log.d("JBMRenderer", "Invalid custom emote, rendering as text")
                         // Invalid custom emote. Append as if it were regular text.
                         for (child in node.children) {
                             append(annotateText(state, child, revealedSpoilers))
                         }
                     } else {
+                        android.util.Log.d("JBMRenderer", "Valid custom emote, creating inline content")
                         pushStringAnnotation(
                             tag = JBMAnnotations.CustomEmote.tag,
                             annotation = emoteId

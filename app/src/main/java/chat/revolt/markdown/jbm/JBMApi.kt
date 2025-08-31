@@ -10,7 +10,7 @@ annotation class JBM
 
 @JBM
 object JBMApi {
-    fun parse(src: String): ASTNode {
-        return MarkdownParser(RSMFlavourDescriptor()).buildMarkdownTreeFromString(src)
+    fun parse(src: String, flavor: RSMFlavourDescriptor = RSMFlavourDescriptor()): ASTNode {
+        return MarkdownParser(flavor).buildMarkdownTreeFromString(src)
     }
 }

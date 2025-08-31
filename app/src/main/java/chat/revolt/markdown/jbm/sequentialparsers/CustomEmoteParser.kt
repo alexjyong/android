@@ -16,11 +16,14 @@ class CustomEmoteParser : SequentialParser {
         var iterator: TokensCache.Iterator = tokens.RangesListIterator(rangesToGlue)
 
         while (iterator.type != null) {
+            android.util.Log.d("CustomEmoteParser", "Processing token: type=${iterator.type}, text='${iterator.toString()}'")
+            
             if (iterator.type == MarkdownTokenTypes.COLON) {
-
+                android.util.Log.d("CustomEmoteParser", "Found COLON token")
                 val endIterator = findNextColon(iterator.advance())
 
                 if (endIterator != null) {
+                    android.util.Log.d("CustomEmoteParser", "Found matching closing colon, creating CUSTOM_EMOTE node")
                     result.withNode(
                         SequentialParser.Node(
                             iterator.index..endIterator.index + 1,
