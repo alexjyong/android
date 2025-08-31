@@ -1,7 +1,6 @@
 package chat.revolt.markdown.jbm
 
 import chat.revolt.markdown.jbm.sequentialparsers.ChannelMentionParser
-import chat.revolt.markdown.jbm.sequentialparsers.CustomEmoteParser
 import chat.revolt.markdown.jbm.sequentialparsers.MassMentionParser
 import chat.revolt.markdown.jbm.sequentialparsers.RoleMentionParser
 import chat.revolt.markdown.jbm.sequentialparsers.UserMentionParser
@@ -34,8 +33,7 @@ open class RSMFlavourDescriptor : GFMFlavourDescriptor() {
                 UserMentionParser(),
                 ChannelMentionParser(),
                 RoleMentionParser(),
-                MassMentionParser(),
-                CustomEmoteParser()
+                MassMentionParser()
             )
         }
     }

@@ -43,6 +43,7 @@ import chat.revolt.api.routes.custom.fetchEmoji
 import chat.revolt.api.schemas.isInviteUri
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
+import chat.revolt.composables.generic.EmojiAwareText
 import chat.revolt.composables.generic.RemoteImage
 import chat.revolt.composables.utils.detectTapGesturesConditionalConsume
 import chat.revolt.internals.EmojiRepository
@@ -484,43 +485,9 @@ fun MarkdownText(textNode: AstNode, modifier: Modifier = Modifier) {
         false
     }
 
-    Text(
+    EmojiAwareText(
         text = annotatedText,
-        style = LocalTextStyle.current,
-        color = LocalContentColor.current,
         onTextLayout = { layoutResult = it },
-        inlineContent = mapOf(
-            "CustomEmote" to InlineTextContent(
-                placeholder = Placeholder(
-                    width = LocalTextStyle.current.fontSize * 1.5,
-                    height = LocalTextStyle.current.fontSize * 1.5,
-                    placeholderVerticalAlign = PlaceholderVerticalAlign.Center
-                ),
-            ) { id ->
-                val emote = RevoltAPI.emojiCache[id]
-                if (emote == null) {
-                    scope.launch {
-                        try {
-                            RevoltAPI.emojiCache[id] = fetchEmoji(id)
-                        } catch (e: Exception) {
-                            // no-op
-                        }
-                    }
-                    return@InlineTextContent
-                } else {
-                    with(LocalDensity.current) {
-                        RemoteImage(
-                            url = "$REVOLT_FILES/emojis/${id}",
-                            description = emote.name,
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier
-                                .width((LocalTextStyle.current.fontSize * 1.5).toDp())
-                                .height((LocalTextStyle.current.fontSize * 1.5).toDp())
-                        )
-                    }
-                }
-            }
-        ),
         modifier = modifier.pointerInput(onClick, onLongClick) {
             detectTapGesturesConditionalConsume(
                 onTap = { pos ->
