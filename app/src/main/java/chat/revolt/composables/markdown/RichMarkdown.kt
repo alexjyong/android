@@ -24,7 +24,6 @@ fun RichMarkdown(input: String, modifier: Modifier = Modifier) {
                 JBMRenderer(input)
             }
             else -> {
-                // Default to enhanced renderer
                 JBMEnhancedRenderer(input)
             }
         }

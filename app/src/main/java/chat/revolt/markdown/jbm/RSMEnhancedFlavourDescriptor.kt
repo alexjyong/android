@@ -12,10 +12,8 @@ import org.intellij.markdown.parser.sequentialparsers.SequentialParserManager
 class RSMEnhancedFlavourDescriptor : RSMFlavourDescriptor() {
     override val sequentialParserManager = object : SequentialParserManager() {
         override fun getParserSequence(): List<SequentialParser> {
-            // Get the original working parser sequence from parent class
             val originalParsers = super@RSMEnhancedFlavourDescriptor.sequentialParserManager.getParserSequence()
             
-            // Add SpoilerParser at the very end to avoid conflicts
             return originalParsers + SpoilerParser()
         }
     }

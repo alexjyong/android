@@ -57,8 +57,6 @@ object Experiments {
             kvStorage.getBoolean("exp/useFinalMarkdownRenderer") == true
         )
 
-        // Handle markdown renderer conflicts - only one should be enabled at a time
-        // Priority: FinalMarkdown > EnhancedMarkdown > KotlinBasedMarkdown
         if (useFinalMarkdownRenderer.isEnabled) {
             if (useEnhancedMarkdownRenderer.isEnabled) {
                 useEnhancedMarkdownRenderer.setEnabled(false)
@@ -69,7 +67,6 @@ object Experiments {
                 kvStorage.set("exp/useKotlinBasedMarkdownRenderer", false)
             }
         } else if (useEnhancedMarkdownRenderer.isEnabled && useKotlinBasedMarkdownRenderer.isEnabled) {
-            // Enhanced takes precedence over basic JetBrains
             useKotlinBasedMarkdownRenderer.setEnabled(false)
             kvStorage.set("exp/useKotlinBasedMarkdownRenderer", false)
         }

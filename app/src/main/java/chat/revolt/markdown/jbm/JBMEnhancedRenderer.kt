@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 @JBM
 @Composable  
 fun JBMEnhancedRenderer(content: String, modifier: Modifier = Modifier) {
-    // Create a custom CompositionLocalProvider that tells JBMRenderer to use enhanced flavor
     CompositionLocalProvider(
         LocalJBMarkdownTreeState provides LocalJBMarkdownTreeState.current.copy(
             enhanced = true
