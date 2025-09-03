@@ -28,13 +28,13 @@ You can download the latest APK [here](https://github.com/alexjyong/android/rele
 ## Features Added
 <table>
   <tr>
-    <td width="50%" valign="top">
+    <td width="50%" valign="top" align="center">
       <strong>Emojis next to channel names</strong><br>
       <img src="https://github.com/user-attachments/assets/6c37f059-47ef-4028-aac9-ef233f7a85e4" width="300" alt="Channel Emojis">
     </td>
-    <td width="50%" valign="top">
+    <td width="50%" valign="top" align="center">
       <strong>Jump to replied message</strong><br>
-      <img src="https://github.com/user-attachments/assets/1dc0fb6b-521d-40e2-a833-1ada19bd207b" width="220" alt="Jump to Reply">
+      <img src="https://github.com/user-attachments/assets/1dc0fb6b-521d-40e2-a833-1ada19bd207b" width="300" alt="Jump to Reply">
     </td>
   </tr>
   <tr>
@@ -43,13 +43,14 @@ You can download the latest APK [here](https://github.com/alexjyong/android/rele
       <img src="https://github.com/user-attachments/assets/1450ea4c-a283-4ac3-8a0a-8e9f1adb436b" width="300" alt="Server Context Menu">
     </td>
   </tr>
-<tr>
+  <tr>
     <td colspan="2" align="center" valign="top">
       <strong>Recently used emojis</strong><br>
-      <img width="1080" height="651" alt="image" src="https://github.com/user-attachments/assets/6f1e126a-8e73-49ee-a5d1-c4841907e14a" alt="Recently used emojis" />
+      <img src="https://github.com/user-attachments/assets/6f1e126a-8e73-49ee-a5d1-c4841907e14a" width="600" alt="Recently Used Emojis">
     </td>
   </tr>
 </table>
+
 
 
 
