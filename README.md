@@ -43,6 +43,12 @@ You can download the latest APK [here](https://github.com/alexjyong/android/rele
       <img src="https://github.com/user-attachments/assets/1450ea4c-a283-4ac3-8a0a-8e9f1adb436b" width="300" alt="Server Context Menu">
     </td>
   </tr>
+<tr>
+    <td colspan="2" align="center" valign="top">
+      <strong>Recently used emojis</strong><br>
+      <img width="1080" height="651" alt="image" src="https://github.com/user-attachments/assets/6f1e126a-8e73-49ee-a5d1-c4841907e14a" alt="Recently used emojis" />
+    </td>
+  </tr>
 </table>
 
 
