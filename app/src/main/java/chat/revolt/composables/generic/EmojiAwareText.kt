@@ -15,6 +15,7 @@ import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.isUnspecified
 import chat.revolt.api.REVOLT_FILES
 
 /**
@@ -26,54 +27,71 @@ fun EmojiAwareText(
     text: AnnotatedString,
     modifier: Modifier = Modifier,
     maxLines: Int = Int.MAX_VALUE,
+    inlineContent: Map<String, InlineTextContent> = emptyMap(),
     onTextLayout: ((androidx.compose.ui.text.TextLayoutResult) -> Unit)? = null
 ) {
     val fontSize = LocalTextStyle.current.fontSize
     val emojiSize = if (fontSize.isUnspecified) 16.sp else fontSize
     
-    // Find all custom emoji patterns :ULID:
     val customEmojiRegex = Regex(":([0-9A-HJKMNP-TV-Z]{26}):")
     val matches = customEmojiRegex.findAll(text.text).toList()
     
     if (matches.isEmpty()) {
-        // No custom emojis, render normally
         Text(
             text = text,
             modifier = modifier,
             maxLines = maxLines,
-            onTextLayout = onTextLayout
+            inlineContent = inlineContent,
+            onTextLayout = onTextLayout ?: {}
         )
         return
     }
     
-    // Build new annotated string with inline content placeholders
     val processedText = buildAnnotatedString {
-        // Copy all existing spans from original text
-        append(text)
+        val sourceText = text.text
+        var lastIndex = 0
         
-        // Replace emoji patterns with inline content placeholders
-        var offset = 0
         matches.forEach { match ->
-            val startIndex = match.range.first - offset
-            val endIndex = match.range.last + 1 - offset
             val emojiId = match.groupValues[1]
             val placeholderKey = "emoji_$emojiId"
             
-            // Remove the :ULID: text and add placeholder
-            val beforeEmoji = subSequence(0, startIndex)
-            val afterEmoji = subSequence(endIndex, length)
+            if (match.range.first > lastIndex) {
+                val beforeEmoji = sourceText.substring(lastIndex, match.range.first)
+                append(beforeEmoji)
+                
+                text.spanStyles.forEach { spanStyle ->
+                    if (spanStyle.start < match.range.first && spanStyle.end > lastIndex) {
+                        val spanStart = maxOf(spanStyle.start - lastIndex, 0)
+                        val spanEnd = minOf(spanStyle.end - lastIndex, beforeEmoji.length)
+                        if (spanStart < spanEnd) {
+                            addStyle(spanStyle.item, length - beforeEmoji.length + spanStart, length - beforeEmoji.length + spanEnd)
+                        }
+                    }
+                }
+            }
             
-            clear()
-            append(beforeEmoji)
             appendInlineContent(placeholderKey, "[emoji]")
-            append(afterEmoji)
             
-            offset += match.value.length - "[emoji]".length
+            lastIndex = match.range.last + 1
+        }
+        
+        if (lastIndex < sourceText.length) {
+            val remainingText = sourceText.substring(lastIndex)
+            append(remainingText)
+            
+            text.spanStyles.forEach { spanStyle ->
+                if (spanStyle.start < sourceText.length && spanStyle.end > lastIndex) {
+                    val spanStart = maxOf(spanStyle.start - lastIndex, 0)
+                    val spanEnd = minOf(spanStyle.end - lastIndex, remainingText.length)
+                    if (spanStart < spanEnd) {
+                        addStyle(spanStyle.item, length - remainingText.length + spanStart, length - remainingText.length + spanEnd)
+                    }
+                }
+            }
         }
     }
     
-    // Create inline content map for each emoji
-    val inlineContent = matches.associate { match ->
+    val emojiInlineContent = matches.associate { match ->
         val emojiId = match.groupValues[1]
         val placeholderKey = "emoji_$emojiId"
         
@@ -94,12 +112,14 @@ fun EmojiAwareText(
         }
     }
     
+    val mergedInlineContent = inlineContent + emojiInlineContent
+    
     Text(
         text = processedText,
-        inlineContent = inlineContent,
+        inlineContent = mergedInlineContent,
         modifier = modifier,
         maxLines = maxLines,
-        onTextLayout = onTextLayout
+        onTextLayout = onTextLayout ?: {}
     )
 }
 
@@ -111,12 +131,14 @@ fun EmojiAwareText(
     text: String,
     modifier: Modifier = Modifier,
     maxLines: Int = Int.MAX_VALUE,
+    inlineContent: Map<String, InlineTextContent> = emptyMap(),
     onTextLayout: ((androidx.compose.ui.text.TextLayoutResult) -> Unit)? = null
 ) {
     EmojiAwareText(
         text = AnnotatedString(text),
         modifier = modifier,
         maxLines = maxLines,
+        inlineContent = inlineContent,
         onTextLayout = onTextLayout
     )
 }
