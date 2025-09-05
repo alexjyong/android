@@ -183,8 +183,7 @@ fun SettingsScreen(
                     viewModel.foundUpdate?.let { updateInfo ->
                         UpdateBanner(
                             updateInfo = updateInfo,
-                            onDismiss = { viewModel.clearManualCheckResult() },
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            onDismiss = { viewModel.clearManualCheckResult() }
                         )
                     }
                     
@@ -307,7 +306,6 @@ fun SettingsScreen(
                         },
                         supportingContent = {
                             Column {
-                                Text(text = "Automatically check for new releases")
                                 
                                 viewModel.manualCheckResult?.let { result ->
                                     Text(
