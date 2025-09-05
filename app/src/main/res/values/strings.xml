@@ -805,6 +805,14 @@
     <string name="keyboard_shortcut_messaging_new_line">New Line</string>
     <string name="keyboard_shortcut_messaging_send_message">Send Message</string>
 
+    <string name="update_banner_close">Close</string>
+    <string name="update_check_now">Check Now</string>
+    <string name="update_checking">Checking...</string>
+    <string name="update_check_clear">Clear</string>
+    <string name="update_check_up_to_date">You\'re up to date!</string>
+    <string name="update_check_failed">Failed to check for updates</string>
+    <string name="update_check_available">Update %1$s available!</string>
+
     <string name="geogate_header">Not available in your region</string>
     <string name="geogate_channel_icon_alt">Unavailable channel</string>
     <string name="geogate_description">Revolt may block content in certain jurisdictions in response to legislation or legal notices</string>

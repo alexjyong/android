@@ -2,14 +2,20 @@ package chat.revolt.screens.settings
 
 import android.content.Intent
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -45,9 +52,11 @@ import chat.revolt.R
 import chat.revolt.activities.InviteActivity
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.UpdateChecker
+import chat.revolt.api.internals.UpdateInfo
 import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.composables.generic.ListHeader
+import chat.revolt.composables.generic.UpdateBanner
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -63,20 +72,58 @@ class SettingsScreenViewModel @Inject constructor(
 ) : ViewModel() {
     private val updateChecker = UpdateChecker(context, kvStorage)
     
-    var updateCheckerEnabled by mutableStateOf(false)
+    var isUpdateCheckerEnabled by mutableStateOf(false)
+        private set
+    
+    var isCheckingForUpdates by mutableStateOf(false)
+        private set
+    
+    var manualCheckResult by mutableStateOf<String?>(null)
+        private set
+    
+    var foundUpdate by mutableStateOf<UpdateInfo?>(null)
         private set
     
     init {
         viewModelScope.launch {
-            updateCheckerEnabled = updateChecker.isUpdateCheckerEnabled()
+            isUpdateCheckerEnabled = updateChecker.isUpdateCheckerEnabled()
         }
     }
     
-    fun setUpdateCheckerEnabled(enabled: Boolean) {
-        updateCheckerEnabled = enabled
+    fun toggleUpdateChecker(enabled: Boolean) {
+        isUpdateCheckerEnabled = enabled
         viewModelScope.launch {
             updateChecker.setUpdateCheckerEnabled(enabled)
         }
+    }
+    
+    fun manualCheckForUpdates() {
+        if (isCheckingForUpdates) return
+        
+        viewModelScope.launch {
+            isCheckingForUpdates = true
+            manualCheckResult = null
+            foundUpdate = null
+            
+            try {
+                val updateInfo = updateChecker.checkForUpdates()
+                if (updateInfo != null) {
+                    foundUpdate = updateInfo
+                    manualCheckResult = context.getString(R.string.update_check_available, updateInfo.version)
+                } else {
+                    manualCheckResult = context.getString(R.string.update_check_up_to_date)
+                }
+            } catch (e: Exception) {
+                manualCheckResult = context.getString(R.string.update_check_failed)
+            } finally {
+                isCheckingForUpdates = false
+            }
+        }
+    }
+    
+    fun clearManualCheckResult() {
+        manualCheckResult = null
+        foundUpdate = null
     }
     
     fun logout() {
@@ -133,6 +180,14 @@ fun SettingsScreen(
                         .fillMaxSize()
                         .padding(vertical = 10.dp)
                 ) {
+                    viewModel.foundUpdate?.let { updateInfo ->
+                        UpdateBanner(
+                            updateInfo = updateInfo,
+                            onDismiss = { viewModel.clearManualCheckResult() },
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                        )
+                    }
+                    
                     ListHeader {
                         Text(stringResource(R.string.settings_category_account))
                     }
@@ -251,21 +306,56 @@ fun SettingsScreen(
                             Text(text = "App Updates")
                         },
                         supportingContent = {
-                            Text(text = "Automatically check for new releases")
+                            Column {
+                                Text(text = "Automatically check for new releases")
+                                
+                                viewModel.manualCheckResult?.let { result ->
+                                    Text(
+                                        text = result,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = if (viewModel.foundUpdate != null) {
+                                            MaterialTheme.colorScheme.primary
+                                        } else {
+                                            MaterialTheme.colorScheme.onSurfaceVariant
+                                        },
+                                        modifier = Modifier.padding(top = 2.dp)
+                                    )
+                                }
+                            }
                         },
                         leadingContent = {
                             SettingsIcon {
                                 Icon(
-                                    painter = painterResource(R.drawable.icn_file_download_24dp),
+                                    painter = painterResource(R.drawable.icn_download_24dp),
                                     contentDescription = null,
                                 )
                             }
                         },
                         trailingContent = {
-                            Switch(
-                                checked = viewModel.updateCheckerEnabled,
-                                onCheckedChange = viewModel::setUpdateCheckerEnabled
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                // Manual check button - more compact
+                                Button(
+                                    onClick = { viewModel.manualCheckForUpdates() },
+                                    enabled = !viewModel.isCheckingForUpdates
+                                ) {
+                                    if (viewModel.isCheckingForUpdates) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.width(16.dp),
+                                            strokeWidth = 2.dp
+                                        )
+                                    } else {
+                                        Text(stringResource(R.string.update_check_now))
+                                    }
+                                }
+                                
+                                Switch(
+                                    checked = viewModel.isUpdateCheckerEnabled,
+                                    onCheckedChange = viewModel::toggleUpdateChecker
+                                )
+                            }
                         }
                     )
 

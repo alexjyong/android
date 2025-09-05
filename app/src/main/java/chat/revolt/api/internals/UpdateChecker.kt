@@ -92,7 +92,8 @@ class UpdateChecker(
         val isEnabled = kvStorage.getBoolean("updateChecker/enabled") ?: true // Default enabled
         if (!isEnabled) return false
 
-        val lastCheckTime = kvStorage.getLong("updateChecker/lastCheck") ?: 0
+        val lastCheckTimeStr = kvStorage.get("updateChecker/lastCheck")
+        val lastCheckTime = lastCheckTimeStr?.toLongOrNull() ?: 0
         val now = System.currentTimeMillis()
         val dayInMillis = 24 * 60 * 60 * 1000L
         
@@ -100,7 +101,7 @@ class UpdateChecker(
     }
 
     suspend fun markUpdateCheckDone() {
-        kvStorage.set("updateChecker/lastCheck", System.currentTimeMillis())
+        kvStorage.set("updateChecker/lastCheck", System.currentTimeMillis().toString())
     }
 
     suspend fun isUpdateCheckerEnabled(): Boolean {

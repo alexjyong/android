@@ -207,7 +207,6 @@ class ChatRouterViewModel @Inject constructor(
                 showNotificationRationale = true
             }
 
-            // Check for updates
             if (updateChecker.shouldCheckForUpdates()) {
                 val update = updateChecker.checkForUpdates()
                 if (update != null && !updateChecker.isUpdateDismissed(update.version)) {
@@ -923,7 +922,6 @@ fun ChatRouterScreen(
                     content = {
                         Box(Modifier.fillMaxSize()) {
                             Column {
-                                // Update banner
                                 viewModel.updateInfo?.let { updateInfo ->
                                     UpdateBanner(
                                         updateInfo = updateInfo,
@@ -931,7 +929,6 @@ fun ChatRouterScreen(
                                     )
                                 }
                                 
-                                // Main content
                                 Box(Modifier.weight(1f)) {
                                     ChannelNavigator(
                                         dest = viewModel.currentDestination,
