@@ -157,19 +157,29 @@ val avatarPadding = 2.dp
 fun JBMRenderer(content: String, modifier: Modifier = Modifier) {
     val state = LocalJBMarkdownTreeState.current
     android.util.Log.d("JBMRenderer", "JBMRenderer called with content: '${content.take(50)}...', enhanced: ${state.enhanced}")
+    
+    // Preprocessing: Replace user mentions with placeholders to avoid CommonMark tokenization issues
+    val preprocessedContent = content.replace(Regex("<@([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
+        "ZZUSERMENTION${match.groupValues[1]}ZZ"
+    }
+    android.util.Log.d("JBMRenderer", "Preprocessed content: '${preprocessedContent.take(50)}...'")
+    
     val flavor = if (state.enhanced) RSMEnhancedFlavourDescriptor() else RSMFlavourDescriptor()
     android.util.Log.d("JBMRenderer", "Using flavor: ${flavor.javaClass.simpleName}")
     
-    var tree by remember { mutableStateOf(JBMApi.parse(content, flavor)) }
+    var tree by remember { mutableStateOf(JBMApi.parse(preprocessedContent, flavor)) }
     var revealedSpoilers by remember { mutableStateOf(setOf<String>()) }
 
     LaunchedEffect(content, state.enhanced) {
-        tree = JBMApi.parse(content, flavor)
+        val preprocessedContent = content.replace(Regex("<@([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
+            "ZZUSERMENTION${match.groupValues[1]}ZZ"
+        }
+        tree = JBMApi.parse(preprocessedContent, flavor)
     }
 
     CompositionLocalProvider(
         LocalJBMarkdownTreeState provides LocalJBMarkdownTreeState.current.copy(
-            sourceText = content,
+            sourceText = preprocessedContent,
             revealedSpoilers = revealedSpoilers,
             onSpoilerToggle = { spoilerId ->
                 revealedSpoilers = if (revealedSpoilers.contains(spoilerId)) {
@@ -229,7 +239,7 @@ private fun annotateText(
                     }
                     
                     val text = source.toString()
-                    val mentionRegex = Regex("(@[0-9A-HJKMNP-TV-Z]{26})")
+                    val mentionRegex = Regex("(ZZUSERMENTION([0-9A-HJKMNP-TV-Z]{26})ZZ)")
                     
                     android.util.Log.d("JBMRenderer", "Processing TEXT: '$text'")
                     android.util.Log.d("JBMRenderer", "Contains mention: ${mentionRegex.containsMatchIn(text)}")
@@ -244,7 +254,7 @@ private fun annotateText(
                                 append(text.substring(lastIndex, match.range.first))
                             }
                             
-                            val userId = match.groupValues[0].removePrefix("@")
+                            val userId = match.groupValues[2] // Group 2 contains the ULID
                             android.util.Log.d("JBMRenderer", "Processing mention for userId: '$userId'")
                             
                             pushStringAnnotation(
@@ -612,6 +622,7 @@ private fun annotateText(
                 MarkdownElementTypes.FULL_REFERENCE_LINK -> {
                     append(node.getTextInNode(sourceText))
                 }
+
 
                 else -> {
                     withStyle(SpanStyle(color = Color.Cyan)) {
