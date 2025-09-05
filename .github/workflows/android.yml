@@ -1,4 +1,4 @@
-name: Android CI
+name: Build Android APKs
 
 on:
   workflow_dispatch:
@@ -37,8 +37,19 @@ jobs:
       - name: Add revoltbuild.properties from the revoltbuildPropertiesbase64 secret
         run:  echo "${{ secrets.REVOLTBUILD_PROPERTIES_BASE64 }}" | base64 --decode > revoltbuild.properties
 
-      - name: Build with Gradle
+      - name: Build Release APK
         run: ./gradlew --no-daemon assembleRelease -x app:uploadSentryProguardMappingsRelease
+
+      - name: Build Debug APK
+        run: ./gradlew --no-daemon assembleDebug
+
+      - name: Archive debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-apk
+          retention-days: 5
+          path: |
+            app/build/outputs/apk/debug/app-debug.apk
 
       - name: Archive release APK
         uses: actions/upload-artifact@v4
