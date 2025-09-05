@@ -73,12 +73,6 @@ jobs:
       - name: Set up repo
         run: chmod +x gradlew && deno run -A scripts/download_deps.ts --yes && cp revoltbuild.properties.example revoltbuild.properties && cp sentry.properties.example sentry.properties && cp app/google-services.json.example app/google-services.json && git submodule update --init --recursive
 
-      - name: Add signing key from the KEYSTORE_BASE64 github actions secret
-        run:  echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/release-key.keystore
-
-      - name: Add revoltbuild.properties from the revoltbuildPropertiesbase64 secret
-        run:  echo "${{ secrets.REVOLTBUILD_PROPERTIES_BASE64 }}" | base64 --decode > revoltbuild.properties
-
       - name: Build Debug APK
         run: ./gradlew --no-daemon assembleDebug
 
