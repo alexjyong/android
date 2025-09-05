@@ -158,7 +158,6 @@ fun JBMRenderer(content: String, modifier: Modifier = Modifier) {
     val state = LocalJBMarkdownTreeState.current
     android.util.Log.d("JBMRenderer", "JBMRenderer called with content: '${content.take(50)}...', enhanced: ${state.enhanced}")
     
-    // Preprocessing: Replace user mentions with placeholders to avoid CommonMark tokenization issues
     val preprocessedContent = content.replace(Regex("<@([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
         "ZZUSERMENTION${match.groupValues[1]}ZZ"
     }
@@ -293,7 +292,6 @@ private fun annotateText(
                     android.util.Log.d("JBMRenderer", "Extracted userId: '$userId', isUlid: ${userId.isUlid()}")
                     if (userId == contents || !userId.isUlid()) {
                         android.util.Log.d("JBMRenderer", "Invalid user mention, treating as text")
-                        // Invalid user mention. Append as if it were regular text.
                         for (child in node.children) {
                             append(annotateText(state, child, revealedSpoilers))
                         }
