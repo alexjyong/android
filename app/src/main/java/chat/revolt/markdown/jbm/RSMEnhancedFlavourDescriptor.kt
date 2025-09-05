@@ -1,5 +1,6 @@
 package chat.revolt.markdown.jbm
 
+import chat.revolt.markdown.jbm.sequentialparsers.CustomEmoteParser
 import chat.revolt.markdown.jbm.sequentialparsers.SpoilerParser
 import org.intellij.markdown.parser.sequentialparsers.SequentialParser
 import org.intellij.markdown.parser.sequentialparsers.SequentialParserManager
@@ -14,7 +15,7 @@ class RSMEnhancedFlavourDescriptor : RSMFlavourDescriptor() {
         override fun getParserSequence(): List<SequentialParser> {
             val originalParsers = super@RSMEnhancedFlavourDescriptor.sequentialParserManager.getParserSequence()
             
-            return originalParsers + SpoilerParser()
+            return originalParsers + CustomEmoteParser() + SpoilerParser()
         }
     }
 }

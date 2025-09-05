@@ -156,7 +156,9 @@ val avatarPadding = 2.dp
 @JBM
 fun JBMRenderer(content: String, modifier: Modifier = Modifier) {
     val state = LocalJBMarkdownTreeState.current
+    android.util.Log.d("JBMRenderer", "JBMRenderer called with content: '${content.take(50)}...', enhanced: ${state.enhanced}")
     val flavor = if (state.enhanced) RSMEnhancedFlavourDescriptor() else RSMFlavourDescriptor()
+    android.util.Log.d("JBMRenderer", "Using flavor: ${flavor.javaClass.simpleName}")
     
     var tree by remember { mutableStateOf(JBMApi.parse(content, flavor)) }
     var revealedSpoilers by remember { mutableStateOf(setOf<String>()) }
@@ -213,6 +215,7 @@ private fun annotateText(
     val sourceText = state.sourceText
 
     return buildAnnotatedString {
+            android.util.Log.d("JBMRenderer", "annotateText called with node type: ${node.type}")
             if (node.type.toString().contains("SPOILER", ignoreCase = true) || 
                 sourceText.contains("||")) {
                 android.util.Log.d("JBMRenderer", "Processing node: ${node.type}, text contains spoilers: ${sourceText.contains("||")}") 
@@ -224,18 +227,58 @@ private fun annotateText(
                     } else {
                         node.getTextInNode(sourceText)
                     }
-                    append(source)
+                    
+                    // Process user mentions in text nodes (post-processing approach)
+                    val mentionRegex = Regex("<@([0-9A-HJKMNP-TV-Z]{26})>")
+                    val parts = source.toString().split(mentionRegex)
+                    val matches = mentionRegex.findAll(source.toString()).toList()
+                    
+                    var matchIndex = 0
+                    parts.forEachIndexed { index, part ->
+                        if (index > 0 && matchIndex < matches.size) {
+                            // This is a user mention
+                            val userId = matches[matchIndex].groupValues[1]
+                            
+                            pushStringAnnotation(
+                                tag = JBMAnnotations.UserMention.tag,
+                                annotation = userId
+                            )
+                            pushStyle(
+                                SpanStyle(
+                                    color = state.colors.clickable,
+                                    background = state.colors.clickableBackground
+                                )
+                            )
+                            append(" ")
+                            appendInlineContent(JBMAnnotations.UserAvatar.tag, userId)
+                            append(" ")
+                            append(MentionResolver.resolveUser(userId, state.currentServer))
+                            append(" ")
+                            pop()
+                            pop()
+                            
+                            matchIndex++
+                        }
+                        
+                        if (part.isNotEmpty()) {
+                            append(part)
+                        }
+                    }
                 }
 
                 RSMElementTypes.USER_MENTION -> {
                     val contents = node.getTextInNode(sourceText).toString()
+                    android.util.Log.d("JBMRenderer", "Processing USER_MENTION: '$contents'")
                     val userId = contents.removeSurrounding("<@", ">")
+                    android.util.Log.d("JBMRenderer", "Extracted userId: '$userId', isUlid: ${userId.isUlid()}")
                     if (userId == contents || !userId.isUlid()) {
+                        android.util.Log.d("JBMRenderer", "Invalid user mention, treating as text")
                         // Invalid user mention. Append as if it were regular text.
                         for (child in node.children) {
                             append(annotateText(state, child, revealedSpoilers))
                         }
                     } else {
+                        android.util.Log.d("JBMRenderer", "Valid user mention, resolving to: ${MentionResolver.resolveUser(userId, state.currentServer)}")
                         pushStringAnnotation(
                             tag = JBMAnnotations.UserMention.tag,
                             annotation = userId
@@ -329,6 +372,23 @@ private fun annotateText(
                     }
                 }
 
+                RSMElementTypes.CUSTOM_EMOTE -> {
+                    val contents = node.getTextInNode(sourceText).toString()
+                    val emoteId = contents.removeSurrounding(":", ":")
+                    if (emoteId == contents || !emoteId.isUlid()) {
+                        // Invalid custom emote. Append as if it were regular text.
+                        for (child in node.children) {
+                            append(annotateText(state, child, revealedSpoilers))
+                        }
+                    } else {
+                        pushStringAnnotation(
+                            tag = JBMAnnotations.CustomEmote.tag,
+                            annotation = emoteId
+                        )
+                        appendInlineContent(JBMAnnotations.CustomEmote.tag, emoteId)
+                        pop()
+                    }
+                }
 
                 RSMElementTypes.SPOILER -> {
                     android.util.Log.d("JBMRenderer", "Found SPOILER node with ${node.children.size} children")
