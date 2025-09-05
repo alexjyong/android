@@ -813,6 +813,7 @@
     <string name="update_check_up_to_date">You\'re up to date!</string>
     <string name="update_check_failed">Failed to check for updates</string>
     <string name="update_check_available">Update %1$s available!</string>
+    <string name="update_check_auto">Toggle on to automatically check for new releases</string>
 
     <string name="geogate_header">Not available in your region</string>
     <string name="geogate_channel_icon_alt">Unavailable channel</string>
