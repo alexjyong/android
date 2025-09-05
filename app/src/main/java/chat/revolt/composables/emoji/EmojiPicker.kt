@@ -447,13 +447,13 @@ fun EmojiPicker(
                                         EmojiUsageTracker.recordUsage(emoji)
                                         onEmojiSelected(emoji)
                                     }
-                                    .padding(4.dp)
-                                    .size(24.dp)
+                                    .padding(8.dp)
+                                    .size(32.dp)
                             )
                         } else {
                             Text(
                                 text = emoji,
-                                fontSize = 24.sp,
+                                fontSize = 20.sp,
                                 modifier = Modifier
                                     .clip(CircleShape)
                                     .clickable {
@@ -461,8 +461,8 @@ fun EmojiPicker(
                                         EmojiUsageTracker.recordUsage(emoji)
                                         onEmojiSelected(emoji)
                                     }
-                                    .padding(4.dp)
-                                    .size(24.dp),
+                                    .padding(8.dp)
+                                    .size(32.dp),
                                 textAlign = TextAlign.Center
                             )
                         }
