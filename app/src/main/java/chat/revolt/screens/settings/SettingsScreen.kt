@@ -306,7 +306,7 @@ fun SettingsScreen(
                         },
                         supportingContent = {
                             Column {
-                                Text(text = "Toggle on to automatically check for new releases")
+                                Text(text = stringResource(id = R.string.settings_language))
                                 viewModel.manualCheckResult?.let { result ->
                                     Text(
                                         text = result,
