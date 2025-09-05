@@ -229,15 +229,26 @@ private fun annotateText(
                     }
                     
                     // Process user mentions in text nodes (post-processing approach)
-                    val mentionRegex = Regex("<@([0-9A-HJKMNP-TV-Z]{26})>")
-                    val parts = source.toString().split(mentionRegex)
-                    val matches = mentionRegex.findAll(source.toString()).toList()
+                    val text = source.toString()
+                    val mentionRegex = Regex("(<@[0-9A-HJKMNP-TV-Z]{26}>)")
                     
-                    var matchIndex = 0
-                    parts.forEachIndexed { index, part ->
-                        if (index > 0 && matchIndex < matches.size) {
-                            // This is a user mention
-                            val userId = matches[matchIndex].groupValues[1]
+                    android.util.Log.d("JBMRenderer", "Processing TEXT: '$text'")
+                    android.util.Log.d("JBMRenderer", "Contains mention: ${mentionRegex.containsMatchIn(text)}")
+                    
+                    if (mentionRegex.containsMatchIn(text)) {
+                        android.util.Log.d("JBMRenderer", "Found mentions in text")
+                        var lastIndex = 0
+                        mentionRegex.findAll(text).forEach { match ->
+                            android.util.Log.d("JBMRenderer", "Match: '${match.value}', groups: ${match.groupValues}")
+                            
+                            // Append text before the mention
+                            if (match.range.first > lastIndex) {
+                                append(text.substring(lastIndex, match.range.first))
+                            }
+                            
+                            // Process the mention - match.groupValues[0] is the full match, [1] is the first group
+                            val userId = match.groupValues[0].removeSurrounding("<@", ">")
+                            android.util.Log.d("JBMRenderer", "Processing mention for userId: '$userId'")
                             
                             pushStringAnnotation(
                                 tag = JBMAnnotations.UserMention.tag,
@@ -257,12 +268,16 @@ private fun annotateText(
                             pop()
                             pop()
                             
-                            matchIndex++
+                            lastIndex = match.range.last + 1
                         }
                         
-                        if (part.isNotEmpty()) {
-                            append(part)
+                        // Append remaining text after the last mention
+                        if (lastIndex < text.length) {
+                            append(text.substring(lastIndex))
                         }
+                    } else {
+                        // No mentions, just append the text
+                        append(text)
                     }
                 }
 
