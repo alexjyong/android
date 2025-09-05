@@ -228,9 +228,8 @@ private fun annotateText(
                         node.getTextInNode(sourceText)
                     }
                     
-                    // Process user mentions in text nodes (post-processing approach)
                     val text = source.toString()
-                    val mentionRegex = Regex("(<@[0-9A-HJKMNP-TV-Z]{26}>)")
+                    val mentionRegex = Regex("(@[0-9A-HJKMNP-TV-Z]{26})")
                     
                     android.util.Log.d("JBMRenderer", "Processing TEXT: '$text'")
                     android.util.Log.d("JBMRenderer", "Contains mention: ${mentionRegex.containsMatchIn(text)}")
@@ -241,13 +240,11 @@ private fun annotateText(
                         mentionRegex.findAll(text).forEach { match ->
                             android.util.Log.d("JBMRenderer", "Match: '${match.value}', groups: ${match.groupValues}")
                             
-                            // Append text before the mention
                             if (match.range.first > lastIndex) {
                                 append(text.substring(lastIndex, match.range.first))
                             }
                             
-                            // Process the mention - match.groupValues[0] is the full match, [1] is the first group
-                            val userId = match.groupValues[0].removeSurrounding("<@", ">")
+                            val userId = match.groupValues[0].removePrefix("@")
                             android.util.Log.d("JBMRenderer", "Processing mention for userId: '$userId'")
                             
                             pushStringAnnotation(
@@ -271,12 +268,10 @@ private fun annotateText(
                             lastIndex = match.range.last + 1
                         }
                         
-                        // Append remaining text after the last mention
                         if (lastIndex < text.length) {
                             append(text.substring(lastIndex))
                         }
                     } else {
-                        // No mentions, just append the text
                         append(text)
                     }
                 }
