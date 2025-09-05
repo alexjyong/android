@@ -166,6 +166,8 @@ class ChatRouterViewModel @Inject constructor(
             val current = kvStorage.get("currentDestination")
             setSaveDestination(ChatRouterDestination.fromString(current ?: ""))
 
+            // Disabled for forked version might use later ;)
+            /*
             latestChangelogRead = changelogs.hasSeenCurrent()
             latestChangelog = changelogs.getLatestChangelogCode()
             latestChangelogBody =
@@ -173,7 +175,12 @@ class ChatRouterViewModel @Inject constructor(
             if (!latestChangelogRead) {
                 changelogs.markAsSeen()
             }
+            */
+            // Always mark changelog as read to prevent popup
+            latestChangelogRead = true
 
+            // Disabled for forked version
+            /*
             val seenEarlyAccess = kvStorage.getBoolean("spark/earlyAccess/dismissed")
             val seenSwipeToReply = kvStorage.getBoolean("spark/swipeToReply/dismissed")
             if (seenEarlyAccess == null) {
@@ -186,6 +193,7 @@ class ChatRouterViewModel @Inject constructor(
             if (seenEarlyAccess == true && seenSwipeToReply != true) {
                 showSwipeToReplySpark = true
             }
+            */
 
             val hasNotificationPermission =
                 NotificationManagerCompat.from(context).areNotificationsEnabled()
