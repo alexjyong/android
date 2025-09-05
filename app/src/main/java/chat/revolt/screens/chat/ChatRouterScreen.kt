@@ -70,12 +70,15 @@ import chat.revolt.BuildConfig
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.internals.DirectMessages
+import chat.revolt.api.internals.UpdateChecker
+import chat.revolt.api.internals.UpdateInfo
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
 import chat.revolt.api.routes.push.subscribePush
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
 import chat.revolt.composables.chat.DisconnectedNotice
+import chat.revolt.composables.generic.UpdateBanner
 import chat.revolt.composables.screens.chat.drawer.ChannelSideDrawer
 import chat.revolt.dialogs.NotificationRationaleDialog
 import chat.revolt.internals.Changelogs
@@ -158,8 +161,10 @@ class ChatRouterViewModel @Inject constructor(
     var showNotificationRationale by mutableStateOf(false)
     var showEarlyAccessSpark by mutableStateOf(false)
     var showSwipeToReplySpark by mutableStateOf(false)
+    var updateInfo by mutableStateOf<UpdateInfo?>(null)
 
     private val changelogs = Changelogs(context, kvStorage)
+    private val updateChecker = UpdateChecker(context, kvStorage)
 
     init {
         viewModelScope.launch {
@@ -200,6 +205,15 @@ class ChatRouterViewModel @Inject constructor(
             // right now we only show this in debug builds so Chucker can show its notification
             if (!hasNotificationPermission && BuildConfig.DEBUG) {
                 showNotificationRationale = true
+            }
+
+            // Check for updates
+            if (updateChecker.shouldCheckForUpdates()) {
+                val update = updateChecker.checkForUpdates()
+                if (update != null && !updateChecker.isUpdateDismissed(update.version)) {
+                    updateInfo = update
+                }
+                updateChecker.markUpdateCheckDone()
             }
         }
     }
@@ -242,6 +256,15 @@ class ChatRouterViewModel @Inject constructor(
         showNotificationRationale = false
         viewModelScope.launch {
             kvStorage.set("pushNotificationsRejected", true)
+        }
+    }
+
+    fun dismissUpdate() {
+        viewModelScope.launch {
+            updateInfo?.let {
+                updateChecker.dismissUpdate(it.version)
+                updateInfo = null
+            }
         }
     }
 
@@ -899,21 +922,34 @@ fun ChatRouterScreen(
                     },
                     content = {
                         Box(Modifier.fillMaxSize()) {
-                            ChannelNavigator(
-                                dest = viewModel.currentDestination,
-                                topNav = topNav,
-                                useDrawer = true,
-                                disableBackHandler = disableBackHandler,
-                                toggleDrawer = {
-                                    toggleDrawerLambda()
-                                },
-                                drawerState = drawerState,
-                                drawerGestureEnabled = useSidebarGesture,
-                                setDrawerGestureEnabled = {
-                                    useSidebarGesture = it
-                                },
-                                onEnterVoiceUI = onEnterVoiceUI,
-                            )
+                            Column {
+                                // Update banner
+                                viewModel.updateInfo?.let { updateInfo ->
+                                    UpdateBanner(
+                                        updateInfo = updateInfo,
+                                        onDismiss = viewModel::dismissUpdate
+                                    )
+                                }
+                                
+                                // Main content
+                                Box(Modifier.weight(1f)) {
+                                    ChannelNavigator(
+                                        dest = viewModel.currentDestination,
+                                        topNav = topNav,
+                                        useDrawer = true,
+                                        disableBackHandler = disableBackHandler,
+                                        toggleDrawer = {
+                                            toggleDrawerLambda()
+                                        },
+                                        drawerState = drawerState,
+                                        drawerGestureEnabled = useSidebarGesture,
+                                        setDrawerGestureEnabled = {
+                                            useSidebarGesture = it
+                                        },
+                                        onEnterVoiceUI = onEnterVoiceUI,
+                                    )
+                                }
+                            }
 
                             // This is the overlay on the main content when the drawer is open
                             val interactionSource = remember { MutableInteractionSource() }

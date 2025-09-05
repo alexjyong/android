@@ -18,10 +18,15 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -33,23 +38,47 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import chat.revolt.BuildConfig
 import chat.revolt.R
 import chat.revolt.activities.InviteActivity
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.UpdateChecker
 import chat.revolt.api.settings.FeatureFlags
 import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.composables.generic.ListHeader
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
+import android.content.Context
 
 @HiltViewModel
 class SettingsScreenViewModel @Inject constructor(
-    private val kvStorage: KVStorage
+    private val kvStorage: KVStorage,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
+    private val updateChecker = UpdateChecker(context, kvStorage)
+    
+    var updateCheckerEnabled by mutableStateOf(false)
+        private set
+    
+    init {
+        viewModelScope.launch {
+            updateCheckerEnabled = updateChecker.isUpdateCheckerEnabled()
+        }
+    }
+    
+    fun setUpdateCheckerEnabled(enabled: Boolean) {
+        updateCheckerEnabled = enabled
+        viewModelScope.launch {
+            updateChecker.setUpdateCheckerEnabled(enabled)
+        }
+    }
+    
     fun logout() {
         runBlocking {
             kvStorage.remove("sessionToken")
@@ -215,6 +244,29 @@ fun SettingsScreen(
                             .clickable {
                                 navController.navigate("settings/chat")
                             }
+                    )
+
+                    ListItem(
+                        headlineContent = {
+                            Text(text = "App Updates")
+                        },
+                        supportingContent = {
+                            Text(text = "Automatically check for new releases")
+                        },
+                        leadingContent = {
+                            SettingsIcon {
+                                Icon(
+                                    painter = painterResource(R.drawable.icn_file_download_24dp),
+                                    contentDescription = null,
+                                )
+                            }
+                        },
+                        trailingContent = {
+                            Switch(
+                                checked = viewModel.updateCheckerEnabled,
+                                onCheckedChange = viewModel::setUpdateCheckerEnabled
+                            )
+                        }
                     )
 
                     ListHeader {
