@@ -253,7 +253,7 @@ private fun annotateText(
                                 append(text.substring(lastIndex, match.range.first))
                             }
                             
-                            val userId = match.groupValues[2] // Group 2 contains the ULID
+                            val userId = match.groupValues[2]
                             android.util.Log.d("JBMRenderer", "Processing mention for userId: '$userId'")
                             
                             pushStringAnnotation(
@@ -394,7 +394,6 @@ private fun annotateText(
                     val contents = node.getTextInNode(sourceText).toString()
                     val emoteId = contents.removeSurrounding(":", ":")
                     if (emoteId == contents || !emoteId.isUlid()) {
-                        // Invalid custom emote. Append as if it were regular text.
                         for (child in node.children) {
                             append(annotateText(state, child, revealedSpoilers))
                         }
