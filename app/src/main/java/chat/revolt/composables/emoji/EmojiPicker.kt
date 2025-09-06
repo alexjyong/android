@@ -440,6 +440,7 @@ fun EmojiPicker(
                             RemoteImage(
                                 url = "$REVOLT_FILES/emojis/$emojiId",
                                 description = emoji,
+                                contentScale = ContentScale.Fit,
                                 modifier = Modifier
                                     .clip(CircleShape)
                                     .clickable {
