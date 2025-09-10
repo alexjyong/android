@@ -1,14 +1,12 @@
 package chat.revolt.composables.generic
 
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
@@ -17,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.isUnspecified
 import chat.revolt.api.REVOLT_FILES
+import chat.revolt.composables.generic.RemoteImage
 
 /**
  * Text composable that automatically detects and renders custom emojis in the format :ULID:
@@ -31,7 +30,7 @@ fun EmojiAwareText(
     onTextLayout: ((androidx.compose.ui.text.TextLayoutResult) -> Unit)? = null
 ) {
     val fontSize = LocalTextStyle.current.fontSize
-    val emojiSize = if (fontSize.isUnspecified) 16.sp else fontSize
+    val emojiSize = if (fontSize.isUnspecified) 24.sp else (fontSize * 1.5f)
     
     val customEmojiRegex = Regex(":([0-9A-HJKMNP-TV-Z]{26}):")
     val matches = customEmojiRegex.findAll(text.text).toList()
@@ -42,6 +41,15 @@ fun EmojiAwareText(
             modifier = modifier,
             maxLines = maxLines,
             inlineContent = inlineContent,
+            style = LocalTextStyle.current.copy(
+                lineHeight = if (LocalTextStyle.current.lineHeight.isUnspecified) {
+                    (LocalTextStyle.current.fontSize * 1.5f)
+                } else {
+                    val currentLineHeight = LocalTextStyle.current.lineHeight
+                    val minLineHeight = LocalTextStyle.current.fontSize * 1.5f
+                    if (currentLineHeight.value < minLineHeight.value) minLineHeight else currentLineHeight
+                }
+            ),
             onTextLayout = onTextLayout ?: {}
         )
         return
@@ -98,7 +106,7 @@ fun EmojiAwareText(
         placeholderKey to InlineTextContent(
             placeholder = Placeholder(
                 width = emojiSize,
-                height = emojiSize,
+                height = emojiSize * 1.5f,
                 placeholderVerticalAlign = PlaceholderVerticalAlign.Center
             )
         ) {
@@ -106,8 +114,7 @@ fun EmojiAwareText(
                 url = "$REVOLT_FILES/emojis/$emojiId",
                 description = ":$emojiId:",
                 modifier = Modifier
-                    .size(emojiSize.value.dp)
-                    .clip(CircleShape)
+                    .size(width = emojiSize.value.dp, height = (emojiSize.value * 1.5f).dp)
             )
         }
     }
@@ -119,6 +126,15 @@ fun EmojiAwareText(
         inlineContent = mergedInlineContent,
         modifier = modifier,
         maxLines = maxLines,
+        style = LocalTextStyle.current.copy(
+            lineHeight = if (LocalTextStyle.current.lineHeight.isUnspecified) {
+                (LocalTextStyle.current.fontSize * 1.5f)
+            } else {
+                val currentLineHeight = LocalTextStyle.current.lineHeight
+                val minLineHeight = LocalTextStyle.current.fontSize * 1.5f
+                if (currentLineHeight.value < minLineHeight.value) minLineHeight else currentLineHeight
+            }
+        ),
         onTextLayout = onTextLayout ?: {}
     )
 }

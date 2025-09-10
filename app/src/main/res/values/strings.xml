@@ -620,6 +620,7 @@
     <string name="emoji_picker_skin_tone_fitzpatrick_6">Dark skin tone</string>
     <string name="emoji_picker_search_results_header">Search results</string>
     <string name="emoji_picker_clear_search">Clear search</string>
+    <string name="emoji_picker_recently_used">Recently Used</string>
 
     <string name="voice_join_offering">Join the voice channel</string>
     <string name="voice_join_offering_description_zero">Start the call</string>

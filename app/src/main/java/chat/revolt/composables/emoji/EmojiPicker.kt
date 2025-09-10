@@ -422,19 +422,19 @@ fun EmojiPicker(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "Recently Used",
-                    style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
+                    text = stringResource(R.string.emoji_picker_recently_used),
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(start = 8.dp, bottom = 2.dp)
                 )
                 
                 Row(
                     modifier = Modifier
                         .horizontalScroll(rememberScrollState())
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .padding(horizontal = 8.dp, vertical = 2.dp)
                         .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    recentEmojis.forEach { emoji ->
+                    recentEmojis.take(8).forEach { emoji ->
                         if (emoji.matches(Regex(":[0-9A-Z]{26}:"))) {
                             val emojiId = emoji.removeSurrounding(":", ":")
                             RemoteImage(
@@ -448,13 +448,13 @@ fun EmojiPicker(
                                         EmojiUsageTracker.recordUsage(emoji)
                                         onEmojiSelected(emoji)
                                     }
-                                    .padding(8.dp)
-                                    .size(32.dp)
+                                    .padding(4.dp)
+                                    .size(28.dp)
                             )
                         } else {
                             Text(
                                 text = emoji,
-                                fontSize = 20.sp,
+                                fontSize = 18.sp,
                                 modifier = Modifier
                                     .clip(CircleShape)
                                     .clickable {
@@ -462,15 +462,15 @@ fun EmojiPicker(
                                         EmojiUsageTracker.recordUsage(emoji)
                                         onEmojiSelected(emoji)
                                     }
-                                    .padding(8.dp)
-                                    .size(32.dp),
+                                    .padding(4.dp)
+                                    .size(28.dp),
                                 textAlign = TextAlign.Center
                             )
                         }
                     }
                 }
                 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(4.dp))
             }
         }
 
