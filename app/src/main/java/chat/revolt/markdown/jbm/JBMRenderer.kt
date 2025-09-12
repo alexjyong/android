@@ -87,6 +87,7 @@ import chat.revolt.composables.generic.EmojiAwareText
 import chat.revolt.composables.generic.RemoteImage
 import chat.revolt.composables.generic.UserAvatar
 import chat.revolt.composables.markdown.Annotations
+import chat.revolt.internals.EmojiRepository
 import chat.revolt.composables.utils.detectTapGesturesConditionalConsume
 import chat.revolt.markdown.jbm.RSMElementTypes
 import chat.revolt.ui.theme.FragmentMono
@@ -237,8 +238,14 @@ private fun annotateText(
                         node.getTextInNode(sourceText)
                     }
                     
-                    val text = source.toString()
+                    var text = source.toString()
                     val mentionRegex = Regex("(ZZUSERMENTION([0-9A-HJKMNP-TV-Z]{26})ZZ)")
+                    
+                    val unicodeEmoteRegex = Regex(":([a-zA-Z0-9_+-]+):")
+                    text = unicodeEmoteRegex.replace(text) { matchResult ->
+                        val shortcodeName = matchResult.groupValues[1]
+                        EmojiRepository.unicodeByShortcode(shortcodeName) ?: matchResult.value
+                    }
                     
                     android.util.Log.d("JBMRenderer", "Processing TEXT: '$text'")
                     android.util.Log.d("JBMRenderer", "Contains mention: ${mentionRegex.containsMatchIn(text)}")
@@ -644,16 +651,19 @@ private fun AnnotatedString.Builder.processSpoilerParagraph(
     onSurface: Color,
     contentColor: Color
 ) {
+    val unicodeEmoteRegex = Regex(":([a-zA-Z0-9_+-]+):")
+    val processedText = unicodeEmoteRegex.replace(text) { matchResult ->
+        val shortcodeName = matchResult.groupValues[1]
+        EmojiRepository.unicodeByShortcode(shortcodeName) ?: matchResult.value
+    }
+    
     val spoilerRegex = Regex("\\|\\|(.+?)\\|\\|")
     var lastIndex = 0
     
-    android.util.Log.d("JBMRenderer", "Processing spoiler paragraph: '$text'")
-    
-    for (match in spoilerRegex.findAll(text)) {
-        android.util.Log.d("JBMRenderer", "Found spoiler match: '${match.value}'")
+    for (match in spoilerRegex.findAll(processedText)) {
         
         // Append text before spoiler
-        append(text.substring(lastIndex, match.range.first))
+        append(processedText.substring(lastIndex, match.range.first))
         
         // Handle spoiler
         val spoilerContent = match.groupValues[1]
@@ -679,7 +689,7 @@ private fun AnnotatedString.Builder.processSpoilerParagraph(
         lastIndex = match.range.last + 1
     }
     
-    append(text.substring(lastIndex))
+    append(processedText.substring(lastIndex))
 }
 
 @Composable
