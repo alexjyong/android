@@ -144,6 +144,7 @@ import chat.revolt.composables.screens.chat.molecules.JoinVoiceChannelButton
 import chat.revolt.composables.skeletons.MessageSkeleton
 import chat.revolt.composables.skeletons.MessageSkeletonVariant
 import chat.revolt.internals.extensions.rememberChannelPermissions
+import chat.revolt.internals.extensions.rememberChannelPermissionsWithLoading
 import chat.revolt.internals.extensions.zero
 import chat.revolt.screens.chat.LocalIsConnected
 import chat.revolt.sheets.ChannelInfoSheet
@@ -220,7 +221,8 @@ fun ChannelScreen(
     }
     // </editor-fold>
     // <editor-fold desc="Load/switch channel">
-    val channelPermissions by rememberChannelPermissions(channelId, viewModel.ensuredSelfMember)
+    val channelPermissionState = rememberChannelPermissionsWithLoading(channelId, viewModel.ensuredSelfMember)
+    val channelPermissions = channelPermissionState.permissions
 
     LaunchedEffect(channelId) {
         viewModel.switchChannel(channelId)
@@ -1129,7 +1131,7 @@ fun ChannelScreen(
                                                 }
                                             },
                                             forceSendButton = viewModel.draftAttachments.isNotEmpty(),
-                                            canAttach = (channelPermissions has PermissionBit.UploadFiles) && viewModel.editingMessage == null,
+                                            canAttach = (channelPermissions has PermissionBit.UploadFiles) && viewModel.editingMessage == null && !channelPermissionState.isLoading,
                                             serverId = viewModel.channel?.server,
                                             channelId = channelId,
                                             failedValidation = viewModel.draftContent.length > 2000,
