@@ -159,8 +159,11 @@ fun JBMRenderer(content: String, modifier: Modifier = Modifier) {
     val state = LocalJBMarkdownTreeState.current
     android.util.Log.d("JBMRenderer", "JBMRenderer called with content: '${content.take(50)}...', enhanced: ${state.enhanced}")
     
-    val preprocessedContent = content.replace(Regex("<@([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
+    var preprocessedContent = content.replace(Regex("<@([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
         "ZZUSERMENTION${match.groupValues[1]}ZZ"
+    }
+    preprocessedContent = preprocessedContent.replace(Regex("<#([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
+        "ZZCHANNELMENTION${match.groupValues[1]}ZZ"
     }
     android.util.Log.d("JBMRenderer", "Preprocessed content: '${preprocessedContent.take(50)}...'")
     
@@ -171,8 +174,11 @@ fun JBMRenderer(content: String, modifier: Modifier = Modifier) {
     var revealedSpoilers by remember { mutableStateOf(setOf<String>()) }
 
     LaunchedEffect(content, state.enhanced) {
-        val preprocessedContent = content.replace(Regex("<@([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
+        var preprocessedContent = content.replace(Regex("<@([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
             "ZZUSERMENTION${match.groupValues[1]}ZZ"
+        }
+        preprocessedContent = preprocessedContent.replace(Regex("<#([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
+            "ZZCHANNELMENTION${match.groupValues[1]}ZZ"
         }
         tree = JBMApi.parse(preprocessedContent, flavor)
     }
@@ -240,50 +246,68 @@ private fun annotateText(
                     
                     var text = source.toString()
                     val mentionRegex = Regex("(ZZUSERMENTION([0-9A-HJKMNP-TV-Z]{26})ZZ)")
+                    val channelMentionRegex = Regex("(ZZCHANNELMENTION([0-9A-HJKMNP-TV-Z]{26})ZZ)")
                     
                     val unicodeEmoteRegex = Regex(":([a-zA-Z0-9_+-]+):")
                     text = unicodeEmoteRegex.replace(text) { matchResult ->
                         val shortcodeName = matchResult.groupValues[1]
                         EmojiRepository.unicodeByShortcode(shortcodeName) ?: matchResult.value
                     }
-                    
-                    android.util.Log.d("JBMRenderer", "Processing TEXT: '$text'")
-                    android.util.Log.d("JBMRenderer", "Contains mention: ${mentionRegex.containsMatchIn(text)}")
-                    
-                    if (mentionRegex.containsMatchIn(text)) {
+
+                    if (mentionRegex.containsMatchIn(text) || channelMentionRegex.containsMatchIn(text)) {
                         android.util.Log.d("JBMRenderer", "Found mentions in text")
                         var lastIndex = 0
-                        mentionRegex.findAll(text).forEach { match ->
-                            android.util.Log.d("JBMRenderer", "Match: '${match.value}', groups: ${match.groupValues}")
-                            
+
+                        val userMatches = mentionRegex.findAll(text).map { it to "user" }
+                        val channelMatches = channelMentionRegex.findAll(text).map { it to "channel" }
+                        val allMatches = (userMatches + channelMatches).sortedBy { it.first.range.first }
+
+                        allMatches.forEach { (match, type) ->
+
                             if (match.range.first > lastIndex) {
                                 append(text.substring(lastIndex, match.range.first))
                             }
-                            
-                            val userId = match.groupValues[2]
-                            android.util.Log.d("JBMRenderer", "Processing mention for userId: '$userId'")
-                            
-                            pushStringAnnotation(
-                                tag = JBMAnnotations.UserMention.tag,
-                                annotation = userId
-                            )
-                            pushStyle(
-                                SpanStyle(
-                                    color = state.colors.clickable,
-                                    background = state.colors.clickableBackground
+
+                            if (type == "user") {
+                                val userId = match.groupValues[2]
+
+                                pushStringAnnotation(
+                                    tag = JBMAnnotations.UserMention.tag,
+                                    annotation = userId
                                 )
-                            )
-                            append(" ")
-                            appendInlineContent(JBMAnnotations.UserAvatar.tag, userId)
-                            append(" ")
-                            append(MentionResolver.resolveUser(userId, state.currentServer))
-                            append(" ")
-                            pop()
-                            pop()
-                            
+                                pushStyle(
+                                    SpanStyle(
+                                        color = state.colors.clickable,
+                                        background = state.colors.clickableBackground
+                                    )
+                                )
+                                append(" ")
+                                appendInlineContent(JBMAnnotations.UserAvatar.tag, userId)
+                                append(" ")
+                                append(MentionResolver.resolveUser(userId, state.currentServer))
+                                append(" ")
+                                pop()
+                                pop()
+                            } else if (type == "channel") {
+                                val channelId = match.groupValues[2]
+
+                                pushStringAnnotation(
+                                    tag = JBMAnnotations.ChannelMention.tag,
+                                    annotation = channelId
+                                )
+                                pushStyle(
+                                    SpanStyle(
+                                        color = state.colors.clickable,
+                                        background = state.colors.clickableBackground
+                                    )
+                                )
+                                append(MentionResolver.resolveChannel(channelId))
+                                pop()
+                                pop()
+                            }
+
                             lastIndex = match.range.last + 1
                         }
-                        
                         if (lastIndex < text.length) {
                             append(text.substring(lastIndex))
                         }
