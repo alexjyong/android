@@ -159,7 +159,7 @@ fun preprocessContent(content: String): String {
     EmojiRepository.ensureInitialized()
     val allEmoticons = EmojiRepository.getAllEmoticons()
 
-    val urlPattern = Regex("https?://[^\\s]+")
+    val urlPattern = Regex("(?:https?|ftp|ftps|file|mailto|tel|sms|discord|steam|spotify|twitch|youtube|git|ssh|sftp|ws|wss|rtsp|rtmp|magnet|bitcoin|ethereum|ipfs|dat|hyper)://[^\\s]+")
     val urlRanges = urlPattern.findAll(preprocessedContent).map { it.range }.toList()
 
     for (emoticon in allEmoticons) {
