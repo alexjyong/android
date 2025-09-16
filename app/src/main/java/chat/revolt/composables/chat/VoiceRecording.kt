@@ -204,7 +204,7 @@ fun VoiceRecordingButton(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            onStartRecording()
+            onShowRecordingUI()
         } else {
             permissionDenied = true
         }

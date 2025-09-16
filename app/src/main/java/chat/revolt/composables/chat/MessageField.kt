@@ -221,7 +221,7 @@ fun MessageField(
     val voiceRecorder = remember { VoiceRecorder(context) }
 
     val sendButtonVisible =
-        (!valueIsBlank || forceSendButton || voiceRecordingState is VoiceRecordingState.Recorded) && !disabled && !failedValidation
+        (!valueIsBlank || forceSendButton) && !disabled && !failedValidation
 
     val startVoiceRecording: () -> Unit = {
         val file = voiceRecorder.startRecording()
@@ -233,7 +233,8 @@ fun MessageField(
     val stopVoiceRecording: () -> Unit = {
         val (file, duration) = voiceRecorder.stopRecording()
         if (file != null && duration > 1000) { // At least 1 second
-            voiceRecordingState = VoiceRecordingState.Recorded(file, duration)
+            onVoiceMessageRecorded(file)
+            voiceRecordingState = VoiceRecordingState.Idle
         } else {
             voiceRecordingState = VoiceRecordingState.Idle
             file?.delete() // Delete short recordings
@@ -539,7 +540,7 @@ fun MessageField(
         }
 
         AnimatedVisibility(
-            visible = voiceRecordingState is VoiceRecordingState.Ready || voiceRecordingState is VoiceRecordingState.Recording || voiceRecordingState is VoiceRecordingState.Recorded
+            visible = voiceRecordingState is VoiceRecordingState.Ready || voiceRecordingState is VoiceRecordingState.Recording
         ) {
             VoiceRecordingUI(
                 state = voiceRecordingState,
@@ -713,15 +714,8 @@ fun MessageField(
                         .padding(end = 8.dp)
                         .clip(CircleShape)
                         .clickable {
-                            val currentState = voiceRecordingState
-                            if (currentState is VoiceRecordingState.Recorded) {
-                                // Send voice message
-                                onVoiceMessageRecorded(currentState.file)
-                                voiceRecordingState = VoiceRecordingState.Idle
-                            } else {
-                                // Send text message
-                                onSendMessage()
-                            }
+                            // Send text message
+                            onSendMessage()
                         }
                         .size(32.dp)
                         .padding(4.dp)
