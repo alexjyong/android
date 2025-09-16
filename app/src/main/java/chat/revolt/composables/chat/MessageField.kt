@@ -80,6 +80,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import chat.revolt.R
 import chat.revolt.activities.RevoltTweenFloat
 import chat.revolt.activities.RevoltTweenInt
@@ -93,6 +94,7 @@ import chat.revolt.composables.generic.UserAvatar
 import chat.revolt.composables.screens.chat.ChannelIcon
 import chat.revolt.internals.Autocomplete
 import kotlinx.coroutines.launch
+import java.io.File
 
 fun Pair<Int, Int>.asTextRange(): TextRange {
     return TextRange(this.first, this.second)
@@ -159,6 +161,7 @@ fun MessageField(
     onCommitAttachment: (Uri) -> Unit,
     onPickEmoji: () -> Unit,
     onSendMessage: () -> Unit,
+    onVoiceMessageRecorded: (File) -> Unit = {},
     channelType: ChannelType,
     channelName: String,
     modifier: Modifier = Modifier,
@@ -181,9 +184,6 @@ fun MessageField(
         ChannelType.VoiceChannel -> R.string.message_field_placeholder_voice
         ChannelType.SavedMessages -> R.string.message_field_placeholder_notes
     }
-
-    val sendButtonVisible =
-        (!valueIsBlank || forceSendButton) && !disabled && !failedValidation
 
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
@@ -215,6 +215,42 @@ fun MessageField(
 
     val scope = rememberCoroutineScope()
     var isFocused by remember { mutableStateOf(false) }
+
+    var voiceRecordingState by remember { mutableStateOf<VoiceRecordingState>(VoiceRecordingState.Idle) }
+    val context = LocalContext.current
+    val voiceRecorder = remember { VoiceRecorder(context) }
+
+    val sendButtonVisible =
+        (!valueIsBlank || forceSendButton || voiceRecordingState is VoiceRecordingState.Recorded) && !disabled && !failedValidation
+
+    val startVoiceRecording: () -> Unit = {
+        val file = voiceRecorder.startRecording()
+        if (file != null) {
+            voiceRecordingState = VoiceRecordingState.Recording
+        }
+    }
+
+    val stopVoiceRecording: () -> Unit = {
+        val (file, duration) = voiceRecorder.stopRecording()
+        if (file != null && duration > 1000) { // At least 1 second
+            voiceRecordingState = VoiceRecordingState.Recorded(file, duration)
+        } else {
+            voiceRecordingState = VoiceRecordingState.Idle
+            file?.delete() // Delete short recordings
+        }
+    }
+
+    val deleteVoiceRecording: () -> Unit = {
+        val currentState = voiceRecordingState
+        if (currentState is VoiceRecordingState.Recorded) {
+            currentState.file.delete()
+        }
+        voiceRecordingState = VoiceRecordingState.Idle
+    }
+
+    val showRecordingUI: () -> Unit = {
+        voiceRecordingState = VoiceRecordingState.Ready
+    }
 
     LaunchedEffect(textFieldState.text) {
         onValueChange(textFieldState.text.toString())
@@ -501,6 +537,20 @@ fun MessageField(
                 }
             }
         }
+
+        AnimatedVisibility(
+            visible = voiceRecordingState is VoiceRecordingState.Ready || voiceRecordingState is VoiceRecordingState.Recording || voiceRecordingState is VoiceRecordingState.Recorded
+        ) {
+            VoiceRecordingUI(
+                state = voiceRecordingState,
+                onStartRecording = startVoiceRecording,
+                onStopRecording = stopVoiceRecording,
+                onDeleteRecording = deleteVoiceRecording,
+                onShowRecordingUI = showRecordingUI,
+                modifier = Modifier.padding(8.dp)
+            )
+        }
+
         Row(
             modifier = modifier
                 .background(MaterialTheme.colorScheme.surfaceContainer),
@@ -606,6 +656,14 @@ fun MessageField(
                 }
             )
 
+            VoiceRecordingButton(
+                onStartRecording = startVoiceRecording,
+                onStopRecording = stopVoiceRecording,
+                onShowRecordingUI = showRecordingUI,
+                state = voiceRecordingState,
+                modifier = Modifier
+            )
+
             Icon(
                 painter = painterResource(R.drawable.icn_mood_24dp),
                 tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
@@ -654,7 +712,17 @@ fun MessageField(
                     modifier = Modifier
                         .padding(end = 8.dp)
                         .clip(CircleShape)
-                        .clickable { onSendMessage() }
+                        .clickable {
+                            val currentState = voiceRecordingState
+                            if (currentState is VoiceRecordingState.Recorded) {
+                                // Send voice message
+                                onVoiceMessageRecorded(currentState.file)
+                                voiceRecordingState = VoiceRecordingState.Idle
+                            } else {
+                                // Send text message
+                                onSendMessage()
+                            }
+                        }
                         .size(32.dp)
                         .padding(4.dp)
                         .testTag("send_message")
@@ -674,6 +742,7 @@ fun NativeMessageFieldPreview() {
         onCommitAttachment = {},
         onPickEmoji = {},
         onSendMessage = {},
+        onVoiceMessageRecorded = {},
         channelType = ChannelType.DirectMessage,
         channelName = "Test",
         modifier = Modifier,

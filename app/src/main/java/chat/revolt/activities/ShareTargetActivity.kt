@@ -421,6 +421,7 @@ fun ShareTargetScreen(
                                     }
                                 }
                             },
+                            onVoiceMessageRecorded = { /* Voice messages not supported in share target */ },
                             channelType = RevoltAPI.channelCache[selectedChannel]?.channelType
                                 ?: ChannelType.TextChannel,
                             channelName = RevoltAPI.channelCache[selectedChannel]?.name ?: "",

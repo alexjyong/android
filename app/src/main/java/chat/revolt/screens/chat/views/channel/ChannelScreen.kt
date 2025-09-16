@@ -1117,6 +1117,17 @@ fun ChannelScreen(
                                                 }
                                             },
                                             onSendMessage = viewModel::sendPendingMessage,
+                                            onVoiceMessageRecorded = { file ->
+                                                viewModel.draftAttachments.add(
+                                                    FileArgs(
+                                                        file = file,
+                                                        filename = file.name,
+                                                        contentType = "audio/ogg",
+                                                        spoiler = false,
+                                                        pickerIdentifier = null
+                                                    )
+                                                )
+                                            },
                                             channelType = viewModel.channel?.channelType
                                                 ?: ChannelType.TextChannel,
                                             channelName = viewModel.channel?.let { channel ->
