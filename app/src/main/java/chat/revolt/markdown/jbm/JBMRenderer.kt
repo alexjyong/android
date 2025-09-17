@@ -153,66 +153,34 @@ val LocalJBMarkdownTreeState =
 
 val avatarPadding = 2.dp
 
-fun preprocessContent(content: String): String {
-    var preprocessedContent = content
-
-    EmojiRepository.ensureInitialized()
-    val allEmoticons = EmojiRepository.getAllEmoticons()
-
-    val urlPattern = Regex("(?:https?|ftp|ftps|file|mailto|tel|sms|discord|steam|spotify|twitch|youtube|git|ssh|sftp|ws|wss|rtsp|rtmp|magnet|bitcoin|ethereum|ipfs|dat|hyper)://[^\\s]+")
-    val urlRanges = urlPattern.findAll(preprocessedContent).map { it.range }.toList()
-
-    for (emoticon in allEmoticons) {
-        if (preprocessedContent.contains(emoticon)) {
-            val emoticonMatches = Regex.fromLiteral(emoticon).findAll(preprocessedContent).toList()
-
-            for (match in emoticonMatches.reversed()) { // Process in reverse to maintain indices
-                val matchRange = match.range
-
-                val isInsideUrl = urlRanges.any { urlRange ->
-                    matchRange.first >= urlRange.first && matchRange.last <= urlRange.last
-                }
-
-                if (!isInsideUrl) {
-                    val encoded = java.util.Base64.getEncoder().encodeToString(emoticon.toByteArray())
-                    val placeholder = "ZZEMOTICON${encoded}ZZ"
-                    preprocessedContent = preprocessedContent.replaceRange(matchRange, placeholder)
-                    android.util.Log.d("JBMRenderer", "Replaced '$emoticon' with placeholder $placeholder (not in URL)")
-                } else {
-                    android.util.Log.d("JBMRenderer", "Skipping '$emoticon' replacement - inside URL")
-                }
-            }
-        }
-    }
-
-    preprocessedContent = preprocessedContent.replace(Regex("<@([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
-        "ZZUSERMENTION${match.groupValues[1]}ZZ"
-    }
-    preprocessedContent = preprocessedContent.replace(Regex("<#([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
-        "ZZCHANNELMENTION${match.groupValues[1]}ZZ"
-    }
-
-    return preprocessedContent
-}
-
 @Composable
 @JBM
 fun JBMRenderer(content: String, modifier: Modifier = Modifier) {
     val state = LocalJBMarkdownTreeState.current
     android.util.Log.d("JBMRenderer", "JBMRenderer called with content: '${content.take(50)}...', enhanced: ${state.enhanced}")
-
-    val preprocessedContent = preprocessContent(content)
+    
+    var preprocessedContent = content.replace(Regex("<@([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
+        "ZZUSERMENTION${match.groupValues[1]}ZZ"
+    }
+    preprocessedContent = preprocessedContent.replace(Regex("<#([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
+        "ZZCHANNELMENTION${match.groupValues[1]}ZZ"
+    }
     android.util.Log.d("JBMRenderer", "Preprocessed content: '${preprocessedContent.take(50)}...'")
-
+    
     val flavor = if (state.enhanced) RSMEnhancedFlavourDescriptor() else RSMFlavourDescriptor()
     android.util.Log.d("JBMRenderer", "Using flavor: ${flavor.javaClass.simpleName}")
-
+    
     var tree by remember { mutableStateOf(JBMApi.parse(preprocessedContent, flavor)) }
     var revealedSpoilers by remember { mutableStateOf(setOf<String>()) }
 
     LaunchedEffect(content, state.enhanced) {
-        val processedContent = preprocessContent(content)
-        tree = JBMApi.parse(processedContent, flavor)
+        var preprocessedContent = content.replace(Regex("<@([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
+            "ZZUSERMENTION${match.groupValues[1]}ZZ"
+        }
+        preprocessedContent = preprocessedContent.replace(Regex("<#([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
+            "ZZCHANNELMENTION${match.groupValues[1]}ZZ"
+        }
+        tree = JBMApi.parse(preprocessedContent, flavor)
     }
 
     CompositionLocalProvider(
@@ -275,25 +243,11 @@ private fun annotateText(
                     } else {
                         node.getTextInNode(sourceText)
                     }
-
+                    
                     var text = source.toString()
                     val mentionRegex = Regex("(ZZUSERMENTION([0-9A-HJKMNP-TV-Z]{26})ZZ)")
                     val channelMentionRegex = Regex("(ZZCHANNELMENTION([0-9A-HJKMNP-TV-Z]{26})ZZ)")
-
-                    val emoticonPlaceholderRegex = Regex("ZZEMOTICON([A-Za-z0-9+/=]+)ZZ")
-                    text = emoticonPlaceholderRegex.replace(text) { matchResult ->
-                        try {
-                            val encoded = matchResult.groupValues[1]
-                            val originalEmoticon = String(java.util.Base64.getDecoder().decode(encoded))
-                            val emoji = EmojiRepository.unicodeByEmoticon(originalEmoticon)
-                            android.util.Log.d("JBMRenderer", "Converting placeholder back: '$originalEmoticon' -> '$emoji'")
-                            emoji ?: matchResult.value // Return original if conversion fails
-                        } catch (e: Exception) {
-                            android.util.Log.e("JBMRenderer", "Failed to decode emoticon placeholder: ${matchResult.value}", e)
-                            matchResult.value // Return original on error
-                        }
-                    }
-
+                    
                     val unicodeEmoteRegex = Regex(":([a-zA-Z0-9_+-]+):")
                     text = unicodeEmoteRegex.replace(text) { matchResult ->
                         val shortcodeName = matchResult.groupValues[1]
@@ -721,22 +675,8 @@ private fun AnnotatedString.Builder.processSpoilerParagraph(
     onSurface: Color,
     contentColor: Color
 ) {
-    var processedText = text
-
-    val emoticonPlaceholderRegex = Regex("ZZEMOTICON([A-Za-z0-9+/=]+)ZZ")
-    processedText = emoticonPlaceholderRegex.replace(processedText) { matchResult ->
-        try {
-            val encoded = matchResult.groupValues[1]
-            val originalEmoticon = String(java.util.Base64.getDecoder().decode(encoded))
-            val emoji = EmojiRepository.unicodeByEmoticon(originalEmoticon)
-            emoji ?: matchResult.value
-        } catch (e: Exception) {
-            matchResult.value
-        }
-    }
-
     val unicodeEmoteRegex = Regex(":([a-zA-Z0-9_+-]+):")
-    processedText = unicodeEmoteRegex.replace(processedText) { matchResult ->
+    val processedText = unicodeEmoteRegex.replace(text) { matchResult ->
         val shortcodeName = matchResult.groupValues[1]
         EmojiRepository.unicodeByShortcode(shortcodeName) ?: matchResult.value
     }

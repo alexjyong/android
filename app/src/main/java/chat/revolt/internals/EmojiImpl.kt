@@ -13,6 +13,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
 import java.util.concurrent.ConcurrentHashMap
 
 @Serializable
@@ -69,11 +71,12 @@ sealed class EmojiPickerItem {
 
 object EmojiRepository {
     private var metadata: List<EmojiGroup>? = null
+    private var shortcodeMapping: Map<String, String>? = null
     private val serverEmojiCache = ConcurrentHashMap<String, List<EmojiPickerItem>>()
     private val serverListCache = ConcurrentHashMap<Int, List<Server>>()
     private var cachedPickerList: List<EmojiPickerItem>? = null
     private var cachedCategorySpans: Map<Category, Pair<Int, Int>>? = null
-
+    
     val isReady = mutableStateOf(false)
     val isLoading = mutableStateOf(false)
     
@@ -86,35 +89,29 @@ object EmojiRepository {
         }
     }
     
+    private suspend fun initShortcodeMapping(context: Context): Map<String, String> {
+        return withContext(Dispatchers.IO) {
+            val json = context.assets.open("metadata/shortcode_emoji.json").use {
+                it.reader().readText()
+            }
+            RevoltJson.decodeFromString(MapSerializer(String.serializer(), String.serializer()), json)
+        }
+    }
     
     fun initialize(scope: CoroutineScope) {
         if (isReady.value || isLoading.value) return
-
+        
         scope.launch {
             isLoading.value = true
             try {
                 val context = RevoltApplication.instance.applicationContext
                 metadata = initMetadata(context)
+                shortcodeMapping = initShortcodeMapping(context)
                 isReady.value = true
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
                 isLoading.value = false
-            }
-        }
-    }
-
-    fun ensureInitialized() {
-        if (metadata == null && !isLoading.value) {
-            try {
-                val context = RevoltApplication.instance.applicationContext
-                val json = context.assets.open("metadata/emoji.json").use {
-                    it.reader().readText()
-                }
-                metadata = RevoltJson.decodeFromString(ListSerializer(EmojiGroup.serializer()), json)
-                isReady.value = true
-            } catch (e: Exception) {
-                android.util.Log.e("EmojiRepository", "Failed to initialize emoji metadata", e)
             }
         }
     }
@@ -275,6 +272,18 @@ object EmojiRepository {
             }
         }
 
+        val matchingCustomShortcodes = customShortcodeContains(query)
+        if (matchingCustomShortcodes.isNotEmpty()) {
+            val smileyCategory = Category.UnicodeEmojiCategory(UnicodeEmojiSection.Smileys)
+            list.add(EmojiPickerItem.Section(smileyCategory))
+            list.addAll(matchingCustomShortcodes.map { (shortcode, unicode) ->
+                EmojiPickerItem.UnicodeEmoji(
+                    character = unicode,
+                    hasSkinTones = false,
+                    alternates = emptyList()
+                )
+            })
+        }
 
         for (group in currentMetadata) {
             val matchingEmoji = group.emoji.filter {
@@ -309,26 +318,16 @@ object EmojiRepository {
     }
 
     fun unicodeByShortcode(shortcode: String): String? {
+        shortcodeMapping?.get(shortcode)?.let { return it }
         val currentMetadata = metadata ?: return null
         return currentMetadata.asSequence().mapNotNull { group ->
             group.emoji.find { emoji ->
                 emoji.shortcodes.any { code ->
-                    code == ":${shortcode}:" || code == shortcode
+                    code == ":${shortcode}:"
                 }
             }
-        }.firstOrNull()?.let { emoji ->
-            emoji.base.joinToString("") { String(Character.toChars(it.toInt())) }
-        }
-    }
-
-    fun unicodeByEmoticon(emoticon: String): String? {
-        val currentMetadata = metadata ?: return null
-        return currentMetadata.asSequence().mapNotNull { group ->
-            group.emoji.find { emoji ->
-                emoji.emoticons.contains(emoticon)
-            }
-        }.firstOrNull()?.let { emoji ->
-            emoji.base.joinToString("") { String(Character.toChars(it.toInt())) }
+        }.firstOrNull().let { emoji ->
+            emoji?.base?.joinToString("") { String(Character.toChars(it.toInt())) }
         }
     }
 
@@ -343,6 +342,12 @@ object EmojiRepository {
         }.flatten().toList()
     }
     
+    fun customShortcodeContains(query: String): List<Pair<String, String>> {
+        val currentMapping = shortcodeMapping ?: return emptyList()
+        return currentMapping.filter { (shortcode, _) ->
+            shortcode.contains(query, ignoreCase = true)
+        }.toList()
+    }
 
     fun unicodeAsShortcode(unicode: String): String? {
         val currentMetadata = metadata ?: return null
@@ -366,16 +371,6 @@ object EmojiRepository {
         }
     }
     
-    fun getAllEmoticons(): List<String> {
-        val currentMetadata = metadata ?: return emptyList()
-        return currentMetadata.asSequence()
-            .flatMap { group -> group.emoji }
-            .flatMap { emoji -> emoji.emoticons }
-            .distinct()
-            .sortedByDescending { it.length } // Longer patterns first to avoid partial matches
-            .toList()
-    }
-
     fun invalidateCache() {
         serverEmojiCache.clear()
         serverListCache.clear()
