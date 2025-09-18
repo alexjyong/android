@@ -51,6 +51,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.structuralEqualityPolicy
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
@@ -74,6 +77,8 @@ import chat.revolt.api.internals.UpdateChecker
 import chat.revolt.api.internals.UpdateInfo
 import chat.revolt.api.realtime.DisconnectionState
 import chat.revolt.api.realtime.RealtimeSocket
+import chat.revolt.api.settings.LoadedSettings
+import chat.revolt.api.settings.ServerSelectionBehavior
 import chat.revolt.api.routes.push.subscribePush
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
@@ -162,6 +167,9 @@ class ChatRouterViewModel @Inject constructor(
     var showEarlyAccessSpark by mutableStateOf(false)
     var showSwipeToReplySpark by mutableStateOf(false)
     var updateInfo by mutableStateOf<UpdateInfo?>(null)
+
+    private val _shouldAutoOpenDrawer = MutableStateFlow(false)
+    val shouldAutoOpenDrawer = _shouldAutoOpenDrawer.asStateFlow()
 
     private val changelogs = Changelogs(context, kvStorage)
     private val updateChecker = UpdateChecker(context, kvStorage)
@@ -290,10 +298,18 @@ class ChatRouterViewModel @Inject constructor(
 
             if (channelId != null && channelExists) {
                 setSaveDestination(ChatRouterDestination.Channel(channelId))
+
+                if (LoadedSettings.serverSelectionBehavior == ServerSelectionBehavior.ShowChannelList) {
+                    _shouldAutoOpenDrawer.value = true
+                }
             } else {
                 setSaveDestination(ChatRouterDestination.NoCurrentChannel(serverId))
             }
         }
+    }
+
+    fun clearAutoOpenDrawer() {
+        _shouldAutoOpenDrawer.value = false
     }
 }
 
@@ -396,6 +412,15 @@ fun ChatRouterScreen(
                     keyboard.hideSoftInputFromWindow(view.windowToken, 0)
                 }
             }
+    }
+
+    LaunchedEffect(viewModel) {
+        viewModel.shouldAutoOpenDrawer.collectLatest { shouldOpen ->
+            if (shouldOpen) {
+                drawerState.open()
+                viewModel.clearAutoOpenDrawer()
+            }
+        }
     }
 
     LaunchedEffect(RevoltAPI.selfId) {

@@ -54,6 +54,11 @@ data class AndroidSpecificSettings(
      */
     var messageReplyStyle: String? = null,
     /**
+     * Server selection behavior.
+     * Can be one of `{ LastChannel, ShowChannelList }`
+     */
+    var serverSelectionBehavior: String? = null,
+    /**
      * Avatar radius.
      * Must be integer in range 0..50 inclusive.
      */

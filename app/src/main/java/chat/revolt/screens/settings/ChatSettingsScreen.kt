@@ -40,6 +40,7 @@ import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.api.settings.LoadedSettings
 import chat.revolt.api.settings.MessageReplyStyle
+import chat.revolt.api.settings.ServerSelectionBehavior
 import chat.revolt.api.settings.SpecialEmbedSettings
 import chat.revolt.api.settings.SyncedSettings
 import chat.revolt.composables.generic.ListHeader
@@ -51,6 +52,13 @@ class ChatSettingsScreenViewModel : ViewModel() {
         viewModelScope.launch {
             SyncedSettings.updateAndroid(SyncedSettings.android.copy(messageReplyStyle = next.name))
             LoadedSettings.messageReplyStyle = next
+        }
+    }
+
+    fun updateServerSelectionBehavior(next: ServerSelectionBehavior) {
+        viewModelScope.launch {
+            SyncedSettings.updateAndroid(SyncedSettings.android.copy(serverSelectionBehavior = next.name))
+            LoadedSettings.serverSelectionBehavior = next
         }
     }
 
@@ -195,6 +203,31 @@ fun ChatSettingsScreen(
                     selected = LoadedSettings.messageReplyStyle == MessageReplyStyle.DoubleTap,
                     onClick = { viewModel.updateMessageReplyStyle(MessageReplyStyle.DoubleTap) },
                     label = { Text(text = stringResource(R.string.settings_chat_quick_reply_double_tap)) }
+                )
+            }
+
+            ListHeader {
+                Text(
+                    text = "Server Selection"
+                )
+            }
+
+            Column(Modifier.selectableGroup()) {
+                RadioItem(
+                    selected = LoadedSettings.serverSelectionBehavior == ServerSelectionBehavior.LastChannel,
+                    onClick = { viewModel.updateServerSelectionBehavior(ServerSelectionBehavior.LastChannel) },
+                    label = { Text(text = "Go to Last Channel") },
+                    description = {
+                        Text(text = "Navigate directly to the last used channel when selecting a server")
+                    }
+                )
+                RadioItem(
+                    selected = LoadedSettings.serverSelectionBehavior == ServerSelectionBehavior.ShowChannelList,
+                    onClick = { viewModel.updateServerSelectionBehavior(ServerSelectionBehavior.ShowChannelList) },
+                    label = { Text(text = "Show Channel List") },
+                    description = {
+                        Text(text = "Open the channel list automatically after navigating to the last used channel")
+                    }
                 )
             }
 

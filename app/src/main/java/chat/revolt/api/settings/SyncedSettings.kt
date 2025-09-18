@@ -28,7 +28,8 @@ object SyncedSettings {
         AndroidSpecificSettings(
             theme = "None",
             colourOverrides = null,
-            messageReplyStyle = "None"
+            messageReplyStyle = "None",
+            serverSelectionBehavior = "LastChannel"
         )
     )
     private val _notifications = mutableStateOf(NotificationSettings())
@@ -131,7 +132,8 @@ object SyncedSettings {
         val default = AndroidSpecificSettings(
             theme = "None",
             colourOverrides = null,
-            messageReplyStyle = "None"
+            messageReplyStyle = "None",
+            serverSelectionBehavior = "LastChannel"
         )
         _android.value = default
         setKey("android", RevoltJson.encodeToString(AndroidSpecificSettings.serializer(), default))
