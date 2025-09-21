@@ -1029,7 +1029,7 @@ fun Sidebar(
         navigateToServer = viewModel::navigateToServer,
         onLongPressAvatar = onShowStatusSheet,
         onShowServerContextSheet = onShowServerContextSheet,
-        showSettingsIcon = showSettingsButton,
+        showSettingsIcon = true,
         onOpenSettings = onOpenSettings,
         topNav = topNav,
         onShowAddServerSheet = onShowAddServerSheet
