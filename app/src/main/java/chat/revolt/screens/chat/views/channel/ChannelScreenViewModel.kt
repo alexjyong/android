@@ -723,7 +723,27 @@ class ChannelScreenViewModel @Inject constructor(
 
                     is RealtimeSocketFrames.Reconnected -> {
                         Log.d("ChannelScreen", "Reconnected to WS.")
-                        loadMessages(50, ignoreExisting = true)
+
+                        val mostRecentMessageId = items.firstOrNull { item ->
+                            when (item) {
+                                is ChannelScreenItem.RegularMessage -> item.message.id != null
+                                is ChannelScreenItem.SystemMessage -> item.message.id != null
+                                else -> false
+                            }
+                        }?.let { item ->
+                            when (item) {
+                                is ChannelScreenItem.RegularMessage -> item.message.id
+                                is ChannelScreenItem.SystemMessage -> item.message.id
+                                else -> null
+                            }
+                        }
+
+                        if (items.isEmpty() || items.all { it is ChannelScreenItem.Loading }) {
+                            loadMessages(50, ignoreExisting = true)
+                        } else if (mostRecentMessageId != null) {
+                            loadMessages(50, after = mostRecentMessageId, ignoreExisting = true)
+                        }
+
                         typingUsers.clear()
                         listenToWsEvents()
                     }
