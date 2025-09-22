@@ -131,27 +131,31 @@ fun InReplyTo(
                         overflow = TextOverflow.Ellipsis
                     )
                 } else {
-                    if (Experiments.useKotlinBasedMarkdownRenderer.isEnabled) {
-                        CompositionLocalProvider(
-                            LocalJBMarkdownTreeState provides LocalJBMarkdownTreeState.current.copy(
-                                embedded = true,
-                                singleLine = true,
-                                currentServer = serverId,
-                                linksClickable = false
-                            ),
-                            LocalContentColor provides contentColor.copy(alpha = 0.7f),
-                            LocalTextStyle provides LocalTextStyle.current.copy(fontSize = 12.sp)
-                        ) {
-                            JBMRenderer(message.content)
+                    CompositionLocalProvider(
+                        LocalJBMarkdownTreeState provides LocalJBMarkdownTreeState.current.copy(
+                            embedded = true,
+                            singleLine = true,
+                            currentServer = serverId,
+                            linksClickable = false,
+                            enhanced = true
+                        ),
+                        LocalContentColor provides contentColor.copy(alpha = 0.7f),
+                        LocalTextStyle provides LocalTextStyle.current.copy(fontSize = 12.sp)
+                    ) {
+                        when {
+                            Experiments.useFinalMarkdownRenderer.isEnabled -> {
+                                JBMRenderer(message.content)
+                            }
+                            Experiments.useEnhancedMarkdownRenderer.isEnabled -> {
+                                JBMRenderer(message.content)
+                            }
+                            Experiments.useKotlinBasedMarkdownRenderer.isEnabled -> {
+                                JBMRenderer(message.content)
+                            }
+                            else -> {
+                                JBMRenderer(message.content)
+                            }
                         }
-                    } else {
-                        Text(
-                            text = message.content,
-                            fontSize = 12.sp,
-                            color = contentColor.copy(alpha = 0.7f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
                     }
                 }
             } else {

@@ -42,7 +42,21 @@ fun replyContentText(message: Message): String {
     return if (message.content.isNullOrBlank()) {
         stringResource(id = R.string.reply_message_empty_has_attachments)
     } else {
+        // Process basic formatting for reply preview
         message.content
+            .replace(Regex("<@([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
+                val userId = match.groupValues[1]
+                val user = RevoltAPI.userCache[userId]
+                "@${user?.username ?: "unknown"}"
+            }
+            .replace(Regex("<#([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
+                val channelId = match.groupValues[1]
+                val channel = RevoltAPI.channelCache[channelId]
+                "#${channel?.name ?: "unknown"}"
+            }
+            .replace(Regex("\\|\\|(.+?)\\|\\|")) { match ->
+                "[spoiler]"
+            }
     }
 }
 
