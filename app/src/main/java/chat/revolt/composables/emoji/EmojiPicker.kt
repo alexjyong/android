@@ -632,17 +632,10 @@ fun EmojiPicker(
                     )
                 }
             }
-
+            
+            // Search results do not get a key, this is intentional.
             items(
                 searchResults.size,
-                key = { index ->
-                    val item = searchResults[index]
-                    when (item) {
-                        is EmojiPickerItem.UnicodeEmoji -> "search_unicode_${item.character}"
-                        is EmojiPickerItem.ServerEmote -> "search_server_${item.emote.id}"
-                        is EmojiPickerItem.Section -> "search_section_${item.category.hashCode()}"
-                    }
-                },
                 span = {
                     val item = searchResults[it]
                     when (item) {
@@ -674,14 +667,6 @@ fun EmojiPicker(
 
             items(
                 pickerList.size,
-                key = { index ->
-                    val item = pickerList[index]
-                    when (item) {
-                        is EmojiPickerItem.UnicodeEmoji -> "unicode_${item.character}"
-                        is EmojiPickerItem.ServerEmote -> "server_${item.emote.id}"
-                        is EmojiPickerItem.Section -> "section_${item.category.hashCode()}"
-                    }
-                },
                 span = {
                     val item = pickerList[it]
                     when (item) {
