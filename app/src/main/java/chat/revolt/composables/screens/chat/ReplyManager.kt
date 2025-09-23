@@ -36,13 +36,60 @@ import chat.revolt.composables.chat.authorAvatarUrl
 import chat.revolt.composables.chat.authorColour
 import chat.revolt.composables.chat.authorName
 import chat.revolt.composables.generic.UserAvatar
+import chat.revolt.composables.markdown.RichMarkdown
+import chat.revolt.markdown.jbm.JBMarkdownTreeState
+import chat.revolt.markdown.jbm.LocalJBMarkdownTreeState
+import androidx.compose.runtime.CompositionLocalProvider
+
+fun processMarkdownToPlainText(content: String): String {
+    return content
+        .replace(Regex("<@([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
+            val userId = match.groupValues[1]
+            val user = RevoltAPI.userCache[userId]
+            "@${user?.username ?: "unknown"}"
+        }
+        .replace(Regex("<#([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
+            val channelId = match.groupValues[1]
+            val channel = RevoltAPI.channelCache[channelId]
+            "#${channel?.name ?: "unknown"}"
+        }
+        .replace(Regex("<%([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
+            val roleId = match.groupValues[1]
+            "@role"
+        }
+        .replace(Regex("\\|\\|(.+?)\\|\\|")) { match ->
+            "[spoiler]"
+        }
+        .replace(Regex("\\*\\*(.+?)\\*\\*")) { match ->
+            match.groupValues[1]
+        }
+        .replace(Regex("__(.+?)__")) { match ->
+            match.groupValues[1]
+        }
+        .replace(Regex("(?<!\\*)\\*([^*]+?)\\*(?!\\*)")) { match ->
+            match.groupValues[1]
+        }
+        .replace(Regex("(?<!_)_([^_]+?)_(?!_)")) { match ->
+            match.groupValues[1]
+        }
+        .replace(Regex("~~(.+?)~~")) { match ->
+            match.groupValues[1]
+        }
+        .replace(Regex("`([^`]+?)`")) { match ->
+            match.groupValues[1]
+        }
+        .replace(Regex("```[\\s\\S]*?```")) { match ->
+            "[code block]"
+        }
+        .replace(Regex("\\s+"), " ")
+        .trim()
+}
 
 @Composable
 fun replyContentText(message: Message): String {
     return if (message.content.isNullOrBlank()) {
         stringResource(id = R.string.reply_message_empty_has_attachments)
     } else {
-        // Process basic formatting for reply preview
         message.content
             .replace(Regex("<@([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
                 val userId = match.groupValues[1]
@@ -53,6 +100,9 @@ fun replyContentText(message: Message): String {
                 val channelId = match.groupValues[1]
                 val channel = RevoltAPI.channelCache[channelId]
                 "#${channel?.name ?: "unknown"}"
+            }
+            .replace(Regex("<%([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
+                "@role"
             }
             .replace(Regex("\\|\\|(.+?)\\|\\|")) { match ->
                 "[spoiler]"
@@ -109,15 +159,32 @@ fun ManageableReply(reply: SendMessageReply, onToggleMention: () -> Unit, onRemo
             )
         )
 
-        Text(
-            text = replyContentText(replyMessage),
-            fontSize = 12.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .padding(4.dp)
-                .weight(1f)
-        )
+        if (replyMessage.content.isNullOrBlank()) {
+            Text(
+                text = stringResource(id = R.string.reply_message_empty_has_attachments),
+                fontSize = 12.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .padding(4.dp)
+                    .weight(1f)
+            )
+        } else {
+            CompositionLocalProvider(
+                LocalJBMarkdownTreeState provides JBMarkdownTreeState(
+                    singleLine = true,
+                    linksClickable = false,
+                    embedded = true
+                )
+            ) {
+                RichMarkdown(
+                    input = replyMessage.content,
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .weight(1f)
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.width(4.dp))
 

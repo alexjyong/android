@@ -19,6 +19,7 @@ import chat.revolt.api.routes.push.subscribePush
 import chat.revolt.api.schemas.Message
 import chat.revolt.api.schemas.User
 import chat.revolt.c2dm.ChannelRegistrator.Companion.CHANNEL_ID_GROUP_SOCIAL_FRIENDREQUESTS
+import chat.revolt.composables.screens.chat.processMarkdownToPlainText
 import chat.revolt.persistence.Database
 import chat.revolt.persistence.SqlStorage
 import com.bumptech.glide.Glide
@@ -149,13 +150,13 @@ class HandlerService : FirebaseMessagingService() {
         val builder = NotificationCompat.Builder(this, CHANNEL_ID_GROUP_SOCIAL_FRIENDREQUESTS)
             .setSmallIcon(R.drawable.icn_chat_24dp)
             .setContentTitle(user.displayName ?: user.username)
-            .setContentText(message.content)
+            .setContentText(message.content?.let { processMarkdownToPlainText(it) } ?: "")
             .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setStyle(
                 NotificationCompat.MessagingStyle(author)
                     .setConversationTitle(channelName)
                     .addMessage(
-                        message.content ?: getString(R.string.reply_message_empty_has_attachments),
+                        message.content?.let { processMarkdownToPlainText(it) } ?: getString(R.string.reply_message_empty_has_attachments),
                         messageTimestamp,
                         author
                     )
