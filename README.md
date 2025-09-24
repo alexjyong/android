@@ -18,7 +18,7 @@ I am not affilated with the Revolt Team, nor is this an official Revolt product.
 
 I made this for some QOL changes that aren't present in the current version at the time of writing.
 
-This app also works on de-googled phones as well!
+**This app also works on de-googled phones as well!**
 
 Feel free to use this for whatever, but note that this is NOT the official Revolt android app. :)
 
@@ -27,37 +27,43 @@ You can download the latest APK [here](https://github.com/alexjyong/android/rele
 For support, discussion, updates and other things, visit our support server on [Revolt](https://rvlt.gg/C7qQMwsZ).
 
 ## Features Added
-<table>
-  <tr>
-      <td colspan="2" width="100%" valign="top">
-        <strong>Voice messages!</strong><br>
-          <img width="1080" height="707" alt="image" src="https://github.com/user-attachments/assets/8b794d8e-46cc-407e-84aa-99b4128d5922" />
-       </td>
-  <tr>
-    <td width="50%" valign="top" align="center">
-      <strong>Emojis next to channel names</strong><br>
-      <img src="https://github.com/user-attachments/assets/6c37f059-47ef-4028-aac9-ef233f7a85e4" width="300" alt="Channel Emojis">
-    </td>
-    <td width="50%" valign="top" align="center">
-      <strong>Jump to replied message</strong><br>
-      <img src="https://github.com/user-attachments/assets/1dc0fb6b-521d-40e2-a833-1ada19bd207b" width="300" alt="Jump to Reply">
-    </td>
-  </tr>
-  <tr>
-    <td colspan="2" align="center" valign="top">
-      <strong>Server context menu on long press</strong><br>
-      <img width="1080" height="590" alt="image" src="https://github.com/user-attachments/assets/034eea4f-0d21-4ddc-8b44-b7c70dde8965" alt="Server Context Menu" />
-    </td>
-  </tr>
-  <tr>
-    <td colspan="2" align="center" valign="top">
-      <strong>Recently used emojis</strong><br>
-      <img src="https://github.com/user-attachments/assets/6f1e126a-8e73-49ee-a5d1-c4841907e14a" width="600" alt="Recently Used Emojis"/>
-    </td>
-  </tr>
-</table>
+Tap a card to expand.
 
+<details>
+<summary><strong>Voice messages</strong></summary>
 
+![Voice messages preview](https://github.com/user-attachments/assets/8b794d8e-46cc-407e-84aa-99b4128d5922)
+</details>
+
+<details>
+<summary><strong>Emojis next to channel names</strong></summary>
+
+![Channel Emojis](https://github.com/user-attachments/assets/6c37f059-47ef-4028-aac9-ef233f7a85e4)
+</details>
+
+<details>
+<summary><strong>Jump to replied message</strong></summary>
+
+![Jump to Reply](https://github.com/user-attachments/assets/1dc0fb6b-521d-40e2-a833-1ada19bd207b)
+</details>
+
+<details>
+<summary><strong>Server context menu on long press</strong></summary>
+
+![Server Context Menu](https://github.com/user-attachments/assets/034eea4f-0d21-4ddc-8b44-b7c70dde8965)
+</details>
+
+<details>
+<summary><strong>Recently used emojis</strong></summary>
+
+![Recently Used Emojis](https://github.com/user-attachments/assets/6f1e126a-8e73-49ee-a5d1-c4841907e14a)
+</details>
+
+<details>
+<summary><strong>Auto-open server channel list</strong></summary>
+
+![Server channel list open by default](https://github.com/user-attachments/assets/6a4d7c96-924e-4344-9e19-b90589fa6908)
+</details>
 
 
 The codebase includes the app itself, as well as an internal library for interacting with the Revolt
@@ -73,23 +79,6 @@ uses [Jetpack Compose](https://developer.android.com/jetpack/compose).
       (MDC-Android) library is used.
 - [Ktor](https://ktor.io/)
 - [Dagger](https://dagger.dev/) with [Hilt](https://dagger.dev/hilt/)
-
-## Resources
-
-### Revolt for Android
-
-- [Roadmap](https://op.revolt.wtf/projects/revolt-for-android/work_packages)
-- [Revolt for Android Technical Documentation](https://revoltchat.github.io/android/)
-- [Android-specific Contribution Guide](https://revoltchat.github.io/android/contributing/guidelines/)
-  &mdash;**read carefully before contributing!**
-
-### Revolt
-
-- [Revolt Project Board](https://github.com/revoltchat/revolt/discussions) (Submit feature requests
-  here)
-- [Revolt Development Server](https://app.revolt.chat/invite/API)
-- [Revolt Server](https://app.revolt.chat/invite/Testers)
-- [General Revolt Contribution Guide](https://developers.revolt.chat/contrib.html)
 
 ## Quick Build
 
@@ -186,5 +175,5 @@ Or install [Termux](https://termux.dev/en/), then install `wormhole-rs` on Termu
 Open the project in Android Studio. You can then run the app on an emulator or a physical device by
 running the `app` module.
 
-In-depth setup instructions can be found
+In-depth setup instructions are pretty much the same as the stock Revolt app and can be found
 at [Setting up your Development Environment](https://revoltchat.github.io/android/contributing/setup/)
