@@ -80,7 +80,7 @@ android {
         minSdk = 24
         targetSdk = 36
         versionCode = Integer.parseInt("001_003_206".replace("_", ""), 10)
-        versionName = "1.3.6bf-forked"
+        versionName = "1.3.6bg-forked"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
