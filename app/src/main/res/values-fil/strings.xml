@@ -413,7 +413,7 @@
     <string name="share_target_heading">Ibahagi sa Revolt</string>
     <string name="share_target_login_first">Paki-log in bago magbahagi sa Revolt.</string>
     <string name="share_target_invalid_intent">Hindi ito isang wastong share intent.</string>
-    <string name="share_target_attachment_too_large">Masyadong malaki ang attachment na ito para sa Revolt (max. $1$s).</string>
+    <string name="share_target_attachment_too_large">Masyadong malaki ang attachment na ito para sa Revolt (max. %1$s).</string>
     <string name="share_target_search_channels">Maghanap ng mga channel</string>
     <string name="share_target_select_channel">pumili ng channel na pagbabahagian.</string>
     <string name="channel_age_gate_title">Minarkahang NSFW ang channel na ito</string>

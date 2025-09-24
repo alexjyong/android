@@ -433,7 +433,7 @@
     <string name="channel_settings_overview_description">Опис каналу</string>
     <string name="channel_settings_overview_description_hint">Цей канал призначений виключно для розмови про…</string>
     <string name="channel_settings_overview_nsfw">Позначити як NSFW</string>
-    <string name="share_target_attachment_too_large">Це вкладення занадто велике для Revolt (максимум $1$).</string>
+    <string name="share_target_attachment_too_large">Це вкладення занадто велике для Revolt (максимум %1$s).</string>
     <string name="settings_appearance_colour_overrides_scrim">Скрім</string>
     <string name="settings_chat">Чат</string>
     <string name="emote_info_from_unicode">Смайлик за замовчуванням, який можна використовувати будь-де</string>

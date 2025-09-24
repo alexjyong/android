@@ -390,7 +390,7 @@
     <string name="settings_appearance_colour_overrides_inverse_surface">Surface Inversée</string>
     <string name="settings_appearance_colour_overrides_inverse_on_surface">Inversé sur la Surface</string>
     <string name="discover">Découvrir Revolt</string>
-    <string name="share_target_attachment_too_large">Cette pièce-jointe est trop large pour Revolt (max. $1$s).</string>
+    <string name="share_target_attachment_too_large">Cette pièce-jointe est trop large pour Revolt (max. %1$s).</string>
     <string name="share_target_search_channels">Rechercher des salons</string>
     <string name="share_target_select_channel">M de sélectionner un salon où partager.</string>
     <string name="share_target_heading">Partager sur Revolt</string>

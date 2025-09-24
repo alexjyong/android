@@ -408,7 +408,7 @@
     <string name="share_target_heading">Compartilhar para  Revolt</string>
     <string name="share_target_login_first">Por favor, faça login antes de compartilhar para  Revolt .</string>
     <string name="share_target_invalid_intent">Esta não é uma tentativa de compartilhamento válida.</string>
-    <string name="share_target_attachment_too_large">Este anexo é muito grande para  Revolt (max. $1$s).</string>
+    <string name="share_target_attachment_too_large">Este anexo é muito grande para  Revolt (max. %1$s).</string>
     <string name="share_target_search_channels">Buscar canais</string>
     <string name="share_target_select_channel">Selecione um canal para compartilhar.</string>
     <string name="emote_info_from_unicode">Um emoji padrão que você pode usar em qualquer lugar</string>

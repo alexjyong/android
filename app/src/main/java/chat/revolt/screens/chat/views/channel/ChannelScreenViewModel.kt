@@ -37,6 +37,7 @@ import chat.revolt.api.routes.channel.fetchMessagesFromChannel
 import chat.revolt.api.routes.channel.sendMessage
 import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.api.routes.microservices.autumn.MAX_ATTACHMENTS_PER_MESSAGE
+import chat.revolt.api.routes.microservices.autumn.MAX_FILE_SIZE_BYTES
 import chat.revolt.api.routes.microservices.autumn.uploadToAutumn
 import chat.revolt.api.routes.server.fetchMember
 import chat.revolt.api.routes.user.addUserIfUnknown
@@ -386,7 +387,6 @@ class ChannelScreenViewModel @Inject constructor(
                 } catch (e: Exception) {
                     Log.e("ChannelScreenViewModel", "Failed to upload attachment", e)
                     attachmentUploadProgress = 0f
-                    // TODO show error message
                     return@launch
                 }
             }

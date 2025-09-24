@@ -415,7 +415,7 @@
     <string name="share_target_select_channel">Válaszd ki, hova szeretnéd megosztani!</string>
     <string name="share_target_heading">Megosztás a Revolton</string>
     <string name="share_target_invalid_intent">Nem oszthatsz meg érvénytelen „intentet”</string>
-    <string name="share_target_attachment_too_large">A Revolttal legfeljebb $1$s méretű csatolmányt tudsz megosztani</string>
+    <string name="share_target_attachment_too_large">A Revolttal legfeljebb %1$s méretű csatolmányt tudsz megosztani</string>
     <string name="channel_age_gate_title">Ez a csatorna NSFW-ként van jelölve</string>
     <string name="channel_age_gate_description">18 évnél idősebbnek kell lenned a csatorna megtekintéséhez.</string>
     <string name="channel_age_gate_dob_section">Születési időd</string>

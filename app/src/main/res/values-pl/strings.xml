@@ -411,7 +411,7 @@
     <string name="invite_dialog_close">Zamknij</string>
     <string name="invite_dialog_header">Zaproszenie do #%1$s</string>
     <string name="share_target_invalid_intent">Nie jest to ważna intencja udostępniania.</string>
-    <string name="share_target_attachment_too_large">Ten załącznik jest zbyt duży dla Revolt (maks. $1$s).</string>
+    <string name="share_target_attachment_too_large">Ten załącznik jest zbyt duży dla Revolt (maks. %1$s).</string>
     <string name="share_target_search_channels">Wyszukiwanie kanałów</string>
     <string name="share_target_select_channel">Wybierz kanał do udostępnienia.</string>
     <string name="share_target_heading">Udostępnij na Revolt</string>

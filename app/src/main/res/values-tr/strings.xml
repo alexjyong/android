@@ -428,7 +428,7 @@
     <string name="settings_feedback_description">Geri bildirim veya önerilerde bulunmak ve hataları bildirmek için Revolt sunucusuna katılın.</string>
     <string name="settings_changelogs_new_header">Ne pişiriyor ✨</string>
     <string name="channel_settings_permissions">İzinler</string>
-    <string name="share_target_attachment_too_large">Bu ek, Revolt için çok büyük (maks. $1$s).</string>
+    <string name="share_target_attachment_too_large">Bu ek, Revolt için çok büyük (maks. %1$s).</string>
     <string name="channel_settings_delete">Kanalı Sil</string>
     <string name="channel_settings_delete_confirm">Bu kanalı silmek istediğinize emin misiniz\?</string>
     <string name="channel_settings_delete_confirm_description">Tüm mesajlar ve ayarlar bu kanal için sonsuza dek gidecek (uzun bir süre!)</string>

@@ -291,7 +291,7 @@
     <string name="settings_changelogs_historical_version_header">Seznam změn pro %1$s</string>
     <string name="settings_changelogs_historical_version_header_placeholder">tamta verze</string>
     <string name="share_target_heading">Sdílet na Revoltu</string>
-    <string name="share_target_attachment_too_large">Tato příloha je pro Revolt příliš velká (max. $1$s).</string>
+    <string name="share_target_attachment_too_large">Tato příloha je pro Revolt příliš velká (max. %1$s).</string>
     <string name="share_target_search_channels">Prohledat kanály</string>
     <string name="create_group_action">Vytvořit</string>
     <string name="channel_age_gate_description">Pro zobrazení tohoto kanálu vám musí být alespoň 18 let.</string>

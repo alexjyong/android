@@ -515,7 +515,7 @@
     <string name="channel_settings_overview_nsfw_undo_confirm_yes">Κατάργηση σήμανσης ως NSFW</string>
     <string name="channel_settings_overview_nsfw_undo_confirm_no">Κρατήστε ως έχει</string>
     <string name="channel_settings_delete_confirm_description">Όλα τα μηνύματα και οι ρυθμίσεις για αυτό το κανάλι θα εξαφανιστούν για πάντα (πολύ καιρό!)</string>
-    <string name="share_target_attachment_too_large">Αυτή η επισύναψη είναι πολύ μεγάλη για το Revolt (μέγιστο $1$s).</string>
+    <string name="share_target_attachment_too_large">Αυτή η επισύναψη είναι πολύ μεγάλη για το Revolt (μέγιστο %1$s).</string>
     <string name="user_info_sheet_user_is_bot">Αυτό είναι bot.</string>
     <string name="report_reason_content_other">Άλλο</string>
     <string name="report_submit_success">Αναφέρθηκε</string>

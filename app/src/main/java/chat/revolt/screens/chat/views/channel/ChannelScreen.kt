@@ -119,6 +119,7 @@ import chat.revolt.api.internals.PermissionBit
 import chat.revolt.api.internals.has
 import chat.revolt.api.routes.channel.react
 import chat.revolt.api.routes.microservices.autumn.FileArgs
+import chat.revolt.api.routes.microservices.autumn.MAX_FILE_SIZE_BYTES
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.schemas.Message
 import chat.revolt.api.settings.FeatureFlags
@@ -270,6 +271,17 @@ fun ChannelScreen(
                 mFile.outputStream().use { output ->
                     @Suppress("Recycle")
                     context.contentResolver.openInputStream(uri)?.copyTo(output)
+                }
+
+                if (mFile.length() > MAX_FILE_SIZE_BYTES) {
+                    val maxSizeFormatted = android.text.format.Formatter.formatShortFileSize(context, MAX_FILE_SIZE_BYTES)
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.share_target_attachment_too_large, maxSizeFormatted),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    mFile.delete()
+                    return@let
                 }
 
                 // If the file is already pending and was picked from the inbuilt picker, remove it.
@@ -1118,15 +1130,25 @@ fun ChannelScreen(
                                             },
                                             onSendMessage = viewModel::sendPendingMessage,
                                             onVoiceMessageRecorded = { file ->
-                                                viewModel.draftAttachments.add(
-                                                    FileArgs(
-                                                        file = file,
-                                                        filename = file.name,
-                                                        contentType = "audio/ogg",
-                                                        spoiler = false,
-                                                        pickerIdentifier = null
+                                                if (file.length() > MAX_FILE_SIZE_BYTES) {
+                                                    val maxSizeFormatted = android.text.format.Formatter.formatShortFileSize(context, MAX_FILE_SIZE_BYTES)
+                                                    Toast.makeText(
+                                                        context,
+                                                        context.getString(R.string.share_target_attachment_too_large, maxSizeFormatted),
+                                                        Toast.LENGTH_LONG
+                                                    ).show()
+                                                    file.delete()
+                                                } else {
+                                                    viewModel.draftAttachments.add(
+                                                        FileArgs(
+                                                            file = file,
+                                                            filename = file.name,
+                                                            contentType = "audio/ogg",
+                                                            spoiler = false,
+                                                            pickerIdentifier = null
+                                                        )
                                                     )
-                                                )
+                                                }
                                             },
                                             channelType = viewModel.channel?.channelType
                                                 ?: ChannelType.TextChannel,

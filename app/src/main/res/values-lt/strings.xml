@@ -570,7 +570,7 @@
     <string name="share_target_heading">Dalytis į Revolt</string>
     <string name="share_target_login_first">Prieš dalydamiesi su Revolt, prisijunkite.</string>
     <string name="share_target_invalid_intent">Tai nėra galiojantis dalinimo ketinimas.</string>
-    <string name="share_target_attachment_too_large">Šis priedas yra per didelis Revolt (ne daugiau kaip $1$s).</string>
+    <string name="share_target_attachment_too_large">Šis priedas yra per didelis Revolt (ne daugiau kaip %1$s).</string>
     <string name="share_target_search_channels">Ieškoti kanalų</string>
     <string name="share_target_select_channel">m pasirinkite kanalą, į kurį norite bendrinti.</string>
     <string name="notification_channel_group_conversations">Pokalbiai</string>

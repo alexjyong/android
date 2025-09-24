@@ -416,7 +416,7 @@
     <string name="share_target_heading">Абагуліць да Revolt</string>
     <string name="share_target_login_first">Калі ласка, увайдзіце ў уліковы запіс, каб абагуліць да Revolt.</string>
     <string name="share_target_invalid_intent">Гэта не падыходзіць да абагульнення.</string>
-    <string name="share_target_attachment_too_large">Гэтае далучэнне занадта вялікае для Revolt (макс. $1$s).</string>
+    <string name="share_target_attachment_too_large">Гэтае далучэнне занадта вялікае для Revolt (макс. %1$s).</string>
     <string name="share_target_search_channels">Пошук каналаў</string>
     <string name="share_target_select_channel">Калі ласка, абярыце канал, ў які вы хочаце абагуліць паведамленне.</string>
     <string name="channel_age_gate_dob_section">Дата нараджэння</string>

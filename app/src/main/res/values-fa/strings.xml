@@ -229,7 +229,7 @@
     <string name="channel_settings_overview_save">ذخیره</string>
     <string name="channel_settings_permissions">مجوزها</string>
     <string name="share_target_invalid_intent">این یک هدف اشتراک معتبر نیست.</string>
-    <string name="share_target_attachment_too_large">این پیوست برای ریولت بسیار بزرگ است (حداکثر $1$s).</string>
+    <string name="share_target_attachment_too_large">این پیوست برای ریولت بسیار بزرگ است (حداکثر %1$s).</string>
     <string name="service_health_alert">در حال حاضر ادامه دارد</string>
     <string name="service_health_alert_actions_default">بیشتر بدانید</string>
     <string name="service_health_alert_actions_dismiss">رد کردن</string>

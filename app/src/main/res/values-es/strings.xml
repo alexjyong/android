@@ -397,7 +397,7 @@
     <string name="share_target_heading">Compartir a Revolt</string>
     <string name="share_target_login_first">Por favor, inicia sesión antes de compartir a Revolt.</string>
     <string name="share_target_invalid_intent">Intento de compartir no válido.</string>
-    <string name="share_target_attachment_too_large">Este archivo es muy grande para Revolt (max. $1$s).</string>
+    <string name="share_target_attachment_too_large">Este archivo es muy grande para Revolt (max. %1$s).</string>
     <string name="share_target_search_channels">Buscar canales</string>
     <string name="share_target_select_channel">Por favor, elige un canal para compartir.</string>
     <string name="file_picker_chip_documents">Adjuntar un archivo</string>

@@ -419,7 +419,7 @@
     <string name="share_target_heading">Поделиться на Revolt</string>
     <string name="share_target_login_first">Пожалуйста, войдите в аккаунт, чтобы поделиться в Revolt.</string>
     <string name="share_target_invalid_intent">Это недействительное намерение.</string>
-    <string name="share_target_attachment_too_large">Это вложение слишком большое для Revolt (макс. $1$s).</string>
+    <string name="share_target_attachment_too_large">Это вложение слишком большое для Revolt (макс. %1$s).</string>
     <string name="share_target_search_channels">Поиск каналов</string>
     <string name="channel_age_gate_dob_section">Дата рождения</string>
     <string name="channel_age_gate_dob_day">День</string>

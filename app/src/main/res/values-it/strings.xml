@@ -427,7 +427,7 @@
     <string name="share_target_search_channels">Cerca canali</string>
     <string name="settings_changelogs">Lista dei cambiamenti</string>
     <string name="settings_changelogs_new_header">Cosa sta bollendo in pentola ✨</string>
-    <string name="share_target_attachment_too_large">Questo allegato è troppo grande per Revolt (massimo $1$s).</string>
+    <string name="share_target_attachment_too_large">Questo allegato è troppo grande per Revolt (massimo %1$s).</string>
     <string name="settings_changelogs_historical_version_header">Lista dei cambiamenti per %1$s</string>
     <string name="settings_changelogs_historical_version_header_placeholder">quella versione</string>
     <string name="share_target_heading">Condividi su Revolt</string>

@@ -261,7 +261,7 @@
     <string name="report_message_heading">Diganos o que há de errado com esta mensagem</string>
     <string name="report_reason_content_illegal_pornography">Vingança ou pornografia de menores</string>
     <string name="report_reason_content_scams_fraud">Golpes ou fraude</string>
-    <string name="share_target_attachment_too_large">Este arquivo é muito grande para o Revolt (máx. $1$s).</string>
+    <string name="share_target_attachment_too_large">Este arquivo é muito grande para o Revolt (máx. %1$s).</string>
     <string name="share_target_invalid_intent">Esta não é uma intenção de compartilhamento válida.</string>
     <string name="channel_settings_delete_confirm_description">Todas as mensagens e configurações deste canal desaparecerão para sempre (muito tempo!)</string>
     <string name="emoji_picker_skin_tone_fitzpatrick_6">Tom de pele escuro</string>

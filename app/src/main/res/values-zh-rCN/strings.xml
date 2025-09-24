@@ -411,7 +411,7 @@
     <string name="invite_dialog_header">邀请至 #%1$s</string>
     <string name="invite_dialog_description">发送此链接以邀请其他人到此频道。</string>
     <string name="share_target_login_first">请先登录再分享到 Revolt。</string>
-    <string name="share_target_attachment_too_large">此附件对于 Revolt 来说过大（最大为 $1$s）。</string>
+    <string name="share_target_attachment_too_large">此附件对于 Revolt 来说过大（最大为 %1$s）。</string>
     <string name="share_target_search_channels">搜索频道</string>
     <string name="share_target_select_channel">请选择要分享到的频道。</string>
     <string name="share_target_heading">分享到 Revolt</string>

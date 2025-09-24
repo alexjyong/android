@@ -21,6 +21,7 @@ import io.ktor.http.HttpStatusCode
 import java.io.File
 
 const val MAX_ATTACHMENTS_PER_MESSAGE = 5
+const val MAX_FILE_SIZE_BYTES = 20000000L // yes, this shouldn't be hardcoded. But I'm not sure of a way to dynamically get this from the server, if one exists. That would be ideal.
 
 data class FileArgs(
     val file: File,

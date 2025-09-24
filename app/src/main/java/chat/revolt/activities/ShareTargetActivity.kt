@@ -56,6 +56,7 @@ import chat.revolt.api.internals.ChannelUtils
 import chat.revolt.api.routes.channel.sendMessage
 import chat.revolt.api.routes.microservices.autumn.FileArgs
 import chat.revolt.api.routes.microservices.autumn.MAX_ATTACHMENTS_PER_MESSAGE
+import chat.revolt.api.routes.microservices.autumn.MAX_FILE_SIZE_BYTES
 import chat.revolt.api.routes.microservices.autumn.uploadToAutumn
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.settings.LoadedSettings
@@ -74,6 +75,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.http.ContentType
 import kotlinx.coroutines.launch
 import java.io.File
+import java.text.NumberFormat
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -258,14 +260,24 @@ fun ShareTargetScreen(
                     context.contentResolver.openInputStream(uri)?.copyTo(output)
                 }
 
-                viewModel.attachments.add(
-                    FileArgs(
-                        file = mFile,
-                        contentType = file.type ?: "application/octet-stream",
-                        filename = file.name ?: "attachment",
-                        pickerIdentifier = null
+                if (mFile.length() > MAX_FILE_SIZE_BYTES) {
+                    val maxSizeFormatted = android.text.format.Formatter.formatShortFileSize(context, MAX_FILE_SIZE_BYTES)
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.share_target_attachment_too_large, maxSizeFormatted),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    mFile.delete()
+                } else {
+                    viewModel.attachments.add(
+                        FileArgs(
+                            file = mFile,
+                            contentType = file.type ?: "application/octet-stream",
+                            filename = file.name ?: "attachment",
+                            pickerIdentifier = null
+                        )
                     )
-                )
+                }
             }
         }
 

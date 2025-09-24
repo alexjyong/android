@@ -417,7 +417,7 @@
     <string name="share_target_heading">Cumpartir pa Revolt</string>
     <string name="share_target_login_first">Por fabor ampeça tue sesson antes de cumpartires pa Revolt.</string>
     <string name="share_target_invalid_intent">Esto nun ye ũa tencion bálida pa cumpartir.</string>
-    <string name="share_target_attachment_too_large">Este aneixo ye smasiado lhargo pa\'l Revolt (máss. $1$s).</string>
+    <string name="share_target_attachment_too_large">Este aneixo ye smasiado lhargo pa\'l Revolt (máss. %1$s).</string>
     <string name="share_target_search_channels">Apercurar canales</string>
     <string name="share_target_select_channel">Seleciona un canal pa cumpartir.</string>
     <string name="channel_age_gate_description">Debes tener 18 ó más anhos pa ber este canal.</string>
