@@ -757,6 +757,33 @@
     <string name="settings_chat_hint_poorly_formed_settings_keys_key_unknown">%1$s (unknown)</string>
     <string name="settings_chat_hint_poorly_formed_settings_keys_reset">Reset %1$s settings</string>
 
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_notifications_background_service">Background Service</string>
+    <string name="settings_notifications_background_service_description">Keep a foreground service running to instantly receive notifications. Uses more battery but provides real-time notifications.</string>
+    <string name="settings_notifications_workmanager">Periodic Check</string>
+    <string name="settings_notifications_workmanager_description">Check for new messages periodically in the background. Battery efficient but may have delays (up to 15 minutes).</string>
+    <string name="settings_notifications_permission_required">Notification permission required</string>
+    <string name="settings_notifications_permission_denied">Notifications are disabled. Please enable them in your device settings to use notification services.</string>
+    <string name="settings_notifications_grant_permission">Grant Permission</string>
+
+    <!-- Notification Context Menu -->
+    <string name="notification_menu_title">Notifications</string>
+    <string name="notification_state_all">All Messages</string>
+    <string name="notification_state_mention">Mentions Only</string>
+    <string name="notification_state_none">None</string>
+    <string name="notification_state_server_default">Server Default</string>
+    <string name="notification_state_default">Default</string>
+    <string name="mute_channel">Mute Channel</string>
+    <string name="mute_server">Mute Server</string>
+    <string name="unmute_channel">Unmute Channel</string>
+    <string name="unmute_server">Unmute Server</string>
+    <string name="mute_for_15_minutes">For 15 minutes</string>
+    <string name="mute_for_1_hour">For 1 hour</string>
+    <string name="mute_for_3_hours">For 3 hours</string>
+    <string name="mute_for_8_hours">For 8 hours</string>
+    <string name="mute_for_24_hours">For 24 hours</string>
+    <string name="mute_until_turned_off">Until I turn it back on</string>
+    <string name="muted_until">Muted until %1$s</string>
     <string name="settings_feedback">Feedback</string>
     <string name="settings_feedback_description">Join the Revolt server to give feedback or suggestions and report bugs.</string>
 

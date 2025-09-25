@@ -49,6 +49,7 @@ import chat.revolt.composables.markdown.RichMarkdown
 import chat.revolt.composables.screens.settings.ServerOverview
 import chat.revolt.composables.sheets.SheetSelection
 import chat.revolt.internals.Platform
+import chat.revolt.sheets.ServerNotificationContextSheet
 import kotlinx.coroutines.launch
 
 @Composable
@@ -76,6 +77,7 @@ fun ServerContextSheet(
 
     var showLeaveConfirmation by remember { mutableStateOf(false) }
     var leaveSilently by remember { mutableStateOf(false) }
+    var showNotificationSubmenu by remember { mutableStateOf(false) }
 
     if (showLeaveConfirmation) {
         AlertDialog(
@@ -148,6 +150,27 @@ fun ServerContextSheet(
                 }
             }
         )
+    }
+
+    if (showNotificationSubmenu) {
+        Column(Modifier.verticalScroll(rememberScrollState())) {
+            SheetButton(
+                headlineContent = { Text("← Notifications") },
+                leadingContent = {
+                    Icon(
+                        painter = painterResource(R.drawable.icn_arrow_back_24dp),
+                        contentDescription = null
+                    )
+                },
+                onClick = { showNotificationSubmenu = false }
+            )
+
+            ServerNotificationContextSheet(
+                serverId = serverId,
+                dismissSheet = onHideSheet
+            )
+        }
+        return
     }
 
     Column(Modifier.verticalScroll(rememberScrollState())) {
@@ -255,6 +278,23 @@ fun ServerContextSheet(
                     }
                     onHideSheet()
                 }
+            }
+        )
+
+        SheetButton(
+            leadingContent = {
+                Icon(
+                    painter = painterResource(id = R.drawable.icn_notification_settings_24dp),
+                    contentDescription = null
+                )
+            },
+            headlineContent = {
+                Text(
+                    text = stringResource(id = R.string.notification_menu_title)
+                )
+            },
+            onClick = {
+                showNotificationSubmenu = true
             }
         )
 

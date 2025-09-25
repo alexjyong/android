@@ -9,17 +9,37 @@ data class OrderingSettings(
     val servers: List<String> = emptyList()
 )
 
+enum class NotificationState(val value: String) {
+    ALL("all"),
+    MENTION("mention"),
+    NONE("none");
+
+    companion object {
+        fun fromString(value: String?): NotificationState? {
+            return entries.find { it.value == value }
+        }
+    }
+}
+
+@Serializable
+data class MuteState(
+    val until: Long? = null
+)
 
 @Serializable
 data class NotificationSettings(
     val channel: Map<String, String> = emptyMap(),
-    val server: Map<String, String> = emptyMap()
+    val server: Map<String, String> = emptyMap(),
+    val channel_mutes: Map<String, MuteState> = emptyMap(),
+    val server_mutes: Map<String, MuteState> = emptyMap()
 )
 
 @Serializable
-data class _NotificationSettingsToParse( // quirk
+data class _NotificationSettingsToParse(
     val channel: Map<String, JsonElement?> = emptyMap(),
-    val server: Map<String, JsonElement?> = emptyMap()
+    val server: Map<String, JsonElement?> = emptyMap(),
+    val channel_mutes: Map<String, JsonElement?> = emptyMap(),
+    val server_mutes: Map<String, JsonElement?> = emptyMap()
 )
 
 @Serializable

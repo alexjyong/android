@@ -6,6 +6,7 @@ import chat.revolt.api.RevoltJson
 import chat.revolt.api.routes.sync.getKeys
 import chat.revolt.api.routes.sync.setKey
 import chat.revolt.api.schemas.AndroidSpecificSettings
+import chat.revolt.api.schemas.MuteState
 import chat.revolt.api.schemas.NotificationSettings
 import chat.revolt.api.schemas.OrderingSettings
 import chat.revolt.api.schemas._NotificationSettingsToParse
@@ -71,8 +72,6 @@ object SyncedSettings {
             }
 
             settings["notifications"]?.let {
-                // This is to fix a quirk where the web client sometimes leaves sub-objects in one of the objects
-                // Because it is written in typescript and does what it wants
                 _notifications.value = parseNotificationSettings(it.value)
             }
         } catch (e: Exception) {
@@ -85,7 +84,6 @@ object SyncedSettings {
             var intermediate =
                 RevoltJson.decodeFromString(_NotificationSettingsToParse.serializer(), value)
 
-            // Throw out any value of intermediate.server and .channel that isn't a string
             intermediate = intermediate.copy(
                 server = intermediate.server.filterValues { it != null }
                     .filterValues { it is JsonPrimitive }
@@ -95,10 +93,61 @@ object SyncedSettings {
                     .filterValues { it!!.jsonPrimitive.isString }
             )
 
-            // Convert the intermediate to a NotificationSettings
+            val channelMutes = mutableMapOf<String, MuteState>()
+            intermediate.channel_mutes.forEach { (channelId, element) ->
+                try {
+                    if (element != null) {
+                        val muteState = RevoltJson.decodeFromJsonElement(MuteState.serializer(), element)
+                        val now = System.currentTimeMillis()
+                        if (muteState.until == null || muteState.until > now) {
+                            channelMutes[channelId] = muteState
+                        }
+                    }
+                } catch (e: Exception) {
+                    logcat(LogPriority.WARN) { "Failed to parse channel mute for $channelId: ${e.message}" }
+                }
+            }
+
+            val serverMutes = mutableMapOf<String, MuteState>()
+            intermediate.server_mutes.forEach { (serverId, element) ->
+                try {
+                    if (element != null) {
+                        val muteState = RevoltJson.decodeFromJsonElement(MuteState.serializer(), element)
+                        val now = System.currentTimeMillis()
+                        if (muteState.until == null || muteState.until > now) {
+                            serverMutes[serverId] = muteState
+                        }
+                    }
+                } catch (e: Exception) {
+                    logcat(LogPriority.WARN) { "Failed to parse server mute for $serverId: ${e.message}" }
+                }
+            }
+
+            val serverSettings = intermediate.server.mapValues { entry ->
+                when (entry.value!!.jsonPrimitive.content) {
+                    "muted" -> {
+                        serverMutes[entry.key] = MuteState()
+                        "mention"
+                    }
+                    else -> entry.value!!.jsonPrimitive.content
+                }
+            }
+
+            val channelSettings = intermediate.channel.mapValues { entry ->
+                when (entry.value!!.jsonPrimitive.content) {
+                    "muted" -> {
+                        channelMutes[entry.key] = MuteState()
+                        "all"
+                    }
+                    else -> entry.value!!.jsonPrimitive.content
+                }
+            }
+
             NotificationSettings(
-                server = intermediate.server.mapValues { it.value!!.jsonPrimitive.content },
-                channel = intermediate.channel.mapValues { it.value!!.jsonPrimitive.content }
+                server = serverSettings,
+                channel = channelSettings,
+                server_mutes = serverMutes,
+                channel_mutes = channelMutes
             )
         } catch (e: Exception) {
             logcat(LogPriority.ERROR) { e.asLog() }

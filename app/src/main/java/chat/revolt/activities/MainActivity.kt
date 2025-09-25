@@ -116,6 +116,7 @@ import chat.revolt.screens.settings.ChatSettingsScreen
 import chat.revolt.screens.settings.DebugSettingsScreen
 import chat.revolt.screens.settings.ExperimentsSettingsScreen
 import chat.revolt.screens.settings.LanguagePickerSettingsScreen
+import chat.revolt.screens.settings.NotificationSettingsScreen
 import chat.revolt.screens.settings.ProfileSettingsScreen
 import chat.revolt.screens.settings.SessionSettingsScreen
 import chat.revolt.screens.settings.SettingsScreen
@@ -712,6 +713,7 @@ fun AppEntrypoint(
                     composable("settings/sessions") { SessionSettingsScreen(navController) }
                     composable("settings/appearance") { AppearanceSettingsScreen(navController) }
                     composable("settings/chat") { ChatSettingsScreen(navController) }
+                    composable("settings/notifications") { NotificationSettingsScreen(navController) }
                     composable("settings/debug") { DebugSettingsScreen(navController) }
                     composable("settings/experiments") { ExperimentsSettingsScreen(navController) }
                     composable("settings/changelogs") { ChangelogsSettingsScreen(navController) }
