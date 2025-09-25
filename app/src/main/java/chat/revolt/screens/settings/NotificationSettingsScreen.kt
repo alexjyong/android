@@ -52,6 +52,7 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.composables.generic.ListHeader
+import chat.revolt.services.NotificationForegroundService
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -87,7 +88,12 @@ class NotificationSettingsScreenViewModel @Inject constructor(
             return
         }
         isBackgroundServiceEnabled = enabled
-        // TODO: Implement actual service management
+
+        if (enabled) {
+            NotificationForegroundService.start(context)
+        } else {
+            NotificationForegroundService.stop(context)
+        }
     }
 
     fun toggleWorkManager(enabled: Boolean, onPermissionRequired: () -> Unit) {
