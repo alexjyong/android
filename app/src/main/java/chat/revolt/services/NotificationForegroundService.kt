@@ -180,9 +180,23 @@ class NotificationForegroundService : Service() {
                 }
 
                 val selfId = RevoltAPI.selfId ?: return@withContext
-                val isMention = messageFrame.mentions?.contains(selfId) == true ||
-                        messageFrame.content?.contains("@everyone") == true ||
+                
+                val hasDirectMention = messageFrame.mentions?.contains(selfId) == true
+                
+                val hasMassMention = messageFrame.content?.contains("@everyone") == true ||
                         messageFrame.content?.contains("@here") == true
+                
+                var hasRoleMention = false
+                if (serverId != null && messageFrame.content != null) {
+                    val mentionedRoleIds = chat.revolt.internals.text.MessageProcessor.findMentionedRoleIDs(messageFrame.content)
+                    if (mentionedRoleIds.isNotEmpty()) {
+                        val member = RevoltAPI.members.getMember(serverId, selfId)
+                        val userRoles = member?.roles ?: emptyList()
+                        hasRoleMention = mentionedRoleIds.any { roleId -> userRoles.contains(roleId) }
+                    }
+                }
+                
+                val isMention = hasDirectMention || hasMassMention || hasRoleMention
 
                 if (shouldNotifyMessage(channelId, serverId, isMention)) {
                     val author = RevoltAPI.userCache[messageFrame.author]
