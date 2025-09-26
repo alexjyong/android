@@ -1,6 +1,6 @@
 sentry.dsn=
 sentry.upload_mappings=true
-build.debug.app_name=Revolt Forked
+build.debug.app_name=Refork
 build.flavour_id=ZZUU
 
 # Release signing configuration

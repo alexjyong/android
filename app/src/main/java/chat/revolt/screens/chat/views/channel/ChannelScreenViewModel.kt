@@ -109,6 +109,10 @@ class ChannelScreenViewModel @Inject constructor(
 
     var highlightedMessageId by mutableStateOf<String?>(null)
 
+    var isInHistoricalMode by mutableStateOf(false)
+    private var historicalModeTargetMessageId by mutableStateOf<String?>(null)
+    private var scrollToMessageCallback: ((Int) -> Unit)? = null
+
     init {
         viewModelScope.launch {
             keyboardHeight = kvStorage.getInt("keyboardHeight") ?: 900 // reasonable default for now
@@ -316,13 +320,123 @@ class ChannelScreenViewModel @Inject constructor(
 
     fun setHighlightedMessage(messageId: String) {
         highlightedMessageId = messageId
-        
-        viewModelScope.launch {
-            delay(3000) // 3 second highlight
-            if (highlightedMessageId == messageId) {
-                highlightedMessageId = null
+
+        val messageIndex = findMessageIndex(messageId)
+        if (messageIndex < 0) {
+            if (shouldUseHistoricalModeForMessage(messageId)) {
+                enterHistoricalMode(messageId)
+            } else {
+                loadMessages(50, around = messageId, ignoreExisting = true)
+                viewModelScope.launch {
+                    delay(3000)
+                    if (highlightedMessageId == messageId) {
+                        highlightedMessageId = null
+                    }
+                }
+            }
+        } else {
+            viewModelScope.launch {
+                delay(3000)
+                if (highlightedMessageId == messageId) {
+                    highlightedMessageId = null
+                }
             }
         }
+    }
+
+    private fun shouldUseHistoricalModeForMessage(messageId: String): Boolean {
+        if (items.isEmpty()) return true
+
+        val targetTimestamp = ULID.asTimestamp(messageId)
+
+        val oldestLoadedMessage = items.mapNotNull { item ->
+            when (item) {
+                is ChannelScreenItem.RegularMessage -> item.message.id
+                is ChannelScreenItem.SystemMessage -> item.message.id
+                else -> null
+            }
+        }.minByOrNull { ULID.asTimestamp(it) }
+
+        if (oldestLoadedMessage == null) return true
+
+        val oldestTimestamp = ULID.asTimestamp(oldestLoadedMessage)
+
+        val timeDifference = oldestTimestamp - targetTimestamp
+        return timeDifference > 3600000 // 1 hour in milliseconds
+    }
+
+    fun setScrollCallback(callback: (Int) -> Unit) {
+        scrollToMessageCallback = callback
+    }
+
+    fun enterHistoricalMode(targetMessageId: String) {
+        isInHistoricalMode = true
+        historicalModeTargetMessageId = targetMessageId
+        highlightedMessageId = targetMessageId
+
+        loadMessagesJob?.cancel()
+
+        viewModelScope.launch {
+            try {
+                channel?.id?.let { channelId ->
+                    val messages = arrayListOf<Message>()
+
+                    fetchMessagesFromChannel(channelId, 50, true, nearby = targetMessageId).let {
+                        it.users?.forEach { user ->
+                            if (!RevoltAPI.userCache.containsKey(user.id)) {
+                                RevoltAPI.userCache[user.id!!] = user
+                            }
+                        }
+
+                        it.messages?.forEach { message ->
+                            addUserIfUnknown(message.author ?: return@forEach)
+                            if (!RevoltAPI.messageCache.containsKey(message.id)) {
+                                RevoltAPI.messageCache[message.id!!] = message
+                            }
+                            messages.add(message)
+                        }
+
+                        it.members?.forEach { member ->
+                            if (!RevoltAPI.members.hasMember(member.id!!.server, member.id.user)) {
+                                RevoltAPI.members.setMember(member.id.server, member)
+                            }
+                        }
+                    }
+
+                    // Replace items with historical messages (sorted chronologically)
+                    val newItems = messages.sortedByDescending { ULID.asTimestamp(it.id!!) }.map {
+                        when {
+                            it.system != null -> ChannelScreenItem.SystemMessage(it)
+                            else -> ChannelScreenItem.RegularMessage(it)
+                        }
+                    }
+
+                    updateItems(newItems)
+
+                    delay(200)
+                    val messageIndex = findMessageIndex(targetMessageId)
+                    if (messageIndex >= 0) {
+                        scrollToMessageCallback?.invoke(messageIndex)
+                    }
+
+                    delay(3000)
+                    if (highlightedMessageId == targetMessageId) {
+                        highlightedMessageId = null
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("ChannelScreenViewModel", "Failed to enter historical mode", e)
+                exitHistoricalMode()
+            }
+        }
+    }
+
+    fun exitHistoricalMode() {
+        isInHistoricalMode = false
+        historicalModeTargetMessageId = null
+        highlightedMessageId = null
+
+        switchChannel(channel?.id ?: return)
     }
     
     fun findMessageIndex(messageId: String): Int {
@@ -544,6 +658,8 @@ class ChannelScreenViewModel @Inject constructor(
                 when (it) {
                     is MessageFrame -> {
                         if (it.channel != channel?.id) return@onEach
+                        // Skip real-time updates when in historical mode
+                        if (isInHistoricalMode) return@onEach
                         // If we already have the message we are just catching up on the WebSocket connection. Skip
                         if (items.any { m -> (m is ChannelScreenItem.RegularMessage && m.message.id == it.id) || (m is ChannelScreenItem.SystemMessage && m.message.id == it.id) }) return@onEach
 

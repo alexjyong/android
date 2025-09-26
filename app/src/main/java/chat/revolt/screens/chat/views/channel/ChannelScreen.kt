@@ -57,6 +57,7 @@ import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -441,6 +442,14 @@ fun ChannelScreen(
     val lazyListState = rememberLazyListState()
     var disableScroll by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        viewModel.setScrollCallback { messageIndex ->
+            scope.launch {
+                lazyListState.animateScrollToItem(messageIndex)
+            }
+        }
+    }
+
     LaunchedEffect(initialHighlightMessageId) {
         initialHighlightMessageId?.let { messageId ->
             viewModel.setHighlightedMessage(messageId)
@@ -483,7 +492,7 @@ fun ChannelScreen(
         snapshotFlow { isNearTop.value }
             .distinctUntilChanged()
             .collect { isNearTop ->
-                if (isNearTop) {
+                if (isNearTop && !viewModel.isInHistoricalMode) {
                     Log.d("ChannelScreen", "Loading more messages")
                     viewModel.loadMessages(before = viewModel.items.lastOrNull {
                         it is ChannelScreenItem.RegularMessage || it is ChannelScreenItem.SystemMessage
@@ -1040,11 +1049,61 @@ fun ChannelScreen(
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            AnimatedContent(
-                                targetState = viewModel.denyMessageField,
-                                label = "denyMessageField"
-                            ) { deny ->
-                                if (!deny) {
+                            when {
+                                viewModel.isInHistoricalMode -> {
+                                    // historical mode card thingy
+                                    Card(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = MaterialTheme.colorScheme.secondaryContainer
+                                        )
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Column(
+                                                modifier = Modifier.weight(1f)
+                                            ) {
+                                                Text(
+                                                    text = stringResource(R.string.historical_mode_title),
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    fontWeight = FontWeight.Medium,
+                                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                                )
+                                                Text(
+                                                    text = stringResource(R.string.historical_mode_description),
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                                                )
+                                            }
+                                            TextButton(
+                                                onClick = { viewModel.exitHistoricalMode() }
+                                            ) {
+                                                Text(stringResource(R.string.historical_mode_jump_to_present))
+                                            }
+                                        }
+                                    }
+                                }
+                                viewModel.denyMessageField -> {
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(horizontal = 32.dp, vertical = 16.dp)
+                                    ) {
+                                        Text(
+                                            stringResource(viewModel.denyMessageFieldReasonResource),
+                                            color = MaterialTheme.colorScheme.error,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
+                                else -> {
                                     Column {
                                         AnimatedVisibility(
                                             visible = viewModel.draftReplyTo.isNotEmpty() && !viewModel.denyMessageField
@@ -1238,20 +1297,8 @@ fun ChannelScreen(
                                             )
                                         }
                                     }
-                                } else {
-                                    Box(
-                                        modifier = Modifier
-                                            .padding(horizontal = 32.dp, vertical = 16.dp)
-                                    ) {
-                                        Text(
-                                            stringResource(viewModel.denyMessageFieldReasonResource),
-                                            color = MaterialTheme.colorScheme.error,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            textAlign = TextAlign.Center
-                                        )
-                                    }
-                                }
                             }
+                        }
 
                             if (viewModel.activePane == ChannelScreenActivePane.None && !imeInTransition) {
                                 Spacer(

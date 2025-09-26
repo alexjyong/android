@@ -62,12 +62,12 @@ class Changelogs(val context: Context, val kvStorage: KVStorage? = null) {
                 1003006L -> """
                     <h2>Notification Support!!!!🎉🎉</h2>
                     <ul>
-                        <li><strong>Revolt Forked now supports notifications!</strong>
+                        <li><strong>Revolt Forked is now Refork and it now supports notifications!</strong>
                     </ul>
 
                     <h2>How to Use:</h2>
                     <ol>
-                        <li><strong>Enable Notification Permissions</strong>: There should have been a pop-up asking you for notification permissions. If not, you'll need to enable it for the app.</li>
+                        <li><strong>Enable Notification Permissions</strong>: There should have been a pop-up asking you for notification permissions. If not, you'll need to enable permissions for the app.</li>
                         <li><strong>Enable Background Notifications</strong>: Go to Settings → Notifications → Enable "Background Notifications" (an option to enable permissions for the app will be available here)</li>
                         <li><strong>(Optional, but recommended for reliable notifications) Optimize Battery Settings</strong>: Toggle "Battery Optimization" in notification settings and follow the system prompts to ensure reliable delivery</li>
                         <li><strong>Click Notifications</strong>: Simply tap any notification to jump directly to the message that triggered it</li>

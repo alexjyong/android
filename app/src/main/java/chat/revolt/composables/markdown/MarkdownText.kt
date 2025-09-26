@@ -241,7 +241,38 @@ fun annotateText(node: AstNode, revealedSpoilers: Set<String> = emptySet()): Ann
                                 color = MaterialTheme.colorScheme.primary
                             )
                     )
-                    append(url.value)
+
+                    val displayText = try {
+                        val uri = url.value.toUri()
+                        if (uri.host == "app.revolt.chat" || uri.host == "beta.revolt.chat") {
+                            val pathSegments = uri.pathSegments
+                            if (pathSegments.size >= 4 &&
+                                pathSegments[0] == "server" &&
+                                pathSegments[2] == "channel") {
+
+                                val serverId = pathSegments[1]
+                                val channelId = pathSegments[3]
+                                val messageId = if (pathSegments.size > 4) pathSegments[4] else null
+
+                                val serverName = RevoltAPI.serverCache[serverId]?.name ?: "Unknown Server"
+                                val channelName = RevoltAPI.channelCache[channelId]?.name ?: "Unknown Channel"
+
+                                if (messageId != null) {
+                                    "#$channelName (in $serverName)"
+                                } else {
+                                    "#$channelName (in $serverName)"
+                                }
+                            } else {
+                                url.value
+                            }
+                        } else {
+                            url.value
+                        }
+                    } catch (e: Exception) {
+                        url.value
+                    }
+
+                    append(displayText)
                     pop()
                     pop()
                     lastIndex = url.range.last + 1
@@ -381,6 +412,28 @@ fun MarkdownText(textNode: AstNode, modifier: Modifier = Modifier) {
                             }
                         }
                         return@handler true
+                    }
+
+                    // Handle Revolt app URLs
+                    if (uri.host == "app.revolt.chat" || uri.host == "beta.revolt.chat") {
+                        val pathSegments = uri.pathSegments
+                        // Expected format: /server/{serverId}/channel/{channelId}[/{messageId}]
+                        if (pathSegments.size >= 4 &&
+                            pathSegments[0] == "server" &&
+                            pathSegments[2] == "channel") {
+
+                            val channelId = pathSegments[3]
+                            val messageId = if (pathSegments.size > 4) pathSegments[4] else null
+
+                            scope.launch {
+                                if (messageId != null) {
+                                    ActionChannel.send(Action.SwitchChannelAndHighlight(channelId, messageId))
+                                } else {
+                                    ActionChannel.send(Action.SwitchChannel(channelId))
+                                }
+                            }
+                            return@handler true
+                        }
                     }
                 } catch (e: Exception) {
                     // no-op
