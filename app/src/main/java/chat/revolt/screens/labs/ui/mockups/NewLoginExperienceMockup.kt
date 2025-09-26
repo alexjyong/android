@@ -94,11 +94,8 @@ fun NewLoginExperienceMockup(navController: NavController) {
                     ) {
                         Spacer(modifier = Modifier.height(64.dp))
                         Image(
-                            painter = painterResource(R.drawable.revolt_logo_wide),
+                            painter = painterResource(R.mipmap.ic_launcher),
                             contentDescription = null,
-                            colorFilter = if (LoadedSettings.theme == Theme.M3Dynamic) ColorFilter.tint(
-                                MaterialTheme.colorScheme.onBackground
-                            ) else null,
                             modifier = Modifier.fillMaxWidth(0.5f)
                         )
                         Spacer(modifier = Modifier.height(64.dp))

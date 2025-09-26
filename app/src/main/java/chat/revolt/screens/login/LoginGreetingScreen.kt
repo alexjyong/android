@@ -71,9 +71,8 @@ fun LoginGreetingScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.revolt_logo_wide),
-                colorFilter = ColorFilter.tint(LocalContentColor.current),
-                contentDescription = "Revolt Logo",
+                painter = painterResource(id = R.mipmap.ic_launcher),
+                contentDescription = "Refork Logo",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .height(55.dp)
@@ -104,24 +103,9 @@ fun LoginGreetingScreen(navController: NavController) {
             Text(
                 text = stringResource(R.string.login_onboarding_heading),
                 style = MaterialTheme.typography.displaySmall.copy(
-                    fontSize = 26.sp,
+                    fontSize = 72.sp,
                     fontWeight = FontWeight.Black,
                     textAlign = TextAlign.Center
-                ),
-                modifier = Modifier
-                    .padding(horizontal = 20.dp, vertical = 10.dp)
-                    .fillMaxWidth()
-            )
-
-            Text(
-                text = stringResource(R.string.login_onboarding_body),
-                color = MaterialTheme.colorScheme.onBackground.copy(
-                    alpha = 0.5f
-                ),
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Normal
                 ),
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 10.dp)

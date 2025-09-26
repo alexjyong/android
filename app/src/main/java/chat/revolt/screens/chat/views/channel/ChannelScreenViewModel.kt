@@ -345,9 +345,17 @@ class ChannelScreenViewModel @Inject constructor(
     }
 
     private fun shouldUseHistoricalModeForMessage(messageId: String): Boolean {
-        if (items.isEmpty()) return true
-
         val targetTimestamp = ULID.asTimestamp(messageId)
+        val currentTime = System.currentTimeMillis()
+
+        // If the message is more than 24 hours old, use historical mode regardless of what's loaded
+        val messageAge = currentTime - targetTimestamp
+        if (messageAge > 86400000) { // 24 hours in milliseconds
+            return true
+        }
+
+        // If no messages are loaded yet, don't use historical mode for recent messages
+        if (items.isEmpty()) return false
 
         val oldestLoadedMessage = items.mapNotNull { item ->
             when (item) {
@@ -357,7 +365,7 @@ class ChannelScreenViewModel @Inject constructor(
             }
         }.minByOrNull { ULID.asTimestamp(it) }
 
-        if (oldestLoadedMessage == null) return true
+        if (oldestLoadedMessage == null) return false
 
         val oldestTimestamp = ULID.asTimestamp(oldestLoadedMessage)
 

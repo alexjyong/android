@@ -211,9 +211,8 @@ fun AboutScreen(navController: NavController, viewModel: AboutViewModel = viewMo
                         when (viewModel.selectedTabIndex) {
                             0 -> {
                                 Image(
-                                    painter = painterResource(R.drawable.revolt_logo_wide),
+                                    painter = painterResource(R.mipmap.ic_launcher),
                                     contentDescription = stringResource(R.string.about_full_name),
-                                    colorFilter = ColorFilter.tint(LocalContentColor.current),
                                     modifier = Modifier
                                         .width(250.dp)
                                 )
