@@ -1,4 +1,3 @@
-# Refork
 [![Open in DevPod!](https://devpod.sh/assets/open-in-devpod.svg)](https://devpod.sh/open#https://github.com/alexjyong/android)
 <div align="center">
     <h1>Refork</h1>
@@ -18,7 +17,7 @@ NOTE: This is a forked version of the Android app for the [Revolt](https://revol
 
 I made this for some QOL changes that aren't present in the current version at the time of writing such as notification support, jump to reply, voice messages, and more!
 
-**This app also works on de-googled phones as well!**
+**This app also works on de-Googled phones as well!**
 
 You can download the latest APK [here](https://github.com/alexjyong/android/releases/latest).
 
