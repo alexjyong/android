@@ -10,6 +10,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import chat.revolt.R
 import chat.revolt.activities.MainActivity
+import chat.revolt.api.RevoltAPI
 import chat.revolt.api.realtime.frames.receivable.MessageFrame
 import chat.revolt.api.schemas.Channel
 import chat.revolt.api.schemas.Server
@@ -43,7 +44,8 @@ class NotificationHelper(private val context: Context) {
         val messageContent = messageFrame.content?.take(100) ?: ""
 
         val title = "$authorName in $channelName"
-        val content = if (messageContent.isBlank()) "Sent an attachment" else messageContent
+        val processedContent = processMessageMentions(messageContent, server?.id)
+        val content = if (processedContent.isBlank()) "Sent an attachment" else processedContent
 
         val notificationIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -92,6 +94,41 @@ class NotificationHelper(private val context: Context) {
         } catch (e: SecurityException) {
             logcat(LogPriority.ERROR) { "Failed to show notification: Missing POST_NOTIFICATIONS permission" }
         }
+    }
+
+    private fun processMessageMentions(content: String, serverId: String?): String {
+        if (content.isEmpty()) return content
+        
+        var processedContent = content
+        
+        val userMentionRegex = "<@([0-9A-HJKMNP-TV-Z]{26})>".toRegex()
+        processedContent = userMentionRegex.replace(processedContent) { matchResult ->
+            val userId = matchResult.groupValues[1]
+            val user = RevoltAPI.userCache[userId]
+            val displayName = user?.displayName ?: user?.username ?: "Unknown User"
+            "@$displayName"
+        }
+        
+        if (serverId != null) {
+            val roleMentionRegex = "<%([0-9A-HJKMNP-TV-Z]{26})>".toRegex()
+            processedContent = roleMentionRegex.replace(processedContent) { matchResult ->
+                val roleId = matchResult.groupValues[1]
+                val server = RevoltAPI.serverCache[serverId]
+                val role = server?.roles?.get(roleId)
+                val roleName = role?.name ?: "Unknown Role"
+                "@$roleName"
+            }
+        }
+        
+        val channelMentionRegex = "<#([0-9A-HJKMNP-TV-Z]{26})>".toRegex()
+        processedContent = channelMentionRegex.replace(processedContent) { matchResult ->
+            val channelId = matchResult.groupValues[1]
+            val channel = RevoltAPI.channelCache[channelId]
+            val channelName = channel?.name ?: "Unknown Channel"
+            "#$channelName"
+        }
+        
+        return processedContent
     }
 
     private fun createNotificationChannels() {
