@@ -44,7 +44,7 @@ class Changelogs(val context: Context, val kvStorage: KVStorage? = null) {
         private val changelog1003006 = ChangelogData(
             version = ChangelogVersion(
                 code = 1003006,
-                name = "1.3.6bf-forked",
+                name = "1.3.6bh-forked",
                 title = "Notification Support!!!!🎉🎉"
             ),
             date = ChangelogDate(
