@@ -407,5 +407,5 @@ for (const dep of deps) {
 
 // await Promise.all(writeFilePromises)
 
-// Close the zip reader
-await zipReader.close()
+// // Close the zip reader
+// await zipReader.close()
