@@ -18,11 +18,13 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +45,7 @@ import chat.revolt.api.internals.hasPermission
 import chat.revolt.api.routes.channel.leaveDeleteOrCloseChannel
 import chat.revolt.api.schemas.ChannelType
 import chat.revolt.api.settings.FeatureFlags
+import chat.revolt.api.settings.NotificationSettingsProvider
 import chat.revolt.internals.extensions.rememberChannelPermissions
 import chat.revolt.screens.settings.SettingsIcon
 import kotlinx.coroutines.launch
@@ -171,6 +174,44 @@ fun ChannelSettingsHome(navController: NavController, channelId: String) {
                                 }
                         )
                     }
+
+                    var suppressEveryoneMentions by remember { mutableStateOf(false) }
+                    
+                    LaunchedEffect(channelId) {
+                        suppressEveryoneMentions = NotificationSettingsProvider.getChannelSuppressEveryoneMentions(channelId)
+                    }
+                    
+                    ListItem(
+                        headlineContent = {
+                            Text(stringResource(R.string.settings_notifications_suppress_everyone))
+                        },
+                        supportingContent = {
+                            Text(stringResource(R.string.settings_notifications_suppress_everyone_description))
+                        },
+                        leadingContent = {
+                            SettingsIcon {
+                                Icon(
+                                    painter = painterResource(R.drawable.icn_notification_settings_24dp),
+                                    contentDescription = null,
+                                )
+                            }
+                        },
+                        trailingContent = {
+                            Switch(
+                                checked = suppressEveryoneMentions,
+                                onCheckedChange = null
+                            )
+                        },
+                        modifier = Modifier.clickable {
+                            suppressEveryoneMentions = !suppressEveryoneMentions
+                            scope.launch {
+                                NotificationSettingsProvider.setChannelSuppressEveryoneMentions(
+                                    channelId,
+                                    suppressEveryoneMentions
+                                )
+                            }
+                        }
+                    )
 
                     if (permissions.hasPermission(PermissionBit.ManageChannel) && channel.channelType != ChannelType.DirectMessage && channel.channelType != ChannelType.Group) {
                         ListItem(

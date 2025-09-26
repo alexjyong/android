@@ -528,7 +528,7 @@ fun SettingsScreen(
                                     InviteActivity::class.java
                                 ).setAction(Intent.ACTION_VIEW)
 
-                                intent.data = "https://rvlt.gg/Testers".toUri()
+                                intent.data = "https://rvlt.gg/tyKYccTr".toUri()
                                 context.startActivity(intent)
                             }
                     )

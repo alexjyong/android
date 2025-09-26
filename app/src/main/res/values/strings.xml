@@ -776,6 +776,8 @@
     <string name="toast_find_battery_in_app_info">Please find battery settings in app info</string>
     <string name="toast_battery_settings_manual">Unable to open settings. Please manually disable battery optimization for Revolt.</string>
     <string name="toast_battery_optimization_not_available">Battery optimization not available on this Android version</string>
+    <string name="settings_notifications_suppress_everyone">Suppress @everyone/@here</string>
+    <string name="settings_notifications_suppress_everyone_description">Don\'t notify for @everyone and @here mentions</string>
 
     <!-- Notification Context Menu -->
     <string name="notification_menu_title">Notifications</string>
@@ -796,7 +798,7 @@
     <string name="mute_until_turned_off">Until I turn it back on</string>
     <string name="muted_until">Muted until %1$s</string>
     <string name="settings_feedback">Feedback</string>
-    <string name="settings_feedback_description">Join the Revolt server to give feedback or suggestions and report bugs.</string>
+    <string name="settings_feedback_description">Join the Revolt Forked server to give feedback or suggestions and report bugs.</string>
 
     <string name="settings_changelogs">Changelogs</string>
     <string name="settings_changelogs_new_header">What\'s been cooking ✨</string>

@@ -16,7 +16,8 @@
         "extensions": [
           "redhat.java",
           "vscjava.vscode-java-pack",
-          "kotlin.kotlin"
+          "kotlin.kotlin",
+          "fwcd.kotlin"
         ]
       }
     }

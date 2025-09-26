@@ -4,6 +4,8 @@ import chat.revolt.api.schemas.NotificationState
 import chat.revolt.api.schemas.MuteState
 import chat.revolt.persistence.Database
 import chat.revolt.persistence.SqlStorage
+import chat.revolt.persistence.KVStorage
+import chat.revolt.RevoltApplication
 
 object DefaultNotificationStates {
     const val SAVED_MESSAGES = "all"
@@ -15,8 +17,42 @@ object DefaultNotificationStates {
 }
 
 object NotificationSettingsProvider {
+    private val kv = KVStorage(RevoltApplication.instance)
 
     private fun getCurrentTime() = System.currentTimeMillis()
+    
+    suspend fun getServerSuppressEveryoneMentions(serverId: String): Boolean {
+        return kv.getBoolean("suppress_everyone_server_$serverId") ?: false
+    }
+    
+    suspend fun setServerSuppressEveryoneMentions(serverId: String, suppress: Boolean) {
+        kv.set("suppress_everyone_server_$serverId", suppress)
+    }
+    
+    suspend fun getChannelSuppressEveryoneMentions(channelId: String): Boolean {
+        return kv.getBoolean("suppress_everyone_channel_$channelId") ?: false
+    }
+    
+    suspend fun setChannelSuppressEveryoneMentions(channelId: String, suppress: Boolean) {
+        kv.set("suppress_everyone_channel_$channelId", suppress)
+    }
+    
+    suspend fun shouldSuppressEveryoneMentions(channelId: String, serverId: String?): Boolean {
+        val channelSuppressed = getChannelSuppressEveryoneMentions(channelId)
+        
+        if (channelSuppressed) {
+            return true
+        }
+        
+        if (serverId != null) {
+            val serverSuppressed = getServerSuppressEveryoneMentions(serverId)
+            if (serverSuppressed) {
+                return true
+            }
+        }
+        
+        return false
+    }
 
     fun isServerMuted(serverId: String): Boolean {
         val muteState = SyncedSettings.notifications.server_mutes[serverId] ?: return false

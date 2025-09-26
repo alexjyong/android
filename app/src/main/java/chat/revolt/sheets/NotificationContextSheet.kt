@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -277,6 +278,40 @@ fun ColumnScope.ChannelNotificationContextSheet(
             }
         }
     )
+    
+    var suppressEveryoneMentions by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(channelId) {
+        suppressEveryoneMentions = NotificationSettingsProvider.getChannelSuppressEveryoneMentions(channelId)
+    }
+
+    SheetButton(
+        headlineContent = { Text(stringResource(R.string.settings_notifications_suppress_everyone)) },
+        supportingContent = { Text(stringResource(R.string.settings_notifications_suppress_everyone_description)) },
+        leadingContent = {
+            Icon(
+                painter = painterResource(R.drawable.icn_visibility_off_24dp),
+                contentDescription = null
+            )
+        },
+        trailingContent = {
+            Icon(
+                painter = painterResource(
+                    if (suppressEveryoneMentions) R.drawable.icn_check_24dp else R.drawable.icn_close_24dp
+                ),
+                contentDescription = null,
+                tint = if (suppressEveryoneMentions) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        },
+        onClick = {
+            scope.launch {
+                val newValue = !suppressEveryoneMentions
+                suppressEveryoneMentions = newValue
+                NotificationSettingsProvider.setChannelSuppressEveryoneMentions(channelId, newValue)
+                dismissSheet()
+            }
+        }
+    )
 }
 
 @Composable
@@ -466,6 +501,40 @@ fun ColumnScope.ServerNotificationContextSheet(
         onClick = {
             scope.launch {
                 NotificationSettingsProvider.setServerNotificationState(serverId, NotificationState.NONE)
+                dismissSheet()
+            }
+        }
+    )
+    
+    var suppressEveryoneMentions by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(serverId) {
+        suppressEveryoneMentions = NotificationSettingsProvider.getServerSuppressEveryoneMentions(serverId)
+    }
+
+    SheetButton(
+        headlineContent = { Text(stringResource(R.string.settings_notifications_suppress_everyone)) },
+        supportingContent = { Text(stringResource(R.string.settings_notifications_suppress_everyone_description)) },
+        leadingContent = {
+            Icon(
+                painter = painterResource(R.drawable.icn_visibility_off_24dp),
+                contentDescription = null
+            )
+        },
+        trailingContent = {
+            Icon(
+                painter = painterResource(
+                    if (suppressEveryoneMentions) R.drawable.icn_check_24dp else R.drawable.icn_close_24dp
+                ),
+                contentDescription = null,
+                tint = if (suppressEveryoneMentions) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        },
+        onClick = {
+            scope.launch {
+                val newValue = !suppressEveryoneMentions
+                suppressEveryoneMentions = newValue
+                NotificationSettingsProvider.setServerSuppressEveryoneMentions(serverId, newValue)
                 dismissSheet()
             }
         }
