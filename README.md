@@ -1,5 +1,5 @@
 # Revolt for Android (Forked Version!)
-[![Open in DevPod!](https://devpod.sh/assets/open-in-devpod.svg)](https://devpod.sh/open#https://github.com/loft-sh/devpod)
+[![Open in DevPod!](https://devpod.sh/assets/open-in-devpod.svg)](https://devpod.sh/open#https://github.com/alexjyong/android)
 <div align="center">
     <h1>Revolt for Android (Forked Version!)</h1>
     <p>Forked Version of the <a href="https://revolt.chat">Revolt</a> Android app.</p>
