@@ -1,5 +1,5 @@
 # Revolt for Android (Forked Version!)
-
+[![Open in DevPod!](https://devpod.sh/assets/open-in-devpod.svg)](https://devpod.sh/open#https://github.com/loft-sh/devpod)
 <div align="center">
     <h1>Revolt for Android (Forked Version!)</h1>
     <p>Forked Version of the <a href="https://revolt.chat">Revolt</a> Android app.</p>
@@ -16,11 +16,11 @@
 NOTE: This is a forked version of the Android app for the [Revolt](https://revolt.chat) chat platform.
 I am not affilated with the Revolt Team, nor is this an official Revolt product.
 
-I made this for some QOL changes that aren't present in the current version at the time of writing.
+I made this for some QOL changes that aren't present in the current version at the time of writing such as notification support, jump to reply, voice messages, and more!
 
 **This app also works on de-googled phones as well!**
 
-Feel free to use this for whatever, but note that this is NOT the official Revolt android app. :)
+Feel free to use this for whatever, but note that this is NOT the official Revolt Android app. :)
 
 You can download the latest APK [here](https://github.com/alexjyong/android/releases/latest).
 
@@ -29,9 +29,9 @@ For support, discussion, updates and other things, visit our support server on [
 ## Features Added
 Tap a card to expand.
 <details>
-<summary><strong>Notification Support!!!</strong></summary>
+<summary><strong>Notification Support!!!🎉🎉</strong></summary>
 
-![Notification support preview](https://github.com/user-attachments/assets/8b794d8e-46cc-407e-84aa-99b4128d5922)
+![Notification support preview](https://github.com/user-attachments/assets/8123962e-e2d3-4690-87e3-44e09724a29c)
 </details>
 
 <details>
