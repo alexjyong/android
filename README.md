@@ -33,6 +33,11 @@ Tap a card to expand.
 </details>
 
 <details>
+<summary><strong>Role Mention (with notifications!)</strong></summary>
+![Role Mention (with notifications!)](https://github.com/user-attachments/assets/bb779690-2ac4-4293-b662-102c92a20923)
+</details>
+
+<details>
 <summary><strong>Voice messages</strong></summary>
 
 ![Voice messages preview](https://github.com/user-attachments/assets/8b794d8e-46cc-407e-84aa-99b4128d5922)
