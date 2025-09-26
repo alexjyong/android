@@ -179,6 +179,45 @@ object Autocomplete {
         } else listOf()
     }
 
+    fun role(
+        channelId: String,
+        serverId: String? = null,
+        query: String
+    ): List<AutocompleteSuggestion.Role> {
+        val channel = RevoltAPI.channelCache[channelId] ?: return emptyList()
+        if (serverId == null) return emptyList()
+        if (query.length < 1) return emptyList()
+
+        val member = RevoltAPI.members.getMember(serverId, RevoltAPI.selfId ?: "")
+        val selfPermissions = RevoltAPI.channelCache[channelId]?.let { ch ->
+            Roles.permissionFor(
+                ch,
+                RevoltAPI.userCache[RevoltAPI.selfId],
+                member
+            )
+        }
+
+        return when (channel.channelType) {
+            ChannelType.TextChannel, ChannelType.VoiceChannel -> {
+                val roles =
+                    if (selfPermissions has PermissionBit.MentionRoles && FeatureFlags.massMentionsGranted) RevoltAPI.serverCache[serverId]?.roles
+                        ?: emptyMap() else emptyMap()
+                val rolesByName =
+                    roles.filter { it.value.name?.contains(query, ignoreCase = true) == true }
+                        .map { it.value to it.key }
+
+                rolesByName.map { (role, roleId) ->
+                    AutocompleteSuggestion.Role(
+                        role,
+                        roleId,
+                        query
+                    )
+                }.sortedBy { it.role.name }
+            }
+            else -> emptyList()
+        }
+    }
+
     fun channel(
         serverId: String,
         query: String

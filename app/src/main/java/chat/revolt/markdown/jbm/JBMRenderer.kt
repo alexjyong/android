@@ -165,6 +165,9 @@ fun JBMRenderer(content: String, modifier: Modifier = Modifier) {
     preprocessedContent = preprocessedContent.replace(Regex("<#([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
         "ZZCHANNELMENTION${match.groupValues[1]}ZZ"
     }
+    preprocessedContent = preprocessedContent.replace(Regex("<%([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
+        "ZZROLEMENTION${match.groupValues[1]}ZZ"
+    }
     android.util.Log.d("JBMRenderer", "Preprocessed content: '${preprocessedContent.take(50)}...'")
     
     val flavor = if (state.enhanced) RSMEnhancedFlavourDescriptor() else RSMFlavourDescriptor()
@@ -179,6 +182,9 @@ fun JBMRenderer(content: String, modifier: Modifier = Modifier) {
         }
         preprocessedContent = preprocessedContent.replace(Regex("<#([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
             "ZZCHANNELMENTION${match.groupValues[1]}ZZ"
+        }
+        preprocessedContent = preprocessedContent.replace(Regex("<%([0-9A-HJKMNP-TV-Z]{26})>")) { match ->
+            "ZZROLEMENTION${match.groupValues[1]}ZZ"
         }
         tree = JBMApi.parse(preprocessedContent, flavor)
     }
@@ -247,6 +253,7 @@ private fun annotateText(
                     var text = source.toString()
                     val mentionRegex = Regex("(ZZUSERMENTION([0-9A-HJKMNP-TV-Z]{26})ZZ)")
                     val channelMentionRegex = Regex("(ZZCHANNELMENTION([0-9A-HJKMNP-TV-Z]{26})ZZ)")
+                    val roleMentionRegex = Regex("(ZZROLEMENTION([0-9A-HJKMNP-TV-Z]{26})ZZ)")
                     
                     val unicodeEmoteRegex = Regex(":([a-zA-Z0-9_+-]+):")
                     text = unicodeEmoteRegex.replace(text) { matchResult ->
@@ -254,13 +261,14 @@ private fun annotateText(
                         EmojiRepository.unicodeByShortcode(shortcodeName) ?: matchResult.value
                     }
 
-                    if (mentionRegex.containsMatchIn(text) || channelMentionRegex.containsMatchIn(text)) {
+                    if (mentionRegex.containsMatchIn(text) || channelMentionRegex.containsMatchIn(text) || roleMentionRegex.containsMatchIn(text)) {
                         android.util.Log.d("JBMRenderer", "Found mentions in text")
                         var lastIndex = 0
 
                         val userMatches = mentionRegex.findAll(text).map { it to "user" }
                         val channelMatches = channelMentionRegex.findAll(text).map { it to "channel" }
-                        val allMatches = (userMatches + channelMatches).sortedBy { it.first.range.first }
+                        val roleMatches = roleMentionRegex.findAll(text).map { it to "role" }
+                        val allMatches = (userMatches + channelMatches + roleMatches).sortedBy { it.first.range.first }
 
                         allMatches.forEach { (match, type) ->
 
@@ -302,6 +310,37 @@ private fun annotateText(
                                     )
                                 )
                                 append(MentionResolver.resolveChannel(channelId))
+                                pop()
+                                pop()
+                            } else if (type == "role") {
+                                val roleId = match.groupValues[2]
+                                val server = RevoltAPI.serverCache[state.currentServer]
+                                val role = server?.roles?.get(roleId)
+                                val isGradient = role?.colour?.contains("gradient") == true
+
+                                pushStyle(
+                                    SpanStyle(
+                                        background = state.colors.clickableBackground
+                                    )
+                                )
+                                pushStyle(
+                                    SpanStyle(
+                                        brush = (if (!isGradient) role?.colour?.let {
+                                            state.brushCompat?.parseColour(it)
+                                        } else null) ?: SolidColor(state.colors.clickable),
+                                    )
+                                )
+                                pushStyle(
+                                    SpanStyle(
+                                        background = state.colors.clickableBackground
+                                    )
+                                )
+                                append(" ")
+                                appendInlineContent(JBMAnnotations.RoleChip.tag, roleId)
+                                append(" ")
+                                append(role?.name ?: "invalid-role")
+                                append(" ")
+                                pop()
                                 pop()
                                 pop()
                             }

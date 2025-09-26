@@ -284,6 +284,18 @@ fun MessageField(
                             )
                         }
                     }
+                    
+                    lastWord.startsWith('%') -> {
+                        if (channelId != null && serverId != null) {
+                            autocompleteSuggestions.addAll(
+                                Autocomplete.role(
+                                    channelId,
+                                    serverId,
+                                    lastWord.substring(1)
+                                )
+                            )
+                        }
+                    }
 
                     lastWord.startsWith('#') -> {
                         if (serverId != null) {
