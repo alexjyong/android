@@ -3,6 +3,7 @@ package chat.revolt
 import android.app.Application
 import android.os.StrictMode
 import chat.revolt.internals.EmojiRepository
+import chat.revolt.services.NotificationServiceManager
 import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
@@ -10,12 +11,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import logcat.AndroidLogcatLogger
 import logcat.LogPriority
+import javax.inject.Inject
 
 @HiltAndroidApp
 class RevoltApplication : Application() {
     companion object {
         lateinit var instance: RevoltApplication
     }
+
+    @Inject
+    lateinit var notificationServiceManager: NotificationServiceManager
 
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
@@ -39,6 +44,7 @@ class RevoltApplication : Application() {
         }
         
         EmojiRepository.initialize(applicationScope)
+        notificationServiceManager.startServicesIfEnabled(applicationScope)
     }
 
     init {

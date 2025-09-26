@@ -46,13 +46,23 @@ class NotificationHelper(private val context: Context) {
         val content = if (messageContent.isBlank()) "Sent an attachment" else messageContent
 
         val notificationIntent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+
+            logcat(LogPriority.DEBUG) { "Creating notification intent for channel: ${messageFrame.channel}" }
             putExtra("channelId", messageFrame.channel)
+
+            if (server != null && channel != null) {
+                putExtra("serverId", server.id)
+                putExtra("serverName", server.name)
+                putExtra("channelName", channel.name)
+                logcat(LogPriority.DEBUG) { "Added server context - serverId: ${server.id}, channelName: ${channel.name}" }
+            }
         }
 
+        val requestCode = (messageFrame.channel?.hashCode() ?: 0) + System.currentTimeMillis().toInt()
         val pendingIntent = PendingIntent.getActivity(
             context,
-            messageFrame.channel.hashCode(),
+            requestCode,
             notificationIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )

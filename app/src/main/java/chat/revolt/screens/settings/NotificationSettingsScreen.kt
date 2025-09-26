@@ -49,10 +49,13 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import chat.revolt.R
 import chat.revolt.composables.generic.ListHeader
+import chat.revolt.persistence.KVStorage
 import chat.revolt.services.NotificationForegroundService
+import kotlinx.coroutines.launch
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -63,13 +66,29 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NotificationSettingsScreenViewModel @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val kvStorage: KVStorage
 ) : ViewModel() {
+    companion object {
+        private const val KEY_BACKGROUND_SERVICE_ENABLED = "notification_background_service_enabled"
+    }
+
     var isBackgroundServiceEnabled by mutableStateOf(false)
         private set
 
-    var isWorkManagerEnabled by mutableStateOf(false)
-        private set
+    init {
+        loadSettings()
+    }
+
+    private fun loadSettings() {
+        viewModelScope.launch {
+            isBackgroundServiceEnabled = kvStorage.getBoolean(KEY_BACKGROUND_SERVICE_ENABLED) ?: false
+
+            if (isBackgroundServiceEnabled && hasNotificationPermission()) {
+                NotificationForegroundService.start(context)
+            }
+        }
+    }
 
     fun hasNotificationPermission(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -89,20 +108,15 @@ class NotificationSettingsScreenViewModel @Inject constructor(
         }
         isBackgroundServiceEnabled = enabled
 
+        viewModelScope.launch {
+            kvStorage.set(KEY_BACKGROUND_SERVICE_ENABLED, enabled)
+        }
+
         if (enabled) {
             NotificationForegroundService.start(context)
         } else {
             NotificationForegroundService.stop(context)
         }
-    }
-
-    fun toggleWorkManager(enabled: Boolean, onPermissionRequired: () -> Unit) {
-        if (enabled && !hasNotificationPermission()) {
-            onPermissionRequired()
-            return
-        }
-        isWorkManagerEnabled = enabled
-        // TODO: Implement actual WorkManager scheduling
     }
 
     fun openNotificationSettings() {
@@ -130,7 +144,17 @@ fun NotificationSettingsScreen(
         null
     }
 
-    val hasPermission = viewModel.hasNotificationPermission()
+    val hasPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        notificationPermissionState?.status?.isGranted == true
+    } else {
+        true // Permission wasn't required in older versions
+    }
+
+    LaunchedEffect(hasPermission) {
+        if (hasPermission && !viewModel.isBackgroundServiceEnabled) {
+            viewModel.toggleBackgroundService(true) {}
+        }
+    }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -201,7 +225,7 @@ fun NotificationSettingsScreen(
                             OutlinedButton(
                                 onClick = viewModel::openNotificationSettings
                             ) {
-                                Text("Open Settings")
+                                Text(stringResource(R.string.settings_notifications_open_system_settings))
                             }
                         }
                     }
@@ -210,13 +234,13 @@ fun NotificationSettingsScreen(
 
             ListHeader {
                 Text(
-                    text = "Client-side Notifications",
+                    text = stringResource(R.string.settings_notifications_header),
                     style = MaterialTheme.typography.titleMedium
                 )
             }
 
             Text(
-                text = "These options provide notifications without server support. Choose the method that works best for you.",
+                text = stringResource(R.string.settings_notifications_description),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
@@ -244,28 +268,6 @@ fun NotificationSettingsScreen(
                 modifier = Modifier.clickable(enabled = hasPermission || !viewModel.isBackgroundServiceEnabled) {
                     viewModel.toggleBackgroundService(
                         !viewModel.isBackgroundServiceEnabled,
-                        onPermissionRequired
-                    )
-                }
-            )
-
-            ListItem(
-                headlineContent = {
-                    Text(stringResource(R.string.settings_notifications_workmanager))
-                },
-                supportingContent = {
-                    Text(stringResource(R.string.settings_notifications_workmanager_description))
-                },
-                trailingContent = {
-                    Switch(
-                        checked = viewModel.isWorkManagerEnabled,
-                        onCheckedChange = null,
-                        enabled = hasPermission
-                    )
-                },
-                modifier = Modifier.clickable(enabled = hasPermission || !viewModel.isWorkManagerEnabled) {
-                    viewModel.toggleWorkManager(
-                        !viewModel.isWorkManagerEnabled,
                         onPermissionRequired
                     )
                 }

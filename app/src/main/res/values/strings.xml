@@ -758,13 +758,14 @@
     <string name="settings_chat_hint_poorly_formed_settings_keys_reset">Reset %1$s settings</string>
 
     <string name="settings_notifications">Notifications</string>
-    <string name="settings_notifications_background_service">Background Service</string>
-    <string name="settings_notifications_background_service_description">Keep a foreground service running to instantly receive notifications. Uses more battery but provides real-time notifications.</string>
-    <string name="settings_notifications_workmanager">Periodic Check</string>
-    <string name="settings_notifications_workmanager_description">Check for new messages periodically in the background. Battery efficient but may have delays (up to 15 minutes).</string>
+    <string name="settings_notifications_header">App Notifications</string>
+    <string name="settings_notifications_description">Get notified instantly about new messages from your friends and servers.</string>
+    <string name="settings_notifications_background_service">Real-time Notifications</string>
+    <string name="settings_notifications_background_service_description">Receive notifications instantly when the app is closed. Uses more battery but ensures you never miss a message.</string>
     <string name="settings_notifications_permission_required">Notification permission required</string>
-    <string name="settings_notifications_permission_denied">Notifications are disabled. Please enable them in your device settings to use notification services.</string>
+    <string name="settings_notifications_permission_denied">Notifications are disabled. Please enable them in your device settings to receive message notifications.</string>
     <string name="settings_notifications_grant_permission">Grant Permission</string>
+    <string name="settings_notifications_open_system_settings">Open Settings</string>
 
     <!-- Notification Context Menu -->
     <string name="notification_menu_title">Notifications</string>

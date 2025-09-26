@@ -2,6 +2,7 @@ package chat.revolt.activities
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
@@ -72,6 +73,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import chat.revolt.callbacks.Action
+import chat.revolt.callbacks.ActionChannel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import chat.revolt.BuildConfig
 import chat.revolt.R
 import chat.revolt.RevoltApplication
@@ -144,6 +149,8 @@ class MainActivityViewModel @Inject constructor(
     var isConnected = MutableStateFlow(false)
     val isReady = MutableStateFlow(false)
     val couldNotLogIn = MutableStateFlow(false)
+
+    private var pendingChannelId: String? = null
 
     private fun hasInternetConnection(): Boolean {
         val connectivityManager =
@@ -286,6 +293,45 @@ class MainActivityViewModel @Inject constructor(
         }
     }
 
+    fun setPendingChannelNavigation(channelId: String) {
+        Log.d("MainActivity", "Setting pending channel navigation to: $channelId")
+        pendingChannelId = channelId
+
+        updateNextDestination("main/conversation/$channelId")
+    }
+
+    fun processPendingNavigation() {
+        pendingChannelId?.let { channelId ->
+            Log.d("MainActivity", "Processing pending navigation to channel: $channelId")
+
+            if (!isReady.value) {
+                viewModelScope.launch {
+                    isReady.first { it }
+                    processPendingNavigationNow()
+                }
+                return
+            }
+
+            processPendingNavigationNow()
+        } ?: run {
+            System.out.println("REVOLT_DEBUG: processPendingNavigation called but no pending channelId")
+        }
+    }
+
+    private fun processPendingNavigationNow() {
+        pendingChannelId?.let { channelId ->
+            viewModelScope.launch {
+                try {
+                    ActionChannel.send(Action.SwitchChannel(channelId))
+                    Log.d("MainActivity", "Successfully sent SwitchChannel action for: $channelId")
+                    pendingChannelId = null
+                } catch (e: Exception) {
+                    Log.e("MainActivity", "Failed to navigate to channel from notification: $channelId", e)
+                }
+            }
+        }
+    }
+
     val activeAlert = MutableStateFlow<HealthNotice?>(null)
     val isAlertActive = MutableStateFlow(false)
 
@@ -346,6 +392,26 @@ class MainActivity : AppCompatActivity() {
         window.statusBarColor = Color.Transparent.toArgb()
     }
 
+    override fun onNewIntent(intent: Intent) {
+        Log.d("MainActivity", "onNewIntent called")
+        super.onNewIntent(intent)
+        processNotificationIntent(intent)
+        viewModel.processPendingNavigation()
+    }
+
+    private fun processNotificationIntent(intent: Intent) {
+
+        val channelId = intent.getStringExtra("channelId")
+        Log.d("MainActivity", "Channel ID from intent: $channelId")
+
+        if (channelId != null) {
+            Log.d("MainActivity", "Found notification deep link to channel: $channelId")
+            viewModel.setPendingChannelNavigation(channelId)
+        } else {
+            Log.w("MainActivity", "No channelId found in intent extras")
+        }
+    }
+
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -361,6 +427,8 @@ class MainActivity : AppCompatActivity() {
 
         RevoltAPI.hydrateFromPersistentCache()
 
+        processNotificationIntent(intent)
+
         setContent {
             val windowSizeClass = calculateWindowSizeClass(this)
             AppEntrypoint(
@@ -374,7 +442,8 @@ class MainActivity : AppCompatActivity() {
                 viewModel::onDismissHealthAlert,
                 viewModel::onDismissLoginError,
                 viewModel::checkLoggedInState,
-                viewModel::updateNextDestination
+                viewModel::updateNextDestination,
+                viewModel::processPendingNavigation
             )
         }
 
@@ -449,7 +518,8 @@ fun AppEntrypoint(
     onDismissHealthAlert: () -> Unit = {},
     onDismissLoginError: () -> Unit = {},
     onRetryConnection: () -> Unit,
-    onUpdateNextDestination: (String) -> Unit = {}
+    onUpdateNextDestination: (String) -> Unit = {},
+    onProcessPendingNavigation: () -> Unit = {}
 ) {
     var showVoiceUI by rememberSaveable { mutableStateOf(false) }
     var voiceChannelId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -625,6 +695,11 @@ fun AppEntrypoint(
                             ) + fadeIn(animationSpec = RevoltTweenFloat)
                         }
                     ) {
+
+                        LaunchedEffect(Unit) {
+                            onProcessPendingNavigation()
+                        }
+
                         ChatRouterScreen(
                             navController,
                             windowSizeClass,
@@ -666,6 +741,10 @@ fun AppEntrypoint(
                             )
                         }
                     ) {
+                        LaunchedEffect(Unit) {
+                            onProcessPendingNavigation()
+                        }
+
                         MainScreen(navController)
                     }
                     composable(
