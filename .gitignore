@@ -19,8 +19,8 @@ revoltbuild.properties
 sentry.properties
 /.kotlin/sessions
 app/src/main/assets/embedded
-/app/src/main/jniLibs/arm64-v8a/
-/app/src/main/jniLibs/armeabi-v7a/
-/app/src/main/jniLibs/x86/
-/app/src/main/jniLibs/x86_64/
+# /app/src/main/jniLibs/arm64-v8a/
+# /app/src/main/jniLibs/armeabi-v7a/
+# /app/src/main/jniLibs/x86/
+# /app/src/main/jniLibs/x86_64/
 app/release-key.keystore
