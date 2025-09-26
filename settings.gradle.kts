@@ -21,10 +21,6 @@ dependencyResolutionManagement {
             name = "compose-dev"
             url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         }
-        maven {
-            name = "revolt"
-            url = uri("https://git.revolt.chat/api/packages/librevolt/maven")
-        }
     }
 }
 rootProject.name = "Revolt"

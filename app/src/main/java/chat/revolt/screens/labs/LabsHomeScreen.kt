@@ -187,20 +187,7 @@ fun LabsHomeScreen(navController: NavController, topNav: NavController) {
                             }
                         )
                         HorizontalDivider()
-                        ListItem(
-                            headlineContent = {
-                                Text(buildAnnotatedString {
-                                    pushStyle(SpanStyle(fontFamily = FragmentMono))
-                                    append("librevolt")
-                                    pop()
-                                    append(" Sample")
-                                })
-                            },
-                            modifier = Modifier.clickable {
-                                navController.navigate("sandboxes/librevolt")
-                            }
-                        )
-                        HorizontalDivider()
+
                         ListItem(
                             headlineContent = {
                                 Text("New Card")

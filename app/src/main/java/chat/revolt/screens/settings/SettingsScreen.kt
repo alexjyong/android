@@ -327,7 +327,6 @@ fun SettingsScreen(
                         },
                         supportingContent = {
                             Column {
-                                Text(text = stringResource(id = R.string.settings_language))
                                 viewModel.manualCheckResult?.let { result ->
                                     Text(
                                         text = result,

@@ -319,11 +319,8 @@ dependencies {
     debugImplementation("com.github.chuckerteam.chucker:library:4.0.0")
     releaseImplementation("com.github.chuckerteam.chucker:library-no-op:4.0.0")
 
-    // Square Logcat
+        // Square Logcat
     implementation("com.squareup.logcat:logcat:0.1")
-
-    // Librevolt
-    implementation("librevolt:librevolt-jvm:0.1.0")
 
     // Testing
     androidTestImplementation("androidx.test:runner:$androidXTestVersion")
