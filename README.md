@@ -5,7 +5,7 @@
     <p>Forked and modified version of the <a href="https://revolt.chat">Revolt</a> Android app.</p>
     <br/><br/>
     <div>
-        <img width="192" height="192" alt="image" src="https://github.com/user-attachments/assets/ec2986a6-115d-4f66-8b17-c76cff10ead7" />
+        <img width="537" height="455" alt="image" src="https://github.com/user-attachments/assets/ea3e5f70-295d-4015-b4c5-0b981f68f143" />
         <br/>
     </div>
     <br/><br/><br/>
