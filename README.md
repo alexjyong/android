@@ -33,7 +33,8 @@ Tap a card to expand.
 
 <details>
 <summary><strong>Role Mention (with notifications!)</strong></summary>
-![Role Mention (with notifications!)](https://github.com/user-attachments/assets/bb779690-2ac4-4293-b662-102c92a20923)
+    
+![Role Mention - with notifications](https://github.com/user-attachments/assets/bb779690-2ac4-4293-b662-102c92a20923)
 </details>
 
 <details>
@@ -71,6 +72,8 @@ Tap a card to expand.
 
 ![Server channel list open by default](https://github.com/user-attachments/assets/6a4d7c96-924e-4344-9e19-b90589fa6908)
 </details>
+
+And more!
 
 
 The codebase includes the app itself, as well as an internal library for interacting with the Revolt
