@@ -75,6 +75,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import chat.revolt.callbacks.Action
 import chat.revolt.callbacks.ActionChannel
+import chat.revolt.api.internals.CurrentChannelState
+import chat.revolt.screens.chat.ChatRouterDestination
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import chat.revolt.BuildConfig
@@ -151,6 +154,7 @@ class MainActivityViewModel @Inject constructor(
     val couldNotLogIn = MutableStateFlow(false)
 
     private var pendingChannelId: String? = null
+    private var pendingMessageId: String? = null
 
     private fun hasInternetConnection(): Boolean {
         val connectivityManager =
@@ -293,9 +297,10 @@ class MainActivityViewModel @Inject constructor(
         }
     }
 
-    fun setPendingChannelNavigation(channelId: String) {
-        Log.d("MainActivity", "Setting pending channel navigation to: $channelId")
+    fun setPendingChannelNavigation(channelId: String, messageId: String? = null) {
+        Log.d("MainActivity", "Setting pending channel navigation to: $channelId, messageId: $messageId")
         pendingChannelId = channelId
+        pendingMessageId = messageId
 
         updateNextDestination("main/conversation/$channelId")
     }
@@ -322,9 +327,41 @@ class MainActivityViewModel @Inject constructor(
         pendingChannelId?.let { channelId ->
             viewModelScope.launch {
                 try {
-                    ActionChannel.send(Action.SwitchChannel(channelId))
-                    Log.d("MainActivity", "Successfully sent SwitchChannel action for: $channelId")
+                    // First establish server context for proper back navigation
+                    val channel = RevoltAPI.channelCache[channelId]
+                    val serverId = channel?.server
+
+                    if (serverId != null) {
+                        Log.d("MainActivity", "Building navigation stack - Server: $serverId, Channel: $channelId")
+
+                        // First navigate to server context (establishes proper back navigation)
+                        ActionChannel.send(Action.ChatNavigate(ChatRouterDestination.NoCurrentChannel(serverId)))
+
+                        // Small delay to ensure server context is established
+                        delay(100)
+
+                        // Then navigate to the specific channel
+                        val messageId = pendingMessageId
+                        if (messageId != null) {
+                            ActionChannel.send(Action.SwitchChannelAndHighlight(channelId, messageId))
+                            Log.d("MainActivity", "Successfully built navigation stack with highlighting: Server($serverId) -> Channel($channelId) -> Message($messageId)")
+                        } else {
+                            ActionChannel.send(Action.SwitchChannel(channelId))
+                            Log.d("MainActivity", "Successfully built navigation stack: Server($serverId) -> Channel($channelId)")
+                        }
+                    } else {
+                        Log.w("MainActivity", "Could not determine server for channel $channelId, falling back to direct navigation")
+                        // Fallback to direct navigation if we can't determine server
+                        val messageId = pendingMessageId
+                        if (messageId != null) {
+                            ActionChannel.send(Action.SwitchChannelAndHighlight(channelId, messageId))
+                        } else {
+                            ActionChannel.send(Action.SwitchChannel(channelId))
+                        }
+                    }
+
                     pendingChannelId = null
+                    pendingMessageId = null
                 } catch (e: Exception) {
                     Log.e("MainActivity", "Failed to navigate to channel from notification: $channelId", e)
                 }
@@ -381,6 +418,15 @@ class MainActivity : AppCompatActivity() {
         DynamicColors.applyToActivitiesIfAvailable(RevoltApplication.instance)
         @Suppress("DEPRECATION") // We are fixing a bug in the splash screen
         window.statusBarColor = Color.Transparent.toArgb()
+
+        // Set app as foreground for notification filtering
+        CurrentChannelState.setAppForegroundState(true)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Set app as background for notification filtering
+        CurrentChannelState.setAppForegroundState(false)
     }
 
     // Same as above for configuration changes (rotation, dark mode, etc.)
@@ -400,13 +446,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun processNotificationIntent(intent: Intent) {
-
         val channelId = intent.getStringExtra("channelId")
-        Log.d("MainActivity", "Channel ID from intent: $channelId")
+        val messageId = intent.getStringExtra("messageId")
+        Log.d("MainActivity", "Channel ID from intent: $channelId, Message ID: $messageId")
 
         if (channelId != null) {
-            Log.d("MainActivity", "Found notification deep link to channel: $channelId")
-            viewModel.setPendingChannelNavigation(channelId)
+            Log.d("MainActivity", "Found notification deep link to channel: $channelId, messageId: $messageId")
+            viewModel.setPendingChannelNavigation(channelId, messageId)
         } else {
             Log.w("MainActivity", "No channelId found in intent extras")
         }

@@ -641,7 +641,7 @@
     <string name="voice_error_generic">An error occurred. Please try again later.</string>
 
     <string name="spark_notifications_rationale">Stay in the loop</string>
-    <string name="spark_notifications_rationale_description">Enable notifications to be kept up to date with messages and mentions.</string>
+    <string name="spark_notifications_rationale_description">Enable notifications to be kept up to date with messages and mentions. Note you will have to enable background services in notification settings for this to work fully.</string>
     <string name="spark_notifications_rationale_cta">Enable notifications</string>
     <string name="spark_notifications_rationale_dismiss">Not now</string>
 
@@ -766,6 +766,16 @@
     <string name="settings_notifications_permission_denied">Notifications are disabled. Please enable them in your device settings to receive message notifications.</string>
     <string name="settings_notifications_grant_permission">Grant Permission</string>
     <string name="settings_notifications_open_system_settings">Open Settings</string>
+    <string name="settings_notifications_battery_optimization">Battery Optimization</string>
+    <string name="settings_notifications_battery_optimization_description">Disable battery optimization to ensure reliable background notifications. May impact battery life.</string>
+    <string name="settings_notifications_battery_optimized">Battery optimization enabled - notifications may be delayed</string>
+    <string name="settings_notifications_battery_not_optimized">Battery optimization disabled - notifications will arrive reliably</string>
+    <string name="settings_notifications_open_battery_settings">Battery Settings</string>
+    <string name="toast_opening_battery_settings">Opening battery optimization settings...</string>
+    <string name="toast_find_battery_optimization">Find and disable battery optimization for Revolt</string>
+    <string name="toast_find_battery_in_app_info">Please find battery settings in app info</string>
+    <string name="toast_battery_settings_manual">Unable to open settings. Please manually disable battery optimization for Revolt.</string>
+    <string name="toast_battery_optimization_not_available">Battery optimization not available on this Android version</string>
 
     <!-- Notification Context Menu -->
     <string name="notification_menu_title">Notifications</string>

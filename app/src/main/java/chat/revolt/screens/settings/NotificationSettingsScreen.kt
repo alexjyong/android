@@ -6,7 +6,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.os.PowerManager
 import android.provider.Settings
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,10 +36,14 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -76,8 +82,12 @@ class NotificationSettingsScreenViewModel @Inject constructor(
     var isBackgroundServiceEnabled by mutableStateOf(false)
         private set
 
+    var isBatteryOptimizationDisabled by mutableStateOf(false)
+        private set
+
     init {
         loadSettings()
+        checkBatteryOptimization()
     }
 
     private fun loadSettings() {
@@ -119,6 +129,15 @@ class NotificationSettingsScreenViewModel @Inject constructor(
         }
     }
 
+    private fun checkBatteryOptimization() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+            isBatteryOptimizationDisabled = powerManager.isIgnoringBatteryOptimizations(context.packageName)
+        } else {
+            isBatteryOptimizationDisabled = true // Not applicable for older versions
+        }
+    }
+
     fun openNotificationSettings() {
         val intent = Intent().apply {
             action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
@@ -126,6 +145,62 @@ class NotificationSettingsScreenViewModel @Inject constructor(
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
         context.startActivity(intent)
+    }
+
+    fun openBatteryOptimizationSettings() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            try {
+                val intent = Intent().apply {
+                    action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+                    data = Uri.parse("package:${context.packageName}")
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                }
+
+                if (intent.resolveActivity(context.packageManager) != null) {
+                    context.startActivity(intent)
+                    Toast.makeText(context, context.getString(R.string.toast_opening_battery_settings), Toast.LENGTH_SHORT).show()
+                } else {
+                    throw SecurityException("Intent not resolvable")
+                }
+            } catch (e: Exception) {
+                try {
+                    val fallbackIntent = Intent().apply {
+                        action = Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    }
+
+                    if (fallbackIntent.resolveActivity(context.packageManager) != null) {
+                        context.startActivity(fallbackIntent)
+                        Toast.makeText(context, context.getString(R.string.toast_find_battery_optimization), Toast.LENGTH_LONG).show()
+                    } else {
+                        throw SecurityException("Fallback intent not resolvable")
+                    }
+                } catch (e2: Exception) {
+                    try {
+                        val appSettingsIntent = Intent().apply {
+                            action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                            data = Uri.parse("package:${context.packageName}")
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        }
+
+                        if (appSettingsIntent.resolveActivity(context.packageManager) != null) {
+                            context.startActivity(appSettingsIntent)
+                            Toast.makeText(context, context.getString(R.string.toast_find_battery_in_app_info), Toast.LENGTH_LONG).show()
+                        } else {
+                            throw SecurityException("App settings intent not resolvable")
+                        }
+                    } catch (e3: Exception) {
+                        Toast.makeText(context, context.getString(R.string.toast_battery_settings_manual), Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        } else {
+            Toast.makeText(context, context.getString(R.string.toast_battery_optimization_not_available), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun refreshBatteryOptimizationStatus() {
+        checkBatteryOptimization()
     }
 }
 
@@ -272,6 +347,60 @@ fun NotificationSettingsScreen(
                     )
                 }
             )
+
+            // Battery Optimization Settings
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                ListItem(
+                    headlineContent = {
+                        Text(stringResource(R.string.settings_notifications_battery_optimization))
+                    },
+                    supportingContent = {
+                        Column {
+                            Text(stringResource(R.string.settings_notifications_battery_optimization_description))
+                            Text(
+                                text = if (viewModel.isBatteryOptimizationDisabled) {
+                                    stringResource(R.string.settings_notifications_battery_not_optimized)
+                                } else {
+                                    stringResource(R.string.settings_notifications_battery_optimized)
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = if (viewModel.isBatteryOptimizationDisabled) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                }
+                            )
+                        }
+                    },
+                    trailingContent = {
+                        OutlinedButton(
+                            onClick = {
+                                viewModel.openBatteryOptimizationSettings()
+                            }
+                        ) {
+                            Text(stringResource(R.string.settings_notifications_open_battery_settings))
+                        }
+                    }
+                )
+            }
+        }
+
+        val lifecycleOwner = LocalLifecycleOwner.current
+        DisposableEffect(lifecycleOwner) {
+            val observer = LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    viewModel.refreshBatteryOptimizationStatus()
+                }
+            }
+            lifecycleOwner.lifecycle.addObserver(observer)
+
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
+        }
+
+        LaunchedEffect(Unit) {
+            viewModel.refreshBatteryOptimizationStatus()
         }
     }
 }

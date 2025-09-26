@@ -48,8 +48,9 @@ class NotificationHelper(private val context: Context) {
         val notificationIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
 
-            logcat(LogPriority.DEBUG) { "Creating notification intent for channel: ${messageFrame.channel}" }
+            logcat(LogPriority.DEBUG) { "Creating notification intent for channel: ${messageFrame.channel}, messageId: ${messageFrame.id}" }
             putExtra("channelId", messageFrame.channel)
+            putExtra("messageId", messageFrame.id)
 
             if (server != null && channel != null) {
                 putExtra("serverId", server.id)

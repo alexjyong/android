@@ -154,6 +154,7 @@ import chat.revolt.sheets.ReactSheet
 import com.valentinilk.shimmer.ShimmerBounds
 import com.valentinilk.shimmer.rememberShimmer
 import com.valentinilk.shimmer.shimmer
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
@@ -202,6 +203,7 @@ fun ChannelScreen(
     drawerIsOpen: Boolean = false,
     backButtonAction: (() -> Unit)? = null,
     useChatUI: Boolean = false,
+    initialHighlightMessageId: String? = null,
     viewModel: ChannelScreenViewModel = hiltViewModel()
 ) {
     // <editor-fold desc="State and effects">
@@ -438,6 +440,17 @@ fun ChannelScreen(
     // <editor-fold desc="UI elements">
     val lazyListState = rememberLazyListState()
     var disableScroll by remember { mutableStateOf(false) }
+
+    LaunchedEffect(initialHighlightMessageId) {
+        initialHighlightMessageId?.let { messageId ->
+            viewModel.setHighlightedMessage(messageId)
+            val messageIndex = viewModel.findMessageIndex(messageId)
+            if (messageIndex >= 0) {
+                delay(500) // Small delay to ensure messages are loaded
+                lazyListState.animateScrollToItem(messageIndex)
+            }
+        }
+    }
 
     val isScrolledToBottom = remember(lazyListState) {
         derivedStateOf {

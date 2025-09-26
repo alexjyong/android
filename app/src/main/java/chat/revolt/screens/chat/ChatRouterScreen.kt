@@ -9,6 +9,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -72,6 +73,7 @@ import androidx.navigation.NavController
 import chat.revolt.BuildConfig
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.CurrentChannelState
 import chat.revolt.api.internals.DirectMessages
 import chat.revolt.api.internals.UpdateChecker
 import chat.revolt.api.internals.UpdateInfo
@@ -163,6 +165,7 @@ class ChatRouterViewModel @Inject constructor(
     var latestChangelogRead by mutableStateOf(true)
     var latestChangelog by mutableStateOf("")
     var latestChangelogBody by mutableStateOf("")
+    var pendingHighlightMessageId by mutableStateOf<String?>(null)
     var showNotificationRationale by mutableStateOf(false)
     var showEarlyAccessSpark by mutableStateOf(false)
     var showSwipeToReplySpark by mutableStateOf(false)
@@ -179,8 +182,6 @@ class ChatRouterViewModel @Inject constructor(
             val current = kvStorage.get("currentDestination")
             setSaveDestination(ChatRouterDestination.fromString(current ?: ""))
 
-            // Disabled for forked version might use later ;)
-            /*
             latestChangelogRead = changelogs.hasSeenCurrent()
             latestChangelog = changelogs.getLatestChangelogCode()
             latestChangelogBody =
@@ -188,9 +189,6 @@ class ChatRouterViewModel @Inject constructor(
             if (!latestChangelogRead) {
                 changelogs.markAsSeen()
             }
-            */
-            // Always mark changelog as read to prevent popup
-            latestChangelogRead = true
 
             // Disabled for forked version
             /*
@@ -211,7 +209,7 @@ class ChatRouterViewModel @Inject constructor(
             val hasNotificationPermission =
                 NotificationManagerCompat.from(context).areNotificationsEnabled()
             // right now we only show this in debug builds so Chucker can show its notification
-            if (!hasNotificationPermission && BuildConfig.DEBUG) {
+            if (!hasNotificationPermission) {
                 showNotificationRationale = true
             }
 
@@ -228,6 +226,12 @@ class ChatRouterViewModel @Inject constructor(
     fun setSaveDestination(destination: ChatRouterDestination) {
         currentDestination = destination
 
+        // Update global channel state for notification filtering
+        when (destination) {
+            is ChatRouterDestination.Channel -> CurrentChannelState.setCurrentChannel(destination.channelId)
+            else -> CurrentChannelState.setCurrentChannel(null)
+        }
+
         viewModelScope.launch {
             kvStorage.set("currentDestination", destination.asSerialisedString())
 
@@ -240,7 +244,7 @@ class ChatRouterViewModel @Inject constructor(
         }
     }
 
-    fun setRegisterForNotifications() {
+    fun setRegisterForNotifications() { //we technically don't use this in revolt forked.
         showNotificationRationale = false
         FirebaseMessaging.getInstance().token.addOnCompleteListener(
             OnCompleteListener { task ->
@@ -471,6 +475,18 @@ fun ChatRouterScreen(
                         }
 
                         viewModel.setSaveDestination(ChatRouterDestination.Channel(action.channelId))
+                    }
+
+                    is Action.SwitchChannelAndHighlight -> {
+                        val resolvedChannel = RevoltAPI.channelCache[action.channelId]
+
+                        if (resolvedChannel == null) {
+                            showChannelUnavailableAlert = true
+                            return@let
+                        }
+
+                        viewModel.setSaveDestination(ChatRouterDestination.Channel(action.channelId))
+                        viewModel.pendingHighlightMessageId = action.messageId
                     }
 
                     is Action.LinkInfo -> {
@@ -790,11 +806,7 @@ fun ChatRouterScreen(
             },
             onSelected = { accepted ->
                 if (accepted) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        askNotificationsPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-                    } else {
-                        viewModel.setRegisterForNotifications()
-                    }
+                    topNav.navigate("settings/notifications")
                 } else {
                     viewModel.markNotificationsRejected()
                 }
@@ -902,6 +914,7 @@ fun ChatRouterScreen(
                         dest = viewModel.currentDestination,
                         topNav = topNav,
                         useDrawer = false,
+                        viewModel = viewModel,
                         disableBackHandler = disableBackHandler,
                         toggleDrawer = {
                             toggleDrawerLambda()
@@ -969,6 +982,7 @@ fun ChatRouterScreen(
                                             useSidebarGesture = it
                                         },
                                         onEnterVoiceUI = onEnterVoiceUI,
+                                        viewModel = viewModel
                                     )
                                 }
                             }
@@ -1047,6 +1061,7 @@ fun ChannelNavigator(
     disableBackHandler: Boolean = false,
     onEnterVoiceUI: (String) -> Unit = {},
     setDrawerGestureEnabled: (Boolean) -> Unit = {},
+    viewModel: ChatRouterViewModel
 ) {
     val scope = rememberCoroutineScope()
 
@@ -1088,7 +1103,14 @@ fun ChannelNavigator(
                     drawerGestureEnabled = drawerGestureEnabled,
                     setDrawerGestureEnabled = setDrawerGestureEnabled,
                     drawerIsOpen = drawerState?.isOpen == true,
+                    initialHighlightMessageId = viewModel.pendingHighlightMessageId
                 )
+
+                LaunchedEffect(viewModel.pendingHighlightMessageId) {
+                    if (viewModel.pendingHighlightMessageId != null) {
+                        viewModel.pendingHighlightMessageId = null
+                    }
+                }
             }
 
             is ChatRouterDestination.NoCurrentChannel -> {

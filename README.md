@@ -28,6 +28,11 @@ For support, discussion, updates and other things, visit our support server on [
 
 ## Features Added
 Tap a card to expand.
+<details>
+<summary><strong>Notification Support!!!</strong></summary>
+
+![Notification support preview](https://github.com/user-attachments/assets/8b794d8e-46cc-407e-84aa-99b4128d5922)
+</details>
 
 <details>
 <summary><strong>Voice messages</strong></summary>

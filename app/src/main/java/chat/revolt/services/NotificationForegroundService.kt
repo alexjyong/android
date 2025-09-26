@@ -21,6 +21,7 @@ import chat.revolt.api.realtime.frames.receivable.MessageFrame
 import chat.revolt.api.realtime.frames.sendable.AuthorizationFrame
 import chat.revolt.api.schemas.NotificationState
 import chat.revolt.api.settings.NotificationSettingsProvider
+import chat.revolt.api.internals.CurrentChannelState
 import io.ktor.client.plugins.websocket.ws
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
@@ -69,6 +70,10 @@ class NotificationForegroundService : Service() {
             when {
                 channel == null -> false
                 channel.type == "SavedMessages" -> false
+                CurrentChannelState.shouldFilterNotification(channelId) -> {
+                    logcat(LogPriority.DEBUG) { "Notification filtered: message is for currently active channel $channelId (app in foreground)" }
+                    false
+                }
                 else -> NotificationSettingsProvider.shouldNotify(channelId, serverId, isMention)
             }
         } catch (e: Exception) {
