@@ -1,5 +1,7 @@
 package chat.revolt.screens.chat.views
 
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
@@ -51,8 +53,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.navigation.NavController
 import chat.revolt.R
+import chat.revolt.activities.InviteActivity
 import chat.revolt.api.RevoltAPI
 import chat.revolt.api.routes.user.fetchSelf
 import chat.revolt.api.schemas.User
@@ -275,12 +279,14 @@ fun OverviewScreen(
                     item(key = "feedback") {
                         OverviewScreenLink(
                             onClick = {
-                                Toast.makeText(
+                                val intent = Intent(
                                     context,
-                                    context.getString(R.string.comingsoon_toast),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                // navController.navigate("feedback")
+                                    InviteActivity::class.java
+                                ).setAction(Intent.ACTION_VIEW)
+
+                                //TODO: when 3rd party support is active, and the user isn't on the main instance, we need to handle this differently
+                                intent.data = "https://rvlt.gg/tyKYccTr".toUri()
+                                context.startActivity(intent)
                             },
                             backgroundColour = MaterialTheme.colorScheme.primary,
                             foregroundColour = MaterialTheme.colorScheme.onPrimary,

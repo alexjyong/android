@@ -208,8 +208,8 @@ class ChatRouterViewModel @Inject constructor(
 
             val hasNotificationPermission =
                 NotificationManagerCompat.from(context).areNotificationsEnabled()
-            // right now we only show this in debug builds so Chucker can show its notification
-            if (!hasNotificationPermission) {
+            val hasNotificationRationaleBeenDismissed = kvStorage.getBoolean("notificationRationaleDismissed") == true
+            if (!hasNotificationPermission && !hasNotificationRationaleBeenDismissed) {
                 showNotificationRationale = true
             }
 
@@ -246,6 +246,9 @@ class ChatRouterViewModel @Inject constructor(
 
     fun setRegisterForNotifications() { //we technically don't use this in revolt forked.
         showNotificationRationale = false
+        viewModelScope.launch {
+            kvStorage.set("notificationRationaleDismissed", true)
+        }
         FirebaseMessaging.getInstance().token.addOnCompleteListener(
             OnCompleteListener { task ->
                 if (!task.isSuccessful) {
@@ -267,6 +270,14 @@ class ChatRouterViewModel @Inject constructor(
         showNotificationRationale = false
         viewModelScope.launch {
             kvStorage.set("pushNotificationsRejected", true)
+            kvStorage.set("notificationRationaleDismissed", true)
+        }
+    }
+
+    fun dismissNotificationRationale() {
+        showNotificationRationale = false
+        viewModelScope.launch {
+            kvStorage.set("notificationRationaleDismissed", true)
         }
     }
 
@@ -796,16 +807,17 @@ fun ChatRouterScreen(
             if (isGranted) {
                 viewModel.setRegisterForNotifications()
             } else {
-                viewModel.showNotificationRationale = false
+                viewModel.dismissNotificationRationale()
             }
         }
     if (viewModel.showNotificationRationale) {
         NotificationRationaleDialog(
             onDismiss = {
-                viewModel.showNotificationRationale = false
+                viewModel.dismissNotificationRationale()
             },
             onSelected = { accepted ->
                 if (accepted) {
+                    viewModel.dismissNotificationRationale()
                     topNav.navigate("settings/notifications")
                 } else {
                     viewModel.markNotificationsRejected()
