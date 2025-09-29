@@ -216,6 +216,17 @@ fun ChannelScreen(
         viewModel.listenToWsEvents()
     }
 
+    LaunchedEffect(viewModel.shouldShowUploadInProgressToast) {
+        if (viewModel.shouldShowUploadInProgressToast) {
+            Toast.makeText(
+                context,
+                context.getString(R.string.attachment_upload_in_progress),
+                Toast.LENGTH_SHORT
+            ).show()
+            viewModel.dismissUploadInProgressToast()
+        }
+    }
+
     DisposableEffect(Unit) {
         val job = scope.launch { viewModel.listenToUiCallbacks() }
 

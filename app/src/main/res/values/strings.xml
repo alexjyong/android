@@ -124,6 +124,8 @@
     <string name="attachment_preview_spoiler">Mark as spoiler</string>
     <string name="attachment_preview_spoiler_description">This attachment will only be revealed when tapped.</string>
 
+    <string name="attachment_upload_in_progress">Upload in progress</string>
+
     <string name="emoji_category_smileys">Smileys &amp; Emotions</string>
     <string name="emoji_category_people">People &amp; Body</string>
     <string name="emoji_category_animals">Animals &amp; Nature</string>

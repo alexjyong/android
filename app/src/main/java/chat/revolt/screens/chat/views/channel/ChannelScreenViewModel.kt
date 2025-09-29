@@ -93,6 +93,8 @@ class ChannelScreenViewModel @Inject constructor(
     var draftAttachments = mutableStateListOf<FileArgs>()
     var draftReplyTo = mutableStateListOf<SendMessageReply>()
     var attachmentUploadProgress by mutableStateOf(0f)
+    var isUploadingAttachments by mutableStateOf(false)
+    var shouldShowUploadInProgressToast by mutableStateOf(false)
 
     var endOfChannel by mutableStateOf(false)
     var didInitialChannelFetch by mutableStateOf(false)
@@ -151,6 +153,7 @@ class ChannelScreenViewModel @Inject constructor(
         this.draftAttachments = mutableStateListOf()
         this.draftReplyTo = mutableStateListOf()
         this.attachmentUploadProgress = 0f
+        this.isUploadingAttachments = false
 
         viewModelScope.launch {
             ensureSelfHasMember()
@@ -221,6 +224,10 @@ class ChannelScreenViewModel @Inject constructor(
 
     fun putAtCursorPosition(text: String) {
         putDraftContent(draftContent + text, true)
+    }
+
+    fun dismissUploadInProgressToast() {
+        shouldShowUploadInProgressToast = false
     }
 
     private var lastSentBeginTyping: Instant? = null
@@ -479,6 +486,11 @@ class ChannelScreenViewModel @Inject constructor(
             return
         }
 
+        if (isUploadingAttachments) {
+            shouldShowUploadInProgressToast = true
+            return
+        }
+
         // Immediately, make copies of the draft content and replyTo list, as
         // 1. they will be cleared
         // 2. if the user changes the content while the message is being sent we want to persist
@@ -492,6 +504,10 @@ class ChannelScreenViewModel @Inject constructor(
             val takenAttachments =
                 this@ChannelScreenViewModel.draftAttachments.take(MAX_ATTACHMENTS_PER_MESSAGE)
             val totalTaken = takenAttachments.size
+
+            if (totalTaken > 0) {
+                isUploadingAttachments = true
+            }
 
             takenAttachments.forEachIndexed { index, it ->
                 try {
@@ -509,6 +525,7 @@ class ChannelScreenViewModel @Inject constructor(
                 } catch (e: Exception) {
                     Log.e("ChannelScreenViewModel", "Failed to upload attachment", e)
                     attachmentUploadProgress = 0f
+                    isUploadingAttachments = false
                     return@launch
                 }
             }
@@ -539,6 +556,7 @@ class ChannelScreenViewModel @Inject constructor(
             putDraftContent("", true)
             draftReplyTo.clear()
             attachmentUploadProgress = 0f
+            isUploadingAttachments = false
 
             this@ChannelScreenViewModel.draftAttachments.removeAll(takenAttachments)
 
