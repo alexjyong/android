@@ -43,12 +43,17 @@ import androidx.core.net.toUri
 import chat.revolt.R
 import chat.revolt.api.REVOLT_APP
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.PermissionBit
+import chat.revolt.api.internals.Roles
+import chat.revolt.api.internals.has
 import chat.revolt.api.routes.server.leaveOrDeleteServer
+import chat.revolt.api.schemas.ChannelType
 import chat.revolt.composables.generic.SheetButton
 import chat.revolt.composables.markdown.RichMarkdown
 import chat.revolt.composables.screens.settings.ServerOverview
 import chat.revolt.composables.sheets.SheetSelection
 import chat.revolt.internals.Platform
+import chat.revolt.screens.chat.dialogs.InviteDialog
 import chat.revolt.sheets.ServerNotificationContextSheet
 import kotlinx.coroutines.launch
 
@@ -78,6 +83,15 @@ fun ServerContextSheet(
     var showLeaveConfirmation by remember { mutableStateOf(false) }
     var leaveSilently by remember { mutableStateOf(false) }
     var showNotificationSubmenu by remember { mutableStateOf(false) }
+    var inviteDialogShown by remember { mutableStateOf(false) }
+    
+    val inviteableChannel = server.channels?.let { channelIds ->
+        channelIds.mapNotNull { RevoltAPI.channelCache[it] }
+            .find { channel ->
+                (channel.channelType == ChannelType.TextChannel || channel.channelType == ChannelType.VoiceChannel) &&
+                Roles.permissionFor(channel, RevoltAPI.userCache[RevoltAPI.selfId]) has PermissionBit.InviteOthers
+            }
+    }
 
     if (showLeaveConfirmation) {
         AlertDialog(
@@ -173,6 +187,16 @@ fun ServerContextSheet(
         return
     }
 
+    if (inviteDialogShown && inviteableChannel?.id != null) {
+        InviteDialog(
+            channelId = inviteableChannel.id,
+            onDismissRequest = { 
+                inviteDialogShown = false
+                coroutineScope.launch { onHideSheet() }
+            }
+        )
+    }
+
     Column(Modifier.verticalScroll(rememberScrollState())) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -258,6 +282,25 @@ fun ServerContextSheet(
                 }
             }
         )
+
+        if (inviteableChannel != null) {
+            SheetButton(
+                leadingContent = {
+                    Icon(
+                        painter = painterResource(R.drawable.icn_add_24dp),
+                        contentDescription = null
+                    )
+                },
+                headlineContent = {
+                    Text(
+                        text = stringResource(id = R.string.channel_info_sheet_options_invite)
+                    )
+                },
+                onClick = {
+                    inviteDialogShown = true
+                }
+            )
+        }
 
         SheetButton(
             leadingContent = {

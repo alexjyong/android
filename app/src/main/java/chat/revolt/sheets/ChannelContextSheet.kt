@@ -24,9 +24,13 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import chat.revolt.R
 import chat.revolt.api.RevoltAPI
+import chat.revolt.api.internals.PermissionBit
+import chat.revolt.api.internals.Roles
+import chat.revolt.api.internals.has
+import chat.revolt.api.schemas.ChannelType
 import chat.revolt.composables.generic.SheetButton
-
 import chat.revolt.internals.Platform
+import chat.revolt.screens.chat.dialogs.InviteDialog
 import chat.revolt.sheets.ChannelNotificationContextSheet
 import kotlinx.coroutines.launch
 
@@ -49,6 +53,7 @@ fun ChannelContextSheet(channelId: String, onHideSheet: suspend () -> Unit) {
 
     val coroutineScope = rememberCoroutineScope()
     var showNotificationSubmenu by remember { mutableStateOf(false) }
+    var inviteDialogShown by remember { mutableStateOf(false) }
 
     if (showNotificationSubmenu) {
         Column {
@@ -70,6 +75,16 @@ fun ChannelContextSheet(channelId: String, onHideSheet: suspend () -> Unit) {
             )
         }
         return
+    }
+
+    if (inviteDialogShown) {
+        InviteDialog(
+            channelId = channelId,
+            onDismissRequest = { 
+                inviteDialogShown = false
+                coroutineScope.launch { onHideSheet() }
+            }
+        )
     }
 
     Column {
@@ -103,6 +118,28 @@ fun ChannelContextSheet(channelId: String, onHideSheet: suspend () -> Unit) {
             }
         }
     )
+
+    if (
+        (channel.channelType == ChannelType.TextChannel || channel.channelType == ChannelType.VoiceChannel) &&
+        Roles.permissionFor(channel, RevoltAPI.userCache[RevoltAPI.selfId]) has PermissionBit.InviteOthers
+    ) {
+        SheetButton(
+            headlineContent = {
+                Text(
+                    text = stringResource(id = R.string.channel_info_sheet_options_invite),
+                )
+            },
+            leadingContent = {
+                Icon(
+                    painter = painterResource(R.drawable.icn_add_24dp),
+                    contentDescription = null
+                )
+            },
+            onClick = {
+                inviteDialogShown = true
+            }
+        )
+    }
 
     SheetButton(
         headlineContent = {
