@@ -180,6 +180,15 @@ fun LabsHomeScreen(navController: NavController, topNav: NavController) {
                         HorizontalDivider()
                         ListItem(
                             headlineContent = {
+                                Text("Final Markdown")
+                            },
+                            modifier = Modifier.clickable {
+                                navController.navigate("sandboxes/finalmarkdown")
+                            }
+                        )
+                        HorizontalDivider()
+                        ListItem(
+                            headlineContent = {
                                 Text("Gradient Editor")
                             },
                             modifier = Modifier.clickable {
@@ -207,6 +216,15 @@ fun LabsHomeScreen(navController: NavController, topNav: NavController) {
                             },
                             modifier = Modifier.clickable {
                                 navController.navigate("sandboxes/newcard")
+                            }
+                        )
+                        HorizontalDivider()
+                        ListItem(
+                            headlineContent = {
+                                Text("Telecom")
+                            },
+                            modifier = Modifier.clickable {
+                                navController.navigate("sandboxes/telecom")
                             }
                         )
                         HorizontalDivider()

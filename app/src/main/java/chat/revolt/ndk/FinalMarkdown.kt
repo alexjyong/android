@@ -9,6 +9,6 @@ data class FinalMarkdownNodeTest(
 
 @Suppress("KotlinJniMissingFunction")
 object FinalMarkdown {
-    external fun init()
+    external fun init(debug: Boolean)
     external fun process(input: String): FinalMarkdownNodeTest
 }

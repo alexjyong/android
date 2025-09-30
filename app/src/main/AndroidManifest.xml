@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
 
     <!-- Up to Android 10, we need the following to take photos from the camera. -->
     <uses-permission
@@ -135,6 +136,11 @@
 
         <activity
             android:name=".activities.media.VideoViewActivity"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/Theme.Revolt" />
+
+        <activity
+            android:name=".activities.voice.IncomingActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/Theme.Revolt" />
 

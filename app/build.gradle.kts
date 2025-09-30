@@ -256,6 +256,7 @@ dependencies {
     implementation("androidx.webkit:webkit:1.14.0")
     implementation("androidx.core:core-splashscreen:1.2.0-beta02")
     implementation("androidx.palette:palette-ktx:1.0.0")
+    implementation("androidx.core:core-telecom:1.0.0")
 
     // Libraries used for legacy View-based UI
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
