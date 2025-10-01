@@ -112,7 +112,7 @@
     <string name="server_context_sheet_actions_mark_read">Tandai telah dibaca</string>
     <string name="add_server_sheet_title">Tambah server</string>
     <string name="add_server_sheet_join_by_invite_modal_title">Kode atau tautan undangan</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Masukkan tautan seperti rvlt.gg/Testers atau kode undangan seperti Testers</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Masukkan tautan seperti stt.gg/Testers atau kode undangan seperti Testers</string>
     <string name="add_server_sheet_join_by_invite_modal_hint">Kode atau tautan undangan</string>
     <string name="add_server_sheet_join_by_invite_modal_join">Bergabung</string>
     <string name="add_server_sheet_create_new">Buat server baru</string>

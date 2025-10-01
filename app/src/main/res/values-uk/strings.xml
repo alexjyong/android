@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="add_server_sheet_join_by_invite_modal_description">Введіть посилання, наприклад rvlt.gg/Testers, або код запрошення, наприклад Testers</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Введіть посилання, наприклад stt.gg/Testers, або код запрошення, наприклад Testers</string>
     <string name="report_message">Дякуємо, що знайшли час поскаржитися на це повідомлення. Ваша скарга не буде передана користувачу, який надіслав повідомлення, або модераторам сервера.</string>
     <string name="report_message_bridge_notice">Примітка: Це повідомлення, можливо, надіслано з іншої платформи. Рекомендуємо також поскаржитись на платформі, з якої воно було надіслано.</string>
     <string name="report_user">Дякуємо, що знайшли час поскаржитися на цього користувача. Ваша скарга не буде передана користувачеві або модераторам сервера.</string>

@@ -529,7 +529,7 @@ fun SettingsScreen(
                                 ).setAction(Intent.ACTION_VIEW)
 
                                 //TODO: when 3rd party support is active, and the user isn't on the main instance, we need to handle this differently
-                                intent.data = "https://rvlt.gg/tyKYccTr".toUri()
+                                intent.data = "https://stt.gg/tyKYccTr".toUri()
                                 context.startActivity(intent)
                             }
                     )

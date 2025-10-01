@@ -198,7 +198,7 @@
     <string name="message_context_sheet_actions_report">Паскардзіцца</string>
     <string name="message_context_sheet_actions_mark_unread">Пазначыць як непрачытанае</string>
     <string name="add_server_sheet_join_by_invite_modal_title">Код запрашэння або спасылка</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Увядзіце спасылку, напрыклад rvlt.gg/Testers, або код запрашэння, напрыклад Testers</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Увядзіце спасылку, напрыклад stt.gg/Testers, або код запрашэння, напрыклад Testers</string>
     <string name="add_server_sheet_create_new">Стварыць новы сервер</string>
     <string name="add_server_sheet_create_new_modal_title">Стварэнне новага серверу</string>
     <string name="add_server_sheet_create_new_modal_under_construction">Гэта функцыя зараз ў распрацоўке.</string>

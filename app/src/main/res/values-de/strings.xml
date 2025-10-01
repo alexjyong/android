@@ -5,7 +5,7 @@
     <string name="channel_info_sheet_description_empty">Für diesen Kanal wurde noch keine Beschreibung gesetzt.</string>
     <string name="message_context_sheet_actions_copy_link_copied">Link der Nachricht in Zwischenablage kopiert</string>
     <string name="add_server_sheet_join_by_invite">Mit EInladungscode oder -link beitreten</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Gib einen Link wie rvlt.gg/Testers oder einen Einladungscode wie Testers ein</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Gib einen Link wie stt.gg/Testers oder einen Einladungscode wie Testers ein</string>
     <string name="report_server">Danke, dass du dir die Zeit nimmst, diesen Server zu melden. Die Meldung wird nicht mit dem:der gemeldeten Nutzer:in oder den Moderator:innen des Servers geteilt.</string>
     <string name="report_reason_content_harassment">Belästigung oder Cybermobbing</string>
     <string name="report_reason_content_other">Anderes</string>

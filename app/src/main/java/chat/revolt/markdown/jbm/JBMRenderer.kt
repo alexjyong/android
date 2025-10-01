@@ -661,7 +661,7 @@ private fun annotateText(
                     val rawUrl = node.getTextInNode(sourceText).toString()
                     val displayText = try {
                         val uri = rawUrl.toUri()
-                        if (uri.host == "app.revolt.chat" || uri.host == "beta.revolt.chat") {
+                        if (uri.host == "app.revolt.chat" || uri.host == "beta.revolt.chat" || uri.host == "stoat.chat" || uri.host == "old.stoat.chat") {
                             val pathSegments = uri.pathSegments
                             if (pathSegments.size >= 4 &&
                                 pathSegments[0] == "server" &&
@@ -840,7 +840,7 @@ private fun JBMText(node: ASTNode, modifier: Modifier) {
                                 }
 
                                 // Handle Revolt app URLs
-                                if (uri.host == "app.revolt.chat" || uri.host == "beta.revolt.chat") {
+                                if (uri.host == "app.revolt.chat" || uri.host == "beta.revolt.chat" || uri.host == "stoat.chat" || uri.host == "old.stoat.chat") {
                                     val pathSegments = uri.pathSegments
                                     // Expected format: /server/{serverId}/channel/{channelId}[/{messageId}]
                                     if (pathSegments.size >= 4 &&

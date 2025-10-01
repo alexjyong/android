@@ -112,7 +112,7 @@
     <string name="server_context_sheet_actions_mark_read">Marcar com llegit</string>
     <string name="add_server_sheet_title">Afegir un servidor</string>
     <string name="add_server_sheet_join_by_invite">Unir-se a través d\'un codi o enllaç</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Introdueix un enllaç com rvlt.gg/Testers o un codi d\'invitació com Testers</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Introdueix un enllaç com stt.gg/Testers o un codi d\'invitació com Testers</string>
     <string name="add_server_sheet_join_by_invite_modal_hint">Codi o enllaç d\'invitació</string>
     <string name="add_server_sheet_create_new">Crear un nou servidor</string>
     <string name="add_server_sheet_create_new_modal_title">Crear un nou servidor</string>

@@ -210,7 +210,7 @@
     <string name="message_context_sheet_actions_copy_failed_empty">Wiadomość jest pusta, nie ma nic do skopiowania</string>
     <string name="channel_context_sheet_actions_copy_id">Skopiuj ID</string>
     <string name="add_server_sheet_join_by_invite">Dołącz przez kod zaproszenia lub link</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Wprowadź link, taki jak rvlt.gg/Testers lub kod zaproszenia, taki jak Testers</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Wprowadź link, taki jak stt.gg/Testers lub kod zaproszenia, taki jak Testers</string>
     <string name="report_message_preview">Wybrana wiadomość:</string>
     <string name="report_message_bridge_notice">Uwaga: Ta wiadomość mogła zostać wysłana z innej platformy. Zaleca się również zgłoszenie wiadomości na platformie, z której została wysłana.</string>
     <string name="report_reason_content_malware">Złośliwe oprogramowanie lub phishing</string>

@@ -19,7 +19,7 @@
     <string name="message_context_sheet_actions_copy_id">Copier l\'identifiant</string>
     <string name="server_context_sheet_actions_copy_id_copied">L\'Identifiant du serveur a été copié dans le presse-papiers</string>
     <string name="add_server_sheet_join_by_invite_modal_title">Code ou lien d\'invitation</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Entrez un lien comme rvlt.gg/Testers ou un code d\'invitation comme Testers</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Entrez un lien comme stt.gg/Testers ou un code d\'invitation comme Testers</string>
     <string name="add_server_sheet_create_new_modal_title">Créer un nouveau serveur</string>
     <string name="add_server_sheet_create_new_modal_under_construction">Cette fonctionnalité est actuellement en cours de développement.</string>
     <string name="report_server">Merci d\'avoir pris le temps de signaler ce serveur. Votre signalement ne sera pas partagé avec les modérateurs du serveur.</string>

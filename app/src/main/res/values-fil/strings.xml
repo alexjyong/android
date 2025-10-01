@@ -196,7 +196,7 @@
     <string name="channel_context_sheet_actions_copy_id">Kopyahin ang ID</string>
     <string name="channel_context_sheet_actions_copy_id_copied">Kinopya ang channel ID sa clipboard</string>
     <string name="add_server_sheet_title">Magdagdag ng server</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Maglagay ng link tulad ng rvlt.gg/Testers o isang invite code tulad ng Testers</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Maglagay ng link tulad ng stt.gg/Testers o isang invite code tulad ng Testers</string>
     <string name="add_server_sheet_join_by_invite_modal_join">Sumali</string>
     <string name="add_server_sheet_create_new_modal_under_construction">Kasalukuyang ginagawa ang feature na ito.</string>
     <string name="report_message">Salamat sa paglalaan ng oras upang iulat ang mensaheng ito. Hindi ibabahagi ang iyong ulat sa user ng nagpadala ng mensahe o sa mga moderator ng server.</string>

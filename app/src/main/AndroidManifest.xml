@@ -113,6 +113,7 @@
                 <data android:scheme="https" />
 
                 <data android:host="rvlt.gg" />
+                <data android:host="stt.gg" />
 
                 <uri-relative-filter-group
                     android:allow="false"

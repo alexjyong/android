@@ -152,7 +152,7 @@
     <string name="channel_context_sheet_actions_copy_id_copied">ID do canal copiado para a área de transferência</string>
     <string name="add_server_sheet_title">Adicionar um servidor</string>
     <string name="add_server_sheet_join_by_invite_modal_title">Código de convite ou link</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Insira um link como rvlt.gg/Testers ou um código de convite como Testers</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Insira um link como stt.gg/Testers ou um código de convite como Testers</string>
     <string name="add_server_sheet_join_by_invite_modal_hint">Código de convite ou link</string>
     <string name="add_server_sheet_create_new">Criar um novo servidor</string>
     <string name="add_server_sheet_create_new_modal_title">Criar um novo servidor</string>

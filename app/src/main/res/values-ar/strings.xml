@@ -320,7 +320,7 @@
     <string name="user_info_sheet_add_friend">إضافة صديق</string>
     <string name="user_info_sheet_send_message">ارسل رسالة</string>
     <string name="user_info_sheet_remove_friend">إزالة صديق</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">أدخل رابطا مثل rvlt.gg/Testers أو رمز دعوة مثل المختبرين</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">أدخل رابطا مثل stt.gg/Testers أو رمز دعوة مثل المختبرين</string>
     <string name="add_server_sheet_create_new">إنشاء خادم جديد</string>
     <string name="add_server_sheet_create_new_modal_title">إنشاء خادم جديد</string>
     <string name="report_server_preview">الخادم المحدد:</string>

@@ -182,7 +182,7 @@
     <string name="channel_context_sheet_actions_mark_read">既読としてマークする</string>
     <string name="server_context_sheet_actions_copy_id_copied">サーバーIDがクリップボードにコピーされました</string>
     <string name="add_server_sheet_join_by_invite_modal_title">招待コードまたはリンク</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">rvlt.gg/Testersのようなリンク、またはTestersのような招待コードを入力してください</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">stt.gg/Testersのようなリンク、またはTestersのような招待コードを入力してください</string>
     <string name="add_server_sheet_create_new_modal_under_construction">この機能は作成中です。</string>
     <string name="report_message">このメッセージを報告するために時間をとっていただきありがとうございます。このメッセージを報告する理由を入力してください。</string>
     <string name="report_server">このサーバーを報告するために時間をとっていただきありがとうございます。このサーバーを報告する理由を入力してください。</string>

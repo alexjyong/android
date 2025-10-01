@@ -288,7 +288,7 @@
     <string name="user_info_sheet_failed_to_open_dm">Nun fui possible abrir ũa cumbersa pribada custe outelizador.</string>
     <string name="add_server_sheet_title">Adicionar un serbidor</string>
     <string name="add_server_sheet_join_by_invite_modal_title">Código de cumbite ó link</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Pon un link cumo rvlt.gg/Testers ó un código d\'ambite cumo Testers</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Pon un link cumo stt.gg/Testers ó un código d\'ambite cumo Testers</string>
     <string name="add_server_sheet_join_by_invite_modal_hint">Código d\'ambite ó link</string>
     <string name="add_server_sheet_join_by_invite_modal_join">Ajuntar</string>
     <string name="add_server_sheet_create_new">Criar un nuobo serbidor</string>

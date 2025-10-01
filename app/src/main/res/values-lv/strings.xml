@@ -314,7 +314,7 @@
     <string name="user_badge_platform_moderation">Platformas moderēšana</string>
     <string name="user_badge_active_supporter">Aktīvs atbalstītājs</string>
     <string name="user_badge_early_adopter">Agrīnais adoptētājs</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Ievadiet saiti, piemēram, rvlt.gg/Testers, vai ielūguma kodu, piemēram, Testētāji</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Ievadiet saiti, piemēram, stt.gg/Testers, vai ielūguma kodu, piemēram, Testētāji</string>
     <string name="add_server_sheet_create_new_modal_title">Izveidojiet jaunu serveri</string>
     <string name="discover">Atklājiet Revolt</string>
     <string name="report_cancel">Atcelt</string>

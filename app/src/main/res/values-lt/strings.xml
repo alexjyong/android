@@ -167,7 +167,7 @@
     <string name="programming_language_default">Paprastas tekstas</string>
     <string name="server_context_sheet_actions_leave_confirm">Išeiti iš %1$s?</string>
     <string name="message_field_denied_no_permission">Neturite leidimo siųsti žinutes šiuo kanalu.</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Įveskite nuorodą, pavyzdžiui, rvlt.gg/Testers, arba pakvietimo kodą, pavyzdžiui, Testers</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Įveskite nuorodą, pavyzdžiui, stt.gg/Testers, arba pakvietimo kodą, pavyzdžiui, Testers</string>
     <string name="report_user">Dėkojame, kad skyrėte laiko pranešti apie šį naudotoją. Jūsų pranešimas nebus perduotas nei naudotojui, nei serverio moderatoriams.</string>
     <string name="report_reason_content_extreme_violence">Ekstremalus smurtas, žiaurumas ar žiaurus elgesys su gyvūnais</string>
     <string name="message_context_sheet_actions_copy_id_copied">Nukopijuotas pranešimo ID į iškarpinę</string>

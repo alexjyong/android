@@ -481,7 +481,7 @@
     <string name="member_context_sheet_remove_from_channel">Αφαίρεση απο %1$s</string>
     <string name="add_server_sheet_title">Πρόσθεσε έναν server</string>
     <string name="add_server_sheet_join_by_invite_modal_title">Κωδικός πρόσκλησης ή σύνδεσμος</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Εισάγετε έναν σύνδεσμο όπως rvlt.gg/Testers ή έναν κωδικό πρόσκλησης όπως Testers</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Εισάγετε έναν σύνδεσμο όπως stt.gg/Testers ή έναν κωδικό πρόσκλησης όπως Testers</string>
     <string name="report_message">Σας ευχαριστούμε που αφιερώσατε χρόνο για να αναφέρετε αυτό το μήνυμα. Η αναφορά σας δεν θα κοινοποιηθεί στον χρήστη που έστειλε το μήνυμα ή στους επόπτες του server.</string>
     <string name="report_message_preview">Επιλεγμένο μήνυμα:</string>
     <string name="report_message_bridge_notice">Σημείωση: Αυτό το μήνυμα μπορεί να έχει σταλεί από άλλη πλατφόρμα. Συνιστάται επίσης να αναφέρετε το μήνυμα στην πλατφόρμα από την οποία στάλθηκε.</string>

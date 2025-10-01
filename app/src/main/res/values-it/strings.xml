@@ -300,7 +300,7 @@
     <string name="user_info_sheet_failed_to_open_dm">Non riusciamo ad aprire un MD tra te e questo utente.</string>
     <string name="add_server_sheet_title">Aggiungi un server</string>
     <string name="add_server_sheet_join_by_invite">Partecipa usando un codice d\'invito o un link</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Inserisci un link tipo \"rvlt.gg/Testers\" o un codice invito come \"Testers\"</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Inserisci un link tipo \"stt.gg/Testers\" o un codice invito come \"Testers\"</string>
     <string name="add_server_sheet_join_by_invite_modal_join">Partecipa</string>
     <string name="add_server_sheet_create_new">Crea un nuovo server</string>
     <string name="discover">Scopri Revolt</string>

@@ -185,7 +185,7 @@
     <string name="settings_feedback">মতামত</string>
     <string name="settings_appearance_theme_light">লাইট</string>
     <string name="direct_messages">সরাসরিভাবে পাঠানো মেসেজগুলো</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">\"rvlt.gg/Testers\" এর মতো একটি লিঙ্ক বা \"Testers\" -এর মতো একটি আমন্ত্রণ কোড লিখুন</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">\"stt.gg/Testers\" এর মতো একটি লিঙ্ক বা \"Testers\" -এর মতো একটি আমন্ত্রণ কোড লিখুন</string>
     <string name="report_message_preview">নির্বাচিত মেসেজ:</string>
     <string name="report_server_preview">নির্বাচিত সার্ভার:</string>
     <string name="report_user_preview">নির্বাচিত ইউজার:</string>

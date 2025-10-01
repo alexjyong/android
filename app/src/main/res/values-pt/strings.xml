@@ -195,7 +195,7 @@
     <string name="message_context_sheet_actions_copy_id_copied">ID da mensagem copiado para a área de transferência</string>
     <string name="channel_context_sheet_actions_copy_id_copied">ID do canal copiado para a área de transferência</string>
     <string name="server_context_sheet_actions_copy_id_copied">ID do servidor copiado para a área de transferência</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Insere uma ligação como rvlt.gg/Testers ou um código de convite como Testers</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Insere uma ligação como stt.gg/Testers ou um código de convite como Testers</string>
     <string name="add_server_sheet_create_new_modal_title">Criar um novo servidor</string>
     <string name="add_server_sheet_create_new_modal_under_construction">De momento, esta funcionalidade está sob desenvolvimento.</string>
     <string name="report_message_bridge_notice">Nota: Esta mensagem pode ter sido enviada a partir doutra plataforma. Recomenda-se que também se a denuncia nessa plataforma.</string>

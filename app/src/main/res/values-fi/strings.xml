@@ -167,7 +167,7 @@
     <string name="channel_context_sheet_actions_copy_id_copied">Kopioitu kanavan ID liitepöydälle</string>
     <string name="server_context_sheet_actions_mark_read">Merkitse luetuksi</string>
     <string name="add_server_sheet_join_by_invite">Liity kutsukoodilla tai linkillä</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Syötä linkki kuten rvlt.gg/Testers tai kutsukoodi kuten Testers</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Syötä linkki kuten stt.gg/Testers tai kutsukoodi kuten Testers</string>
     <string name="add_server_sheet_join_by_invite_modal_hint">Kutsukoodi tai linkki</string>
     <string name="add_server_sheet_create_new_modal_under_construction">Tämä ominaisuus on vielä kesken.</string>
     <string name="report_server_preview">Valittu palvelin:</string>

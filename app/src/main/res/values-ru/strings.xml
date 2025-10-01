@@ -175,7 +175,7 @@
     <string name="server_context_sheet_actions_copy_id">Скопировать ID</string>
     <string name="server_context_sheet_actions_copy_id_copied">ID сервера скопирован</string>
     <string name="add_server_sheet_join_by_invite">Войдите по коду приглашения или ссылке</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Введите ссылку, например rvlt.gg/Testers, или код приглашения, например Testers</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Введите ссылку, например stt.gg/Testers, или код приглашения, например Testers</string>
     <string name="add_server_sheet_join_by_invite_modal_hint">Код приглашения или ссылка</string>
     <string name="add_server_sheet_join_by_invite_modal_join">Войти</string>
     <string name="add_server_sheet_create_new_modal_under_construction">Эта функция сейчас в разработке.</string>

@@ -53,7 +53,7 @@ fun ColumnScope.DiscoverView() {
                     settings.userAgentString = buildUserAgent("DiscoverView")
                     settings.setSupportZoom(false)
                     settings.setSupportMultipleWindows(false)
-                    loadUrl("https://rvlt.gg/discover/servers?embedded=true")
+                    loadUrl("https://stt.gg/discover/servers?embedded=true")
 
                     webViewClient = object : android.webkit.WebViewClient() {
                         override fun onPageFinished(view: WebView?, url: String?) {
@@ -113,7 +113,7 @@ fun ColumnScope.DiscoverView() {
                                 return true
                             }
 
-                            if (!request?.url?.host.equals("rvlt.gg")) {
+                            if (!request?.url?.host.equals("stt.gg")) {
                                 return true
                             }
 

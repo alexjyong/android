@@ -472,7 +472,7 @@
     <string name="add_server_sheet_step_1j_title">Join with an Invite</string>
     <string name="add_server_sheet_step_1j_description">If you have an invite code or link, you can join a server right now.</string>
     <string name="add_server_sheet_step_1j_examples_heading">Examples of invite codes include:</string>
-    <string name="add_server_sheet_step_1j_example_1" translatable="false">rvlt.gg/Testers</string>
+    <string name="add_server_sheet_step_1j_example_1" translatable="false">stt.gg/Testers</string>
     <string name="add_server_sheet_step_1j_example_2" translatable="false">Testers</string>
     <string name="add_server_sheet_step_1j_example_3" translatable="false">app.revolt.chat/invite/Testers</string>
     <string name="add_server_sheet_step_1j_label">Invite code or link</string>
@@ -488,7 +488,7 @@
     <string name="add_server_sheet_title">Add Server</string>
     <string name="add_server_sheet_join_by_invite">Join by invite code or link</string>
     <string name="add_server_sheet_join_by_invite_modal_title">Invite code or link</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Enter a link like rvlt.gg/Testers or an invite code like Testers</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Enter a link like stt.gg/Testers or an invite code like Testers</string>
     <string name="add_server_sheet_join_by_invite_modal_hint">Invite code or link</string>
     <string name="add_server_sheet_join_by_invite_modal_join">Join</string>
     <string name="add_server_sheet_create_new">Create a new server</string>

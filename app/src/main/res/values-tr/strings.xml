@@ -141,7 +141,7 @@
     <string name="report_message">Bu mesajı raporlamak için zaman ayırdığınız için teşekkür ederiz. Raporunuz, mesajı gönderen kullanıcıyla veya sunucunun moderatörleriyle paylaşılmayacaktır.</string>
     <string name="report">Bildir</string>
     <string name="add_server_sheet_join_by_invite_modal_title">Davet kodu veya bağlantı</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">rvlt.gg/Testers gibi bir bağlantı veya Testers gibi bir davet kodu gir</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">stt.gg/Testers gibi bir bağlantı veya Testers gibi bir davet kodu gir</string>
     <string name="add_server_sheet_join_by_invite_modal_hint">Davet kodu veya bağlantı</string>
     <string name="add_server_sheet_join_by_invite_modal_join">Katıl</string>
     <string name="add_server_sheet_create_new">Yeni bir sunucu oluştur</string>

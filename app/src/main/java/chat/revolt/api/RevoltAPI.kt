@@ -65,7 +65,7 @@ val REVOLT_FILES =
 val REVOLT_JANUARY =
     if (USE_ALPHA_API) "https://alpha.revolt.chat/january" else "https://jan.revolt.chat"
 const val REVOLT_APP = "https://app.revolt.chat"
-const val REVOLT_INVITES = "https://rvlt.gg"
+const val REVOLT_INVITES = "https://stt.gg"
 val REVOLT_WEBSOCKET =
     if (USE_ALPHA_API) "wss://alpha.revolt.chat/ws" else "wss://ws.revolt.chat"
 const val REVOLT_KJBOOK = "https://revoltchat.github.io/android"

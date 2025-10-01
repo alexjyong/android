@@ -244,7 +244,7 @@ fun annotateText(node: AstNode, revealedSpoilers: Set<String> = emptySet()): Ann
 
                     val displayText = try {
                         val uri = url.value.toUri()
-                        if (uri.host == "app.revolt.chat" || uri.host == "beta.revolt.chat") {
+                        if (uri.host == "app.revolt.chat" || uri.host == "beta.revolt.chat" || uri.host == "stoat.chat" || uri.host == "old.stoat.chat") {
                             val pathSegments = uri.pathSegments
                             if (pathSegments.size >= 4 &&
                                 pathSegments[0] == "server" &&
@@ -415,7 +415,7 @@ fun MarkdownText(textNode: AstNode, modifier: Modifier = Modifier) {
                     }
 
                     // Handle Revolt app URLs
-                    if (uri.host == "app.revolt.chat" || uri.host == "beta.revolt.chat") {
+                    if (uri.host == "app.revolt.chat" || uri.host == "beta.revolt.chat" || uri.host == "stoat.chat" || uri.host == "old.stoat.chat") {
                         val pathSegments = uri.pathSegments
                         // Expected format: /server/{serverId}/channel/{channelId}[/{messageId}]
                         if (pathSegments.size >= 4 &&

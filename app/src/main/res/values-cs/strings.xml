@@ -351,7 +351,7 @@
     <string name="add_server_sheet_title">Přidat server</string>
     <string name="add_server_sheet_join_by_invite">Připojte se kódem nebo odkazem pozvánky</string>
     <string name="add_server_sheet_join_by_invite_modal_title">Kód nebo odkaz pozvánky</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Zadejte odkaz jako rvlt.gg/Testers nebo kód jako Testers</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Zadejte odkaz jako stt.gg/Testers nebo kód jako Testers</string>
     <string name="add_server_sheet_create_new">Vytvořit nový server</string>
     <string name="message_context_sheet_actions_reply">Odpovědět</string>
     <string name="message_context_sheet_actions_edit">Upravit</string>

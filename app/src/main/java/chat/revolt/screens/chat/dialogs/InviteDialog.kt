@@ -139,7 +139,7 @@ fun InviteDialog(channelId: String, onDismissRequest: () -> Unit) {
             Spacer(Modifier.height(16.dp))
 
             Text(
-                (Uri.parse(REVOLT_INVITES).host ?: "rvlt.gg") + "/",
+                (Uri.parse(REVOLT_INVITES).host ?: "stt.gg") + "/",
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
                 modifier = Modifier

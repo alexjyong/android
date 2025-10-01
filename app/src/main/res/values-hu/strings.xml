@@ -205,7 +205,7 @@
     <string name="channel_info_sheet_description_empty">Még nincs leírás ehhez a csatornához.</string>
     <string name="message_context_sheet_actions_copy_id_copied">Üzenet ID vágólapra másolva</string>
     <string name="server_context_sheet_actions_copy_id_copied">Szerver ID vágólapra másolva</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Egy linket adj meg, mint: „rvlt.gg/Tesztelők” vagy egy meghívókódot, mint: „Tesztelők”</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Egy linket adj meg, mint: „stt.gg/Tesztelők” vagy egy meghívókódot, mint: „Tesztelők”</string>
     <string name="report_message">Köszönjük, hogy időt szánsz az üzenet jelentésére. A jelentésedet nem tudja meg a szerver moderátora, sem pedig a személy, akinek az üzenetét jelented.</string>
     <string name="report_message_bridge_notice">Megjegyzés: Ezt az üzenetet másik platformon keresztül küldték el. Ajánlott ezt az üzenetet annál a platformnál is jelenteni, ahonnan azt küldték.</string>
     <string name="report_reason_content_spam_abuse">Spam vagy egyéb visszaélés a platformmal</string>

@@ -140,7 +140,7 @@
     <string name="message_context_sheet_actions_mark_unread">Marcar como no leído</string>
     <string name="channel_context_sheet_actions_mark_read">Marcar como leído</string>
     <string name="add_server_sheet_join_by_invite">Unirse utilizando un código de invitación o enlace</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Introduce un enlace como «rvlt.gg/Testers» o un código de invitación como «Testers»</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Introduce un enlace como «stt.gg/Testers» o un código de invitación como «Testers»</string>
     <string name="add_server_sheet_join_by_invite_modal_hint">Código de invitación o enlace</string>
     <string name="add_server_sheet_create_new_modal_title">Crear un nuevo servidor</string>
     <string name="report">Denunciar</string>

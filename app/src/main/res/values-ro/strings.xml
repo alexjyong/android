@@ -206,7 +206,7 @@
     <string name="settings_appearance_theme_m3dynamic_unsupported_toast">Material You nu este acceptat pe acest dispozitiv.</string>
     <string name="add_server_sheet_join_by_invite">Alătură-te cu un cod de invitație sau un link</string>
     <string name="add_server_sheet_join_by_invite_modal_title">Cod de invitație sau link</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Introdu un link precum rvlt.gg/Testers sau un cod de invitație precum Testers</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Introdu un link precum stt.gg/Testers sau un cod de invitație precum Testers</string>
     <string name="add_server_sheet_join_by_invite_modal_hint">Cod de invitație sau link</string>
     <string name="add_server_sheet_create_new_modal_title">Creează un server nou</string>
     <string name="add_server_sheet_create_new_modal_under_construction">Această funcție este în lucru.</string>

@@ -152,7 +152,7 @@
     <string name="user_info_sheet_failed_to_open_dm">پیام خصوصی با این کاربر باز نشد.</string>
     <string name="user_badge_supporter">حامی</string>
     <string name="add_server_sheet_title">یک سرور اضافه کنید</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">پیوندی مانند rvlt.gg/Testers یا کد دعوت مانند Testers را وارد کنید</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">پیوندی مانند stt.gg/Testers یا کد دعوت مانند Testers را وارد کنید</string>
     <string name="media_viewer_pause">توقف</string>
     <string name="report_message_bridge_notice">توجه: این پیام ممکن است از پلتفرم دیگری ارسال شده باشد. توصیه می شود پیام را در پلتفرمی که از آن ارسال شده است نیز گزارش دهید.</string>
     <string name="media_viewer_save_failed_video">ویدیو ذخیره نشد</string>

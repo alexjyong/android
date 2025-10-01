@@ -71,7 +71,7 @@ fun KatexRenderer(content: String, modifier: Modifier = Modifier) {
                         webResourceRequest: WebResourceRequest
                     ): Boolean {
                         // Capture clicks on invite links
-                        if (webResourceRequest.url.host == "rvlt.gg" ||
+                        if (webResourceRequest.url.host == "rvlt.gg" || webResourceRequest.url.host == "stt.gg" ||
                             (
                                     webResourceRequest.url.host?.endsWith("revolt.chat") == true && webResourceRequest.url.path?.startsWith(
                                         "/invite"

@@ -21,7 +21,7 @@ I made this for some QOL changes that aren't present in the current version at t
 
 You can download the latest APK [here](https://github.com/alexjyong/android/releases/latest).
 
-For support, discussion, updates and other things, visit our support server on [Revolt](https://rvlt.gg/C7qQMwsZ).
+For support, discussion, updates and other things, visit our support server on [Revolt](https://stt.gg/C7qQMwsZ).
 
 ## Features Added
 Tap a card to expand.

@@ -200,7 +200,7 @@
     <string name="add_server_sheet_join_by_invite">Unirse por código de invitación o enlace</string>
     <string name="report_reason_additional_hint">Cualquier información adicional que pueda ayudarnos en nuestra investigación. Opcional.</string>
     <string name="next">Siguiente →</string>
-    <string name="add_server_sheet_join_by_invite_modal_description">Ingresa un enlace como rvlt.gg/Testers o un código de invitación como Testers</string>
+    <string name="add_server_sheet_join_by_invite_modal_description">Ingresa un enlace como stt.gg/Testers o un código de invitación como Testers</string>
     <string name="ok">De Acuerdo</string>
     <string name="register_instructions">Es como un lugar para pasar el rato, reunirse y hablar de cosas. La mejor parte, está en Internet.</string>
     <string name="report_message_bridge_notice">Nota: Este mensaje pudo haber sido enviado desde otra plataforma. Se recomienda denunciar también el mensaje en la plataforma desde la que fue enviado.</string>
