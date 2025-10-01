@@ -41,6 +41,19 @@ data class Changelog(
 class Changelogs(val context: Context, val kvStorage: KVStorage? = null) {
 
     companion object {
+
+        private val changelog1003008 = ChangelogData(
+            version = ChangelogVersion(
+                code = 1003008,
+                name = "1.3.7bj-forked",
+                title = "Updates!"
+            ),
+            date = ChangelogDate(
+                publish = "2025-10-01T12:00:00.000Z"
+            ),
+            summary = "Better invite code generation, and first pass at Stoat adjustments"
+        )
+
         private val changelog1003007 = ChangelogData(
             version = ChangelogVersion(
                 code = 1003007,
@@ -66,12 +79,21 @@ class Changelogs(val context: Context, val kvStorage: KVStorage? = null) {
         )
 
         private val allChangelogs = listOf(
+            changelog1003008,
             changelog1003007,
             changelog1003006
         )
 
         private fun getChangelogContent(versionCode: Long): String {
             return when (versionCode) {
+                1003008L -> """
+                    <h2>Updates</h2>
+                    <h3>What's New:</h3>
+                    <ul>
+                        <li><strong>First pass at Stoat link updates</strong></li>
+                        <li><strong>Users can now generate invite links from the Server and Channel Context menus. (Long press to see!)</strong></li>
+                    </ul>
+                """.trimIndent()
                 1003007L -> """
                     <h2>Bug Fixes & Improvements</h2>
                     <h3>What's Fixed:</h3>
