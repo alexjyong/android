@@ -57,17 +57,17 @@ import chat.revolt.api.schemas.Channel as ChannelSchema
 private const val USE_ALPHA_API = false
 
 val REVOLT_BASE =
-    if (USE_ALPHA_API) "https://alpha.revolt.chat/api" else "https://api.revolt.chat/0.8"
+    if (USE_ALPHA_API) "https://alpha.revolt.chat/api" else "https://api.stoat.chat/0.8"
 const val REVOLT_SUPPORT = "https://support.revolt.chat"
-const val REVOLT_MARKETING = "https://revolt.chat"
+const val REVOLT_MARKETING = "https://stoat.chat"
 val REVOLT_FILES =
-    if (USE_ALPHA_API) "https://alpha.revolt.chat/autumn" else "https://cdn.revoltusercontent.com"
+    if (USE_ALPHA_API) "https://alpha.revolt.chat/autumn" else "https://cdn.stoatusercontent.com"
 val REVOLT_JANUARY =
     if (USE_ALPHA_API) "https://alpha.revolt.chat/january" else "https://jan.revolt.chat"
-const val REVOLT_APP = "https://app.revolt.chat"
+const val REVOLT_APP = "https://stoat.chat"
 const val REVOLT_INVITES = "https://stt.gg"
 val REVOLT_WEBSOCKET =
-    if (USE_ALPHA_API) "wss://alpha.revolt.chat/ws" else "wss://ws.revolt.chat"
+    if (USE_ALPHA_API) "wss://alpha.revolt.chat/ws" else "wss://events.stoat.chat"
 const val REVOLT_KJBOOK = "https://revoltchat.github.io/android"
 
 fun String.api(): String {
