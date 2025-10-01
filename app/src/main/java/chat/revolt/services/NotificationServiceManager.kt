@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.Manifest
 import android.os.Build
 import androidx.core.content.ContextCompat
+import chat.revolt.api.settings.NotificationSettingsProvider
 import chat.revolt.persistence.KVStorage
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -34,10 +35,24 @@ class NotificationServiceManager @Inject constructor(
 
     fun startServicesIfEnabled(applicationScope: CoroutineScope) {
         applicationScope.launch {
-            val isBackgroundServiceEnabled = kvStorage.getBoolean(KEY_BACKGROUND_SERVICE_ENABLED) ?: false
+            val notificationMode = NotificationSettingsProvider.getNotificationMode()
 
-            if (isBackgroundServiceEnabled && hasNotificationPermission()) {
-                NotificationForegroundService.start(context)
+            if (hasNotificationPermission()) {
+                when (notificationMode) {
+                    NotificationMode.INSTANT -> {
+                        NotificationForegroundService.start(context)
+                        NotificationPollingService.stop(context)
+                    }
+                    NotificationMode.BATTERY_SAVER -> {
+                        NotificationForegroundService.stop(context)
+                        val interval = NotificationSettingsProvider.getPollingInterval()
+                        NotificationPollingService.start(context, interval)
+                    }
+                    NotificationMode.OFF -> {
+                        NotificationForegroundService.stop(context)
+                        NotificationPollingService.stop(context)
+                    }
+                }
             }
         }
     }

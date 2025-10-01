@@ -6,6 +6,7 @@ import chat.revolt.persistence.Database
 import chat.revolt.persistence.SqlStorage
 import chat.revolt.persistence.KVStorage
 import chat.revolt.RevoltApplication
+import chat.revolt.services.NotificationMode
 
 object DefaultNotificationStates {
     const val SAVED_MESSAGES = "all"
@@ -19,7 +20,27 @@ object DefaultNotificationStates {
 object NotificationSettingsProvider {
     private val kv = KVStorage(RevoltApplication.instance)
 
+    private const val KEY_NOTIFICATION_MODE = "notification_mode"
+    private const val KEY_POLLING_INTERVAL = "notification_polling_interval"
+
     private fun getCurrentTime() = System.currentTimeMillis()
+
+    suspend fun getNotificationMode(): NotificationMode {
+        val modeString = kv.get(KEY_NOTIFICATION_MODE)
+        return NotificationMode.fromString(modeString)
+    }
+
+    suspend fun setNotificationMode(mode: NotificationMode) {
+        kv.set(KEY_NOTIFICATION_MODE, mode.value)
+    }
+
+    suspend fun getPollingInterval(): Long {
+        return kv.get(KEY_POLLING_INTERVAL)?.toLongOrNull() ?: 15L
+    }
+
+    suspend fun setPollingInterval(intervalMinutes: Long) {
+        kv.set(KEY_POLLING_INTERVAL, intervalMinutes.toString())
+    }
     
     suspend fun getServerSuppressEveryoneMentions(serverId: String): Boolean {
         return kv.getBoolean("suppress_everyone_server_$serverId") ?: false

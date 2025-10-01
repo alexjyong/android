@@ -764,10 +764,8 @@
     <string name="settings_chat_hint_poorly_formed_settings_keys_reset">Reset %1$s settings</string>
 
     <string name="settings_notifications">Notifications</string>
-    <string name="settings_notifications_header">App Notifications</string>
-    <string name="settings_notifications_description">Get notified instantly about new messages from your friends and servers.</string>
-    <string name="settings_notifications_background_service">Real-time Notifications</string>
-    <string name="settings_notifications_background_service_description">Receive notifications instantly when the app is closed. Uses more battery but ensures you never miss a message.</string>
+    <string name="settings_notifications_header">Notifications When App is Closed</string>
+    <string name="settings_notifications_description">Choose how you want to receive notifications when the app is in the background.</string>
     <string name="settings_notifications_permission_required">Notification permission required</string>
     <string name="settings_notifications_permission_denied">Notifications are disabled. Please enable them in your device settings to receive message notifications.</string>
     <string name="settings_notifications_grant_permission">Grant Permission</string>
@@ -784,6 +782,28 @@
     <string name="toast_battery_optimization_not_available">Battery optimization not available on this Android version</string>
     <string name="settings_notifications_suppress_everyone">Suppress @everyone/@here</string>
     <string name="settings_notifications_suppress_everyone_description">Don\'t notify for @everyone and @here mentions</string>
+    <string name="settings_notifications_mode_instant">Instant</string>
+    <string name="settings_notifications_mode_instant_description">Get notifications immediately. Higher battery usage.</string>
+    <string name="settings_notifications_mode_battery_saver">Battery Saver</string>
+    <string name="settings_notifications_mode_battery_saver_description">Check for messages every %1$s. Lower battery usage.</string>
+    <string name="settings_notifications_mode_off">Off</string>
+    <string name="settings_notifications_mode_off_description">No notifications when app is closed</string>
+    <string name="settings_notifications_interval_header">Check Interval</string>
+    <string name="settings_notifications_interval_5min">5 minutes</string>
+    <string name="settings_notifications_interval_10min">10 minutes</string>
+    <string name="settings_notifications_interval_15min">15 minutes (Recommended)</string>
+    <string name="settings_notifications_interval_30min">30 minutes</string>
+    <string name="settings_notifications_interval_60min">1 hour</string>
+    <string name="settings_notifications_battery_very_high">Very High Impact</string>
+    <string name="settings_notifications_battery_high">High Impact</string>
+    <string name="settings_notifications_battery_moderate">Moderate Impact</string>
+    <string name="settings_notifications_battery_low">Low Impact</string>
+    <string name="settings_notifications_battery_very_low">Minimal Impact</string>
+    <string name="settings_notifications_exact_alarm_required">Exact Alarm Permission Required</string>
+    <string name="settings_notifications_exact_alarm_description">For frequent check intervals (5-10 minutes), Android requires exact alarm permission. This ensures notifications arrive on time.</string>
+    <string name="settings_notifications_grant_exact_alarm">Grant Permission</string>
+    <string name="settings_notifications_doze_warning_title">Doze Mode Limitation</string>
+    <string name="settings_notifications_doze_warning_description">When your device is sleeping (screen off and idle), Android limits checks to every 9 minutes minimum. Your selected interval will apply when the device is active.</string>
 
     <!-- Notification Context Menu -->
     <string name="notification_menu_title">Notifications</string>

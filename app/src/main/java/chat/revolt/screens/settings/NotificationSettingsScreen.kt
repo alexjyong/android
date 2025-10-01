@@ -79,23 +79,42 @@ class NotificationSettingsScreenViewModel @Inject constructor(
         private const val KEY_BACKGROUND_SERVICE_ENABLED = "notification_background_service_enabled"
     }
 
-    var isBackgroundServiceEnabled by mutableStateOf(false)
+    var isBatteryOptimizationDisabled by mutableStateOf(false)
         private set
 
-    var isBatteryOptimizationDisabled by mutableStateOf(false)
+    var notificationMode by mutableStateOf(chat.revolt.services.NotificationMode.OFF)
+        private set
+
+    var pollingInterval by mutableStateOf(15L)
+        private set
+
+    var canScheduleExactAlarms by mutableStateOf(true)
         private set
 
     init {
         loadSettings()
         checkBatteryOptimization()
+        checkExactAlarmPermission()
     }
 
     private fun loadSettings() {
         viewModelScope.launch {
-            isBackgroundServiceEnabled = kvStorage.getBoolean(KEY_BACKGROUND_SERVICE_ENABLED) ?: false
+            notificationMode = chat.revolt.api.settings.NotificationSettingsProvider.getNotificationMode()
+            pollingInterval = chat.revolt.api.settings.NotificationSettingsProvider.getPollingInterval()
 
-            if (isBackgroundServiceEnabled && hasNotificationPermission()) {
-                NotificationForegroundService.start(context)
+            if (hasNotificationPermission()) {
+                when (notificationMode) {
+                    chat.revolt.services.NotificationMode.INSTANT -> {
+                        chat.revolt.services.NotificationForegroundService.start(context)
+                    }
+                    chat.revolt.services.NotificationMode.BATTERY_SAVER -> {
+                        chat.revolt.services.NotificationPollingService.start(context, pollingInterval)
+                    }
+                    chat.revolt.services.NotificationMode.OFF -> {
+                        chat.revolt.services.NotificationForegroundService.stop(context)
+                        chat.revolt.services.NotificationPollingService.stop(context)
+                    }
+                }
             }
         }
     }
@@ -111,31 +130,81 @@ class NotificationSettingsScreenViewModel @Inject constructor(
         }
     }
 
-    fun toggleBackgroundService(enabled: Boolean, onPermissionRequired: () -> Unit) {
-        if (enabled && !hasNotificationPermission()) {
-            onPermissionRequired()
-            return
-        }
-        isBackgroundServiceEnabled = enabled
-
-        viewModelScope.launch {
-            kvStorage.set(KEY_BACKGROUND_SERVICE_ENABLED, enabled)
-        }
-
-        if (enabled) {
-            NotificationForegroundService.start(context)
-        } else {
-            NotificationForegroundService.stop(context)
-        }
-    }
 
     private fun checkBatteryOptimization() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
             isBatteryOptimizationDisabled = powerManager.isIgnoringBatteryOptimizations(context.packageName)
         } else {
-            isBatteryOptimizationDisabled = true // Not applicable for older versions
+            isBatteryOptimizationDisabled = true
         }
+    }
+
+    private fun checkExactAlarmPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
+            canScheduleExactAlarms = alarmManager.canScheduleExactAlarms()
+        } else {
+            canScheduleExactAlarms = true
+        }
+    }
+
+    fun updateNotificationMode(mode: chat.revolt.services.NotificationMode, onPermissionRequired: () -> Unit) {
+        if (mode != chat.revolt.services.NotificationMode.OFF && !hasNotificationPermission()) {
+            onPermissionRequired()
+            return
+        }
+
+        notificationMode = mode
+
+        viewModelScope.launch {
+            chat.revolt.api.settings.NotificationSettingsProvider.setNotificationMode(mode)
+
+            when (mode) {
+                chat.revolt.services.NotificationMode.INSTANT -> {
+                    chat.revolt.services.NotificationPollingService.stop(context)
+                    chat.revolt.services.NotificationForegroundService.start(context)
+                }
+                chat.revolt.services.NotificationMode.BATTERY_SAVER -> {
+                    chat.revolt.services.NotificationForegroundService.stop(context)
+                    chat.revolt.services.NotificationPollingService.start(context, pollingInterval)
+                }
+                chat.revolt.services.NotificationMode.OFF -> {
+                    chat.revolt.services.NotificationForegroundService.stop(context)
+                    chat.revolt.services.NotificationPollingService.stop(context)
+                }
+            }
+        }
+    }
+
+    fun updatePollingInterval(intervalMinutes: Long) {
+        pollingInterval = intervalMinutes
+
+        viewModelScope.launch {
+            chat.revolt.api.settings.NotificationSettingsProvider.setPollingInterval(intervalMinutes)
+
+            if (notificationMode == chat.revolt.services.NotificationMode.BATTERY_SAVER) {
+                chat.revolt.services.NotificationPollingService.updateInterval(context, intervalMinutes)
+            }
+        }
+    }
+
+    fun openExactAlarmSettings() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            try {
+                val intent = Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                    data = Uri.parse("package:${context.packageName}")
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                context.startActivity(intent)
+            } catch (e: Exception) {
+                Toast.makeText(context, "Could not open exact alarm settings", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    fun refreshExactAlarmPermission() {
+        checkExactAlarmPermission()
     }
 
     fun openNotificationSettings() {
@@ -225,11 +294,6 @@ fun NotificationSettingsScreen(
         true // Permission wasn't required in older versions
     }
 
-    LaunchedEffect(hasPermission) {
-        if (hasPermission && !viewModel.isBackgroundServiceEnabled) {
-            viewModel.toggleBackgroundService(true) {}
-        }
-    }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -328,25 +392,178 @@ fun NotificationSettingsScreen(
 
             ListItem(
                 headlineContent = {
-                    Text(stringResource(R.string.settings_notifications_background_service))
+                    Text(stringResource(R.string.settings_notifications_mode_instant))
                 },
                 supportingContent = {
-                    Text(stringResource(R.string.settings_notifications_background_service_description))
+                    Text(stringResource(R.string.settings_notifications_mode_instant_description))
                 },
-                trailingContent = {
-                    Switch(
-                        checked = viewModel.isBackgroundServiceEnabled,
-                        onCheckedChange = null,
-                        enabled = hasPermission
+                leadingContent = {
+                    androidx.compose.material3.RadioButton(
+                        selected = viewModel.notificationMode == chat.revolt.services.NotificationMode.INSTANT,
+                        onClick = null
                     )
                 },
-                modifier = Modifier.clickable(enabled = hasPermission || !viewModel.isBackgroundServiceEnabled) {
-                    viewModel.toggleBackgroundService(
-                        !viewModel.isBackgroundServiceEnabled,
-                        onPermissionRequired
-                    )
+                modifier = Modifier.clickable {
+                    viewModel.updateNotificationMode(chat.revolt.services.NotificationMode.INSTANT, onPermissionRequired)
                 }
             )
+
+            ListItem(
+                headlineContent = {
+                    Text(stringResource(R.string.settings_notifications_mode_battery_saver))
+                },
+                supportingContent = {
+                    val intervalText = when (viewModel.pollingInterval) {
+                        5L -> stringResource(R.string.settings_notifications_interval_5min)
+                        10L -> stringResource(R.string.settings_notifications_interval_10min)
+                        15L -> stringResource(R.string.settings_notifications_interval_15min)
+                        30L -> stringResource(R.string.settings_notifications_interval_30min)
+                        60L -> stringResource(R.string.settings_notifications_interval_60min)
+                        else -> "${viewModel.pollingInterval} minutes"
+                    }
+                    Text(stringResource(R.string.settings_notifications_mode_battery_saver_description, intervalText))
+                },
+                leadingContent = {
+                    androidx.compose.material3.RadioButton(
+                        selected = viewModel.notificationMode == chat.revolt.services.NotificationMode.BATTERY_SAVER,
+                        onClick = null
+                    )
+                },
+                modifier = Modifier.clickable {
+                    viewModel.updateNotificationMode(chat.revolt.services.NotificationMode.BATTERY_SAVER, onPermissionRequired)
+                }
+            )
+
+            ListItem(
+                headlineContent = {
+                    Text(stringResource(R.string.settings_notifications_mode_off))
+                },
+                supportingContent = {
+                    Text(stringResource(R.string.settings_notifications_mode_off_description))
+                },
+                leadingContent = {
+                    androidx.compose.material3.RadioButton(
+                        selected = viewModel.notificationMode == chat.revolt.services.NotificationMode.OFF,
+                        onClick = null
+                    )
+                },
+                modifier = Modifier.clickable {
+                    viewModel.updateNotificationMode(chat.revolt.services.NotificationMode.OFF, onPermissionRequired)
+                }
+            )
+
+            if (viewModel.notificationMode == chat.revolt.services.NotificationMode.BATTERY_SAVER) {
+                Spacer(modifier = Modifier.height(8.dp))
+
+                if (!viewModel.canScheduleExactAlarms && (viewModel.pollingInterval == 5L || viewModel.pollingInterval == 10L)) {
+                    Card(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.settings_notifications_exact_alarm_required),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_notifications_exact_alarm_description),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                            Button(
+                                onClick = { viewModel.openExactAlarmSettings() }
+                            ) {
+                                Text(stringResource(R.string.settings_notifications_grant_exact_alarm))
+                            }
+                        }
+                    }
+                }
+
+                Text(
+                    text = stringResource(R.string.settings_notifications_interval_header),
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+
+                val intervals = listOf(5L to R.string.settings_notifications_interval_5min, 10L to R.string.settings_notifications_interval_10min, 15L to R.string.settings_notifications_interval_15min, 30L to R.string.settings_notifications_interval_30min, 60L to R.string.settings_notifications_interval_60min)
+
+                intervals.forEach { (minutes, labelRes) ->
+                    val batteryImpact = when (minutes) {
+                        5L -> stringResource(R.string.settings_notifications_battery_very_high)
+                        10L -> stringResource(R.string.settings_notifications_battery_high)
+                        15L -> stringResource(R.string.settings_notifications_battery_moderate)
+                        30L -> stringResource(R.string.settings_notifications_battery_low)
+                        else -> stringResource(R.string.settings_notifications_battery_very_low)
+                    }
+
+                    val needsPermission = (minutes == 5L || minutes == 10L) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                    val enabled = if (needsPermission) viewModel.canScheduleExactAlarms else true
+
+                    ListItem(
+                        headlineContent = {
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(stringResource(labelRes))
+                                Text(
+                                    text = batteryImpact,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = if (minutes <= 10) {
+                                        MaterialTheme.colorScheme.error
+                                    } else if (minutes == 15L) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.tertiary
+                                    }
+                                )
+                            }
+                        },
+                        leadingContent = {
+                            androidx.compose.material3.RadioButton(
+                                selected = viewModel.pollingInterval == minutes,
+                                onClick = null,
+                                enabled = enabled
+                            )
+                        },
+                        modifier = Modifier.clickable(enabled = enabled) {
+                            viewModel.updatePollingInterval(minutes)
+                        }
+                    )
+                }
+
+                if (viewModel.pollingInterval <= 10) {
+                    Card(
+                        modifier = Modifier.padding(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.settings_notifications_doze_warning_title),
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_notifications_doze_warning_description),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                        }
+                    }
+                }
+            }
 
             // Battery Optimization Settings
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -390,6 +607,7 @@ fun NotificationSettingsScreen(
             val observer = LifecycleEventObserver { _, event ->
                 if (event == Lifecycle.Event.ON_RESUME) {
                     viewModel.refreshBatteryOptimizationStatus()
+                    viewModel.refreshExactAlarmPermission()
                 }
             }
             lifecycleOwner.lifecycle.addObserver(observer)
@@ -401,6 +619,7 @@ fun NotificationSettingsScreen(
 
         LaunchedEffect(Unit) {
             viewModel.refreshBatteryOptimizationStatus()
+            viewModel.refreshExactAlarmPermission()
         }
     }
 }

@@ -63,24 +63,6 @@ class NotificationForegroundService : Service() {
     private var websocketJob: Job? = null
     private lateinit var notificationHelper: NotificationHelper
 
-    private fun shouldNotifyMessage(channelId: String, serverId: String?, isMention: Boolean): Boolean {
-        return try {
-            val channel = RevoltAPI.channelCache[channelId]
-
-            when {
-                channel == null -> false
-                channel.type == "SavedMessages" -> false
-                CurrentChannelState.shouldFilterNotification(channelId) -> {
-                    logcat(LogPriority.DEBUG) { "Notification filtered: message is for currently active channel $channelId (app in foreground)" }
-                    false
-                }
-                else -> NotificationSettingsProvider.shouldNotify(channelId, serverId, isMention)
-            }
-        } catch (e: Exception) {
-            logcat(LogPriority.ERROR) { "Notification logic failed: ${e.message}" }
-            isMention
-        }
-    }
 
     override fun onCreate() {
         super.onCreate()
@@ -174,52 +156,40 @@ class NotificationForegroundService : Service() {
             val channel = RevoltAPI.channelCache[channelId]
             val serverId = channel?.server
 
-            if (messageFrame.author == RevoltAPI.selfId) {
-                return
-            }
+            val message = chat.revolt.api.schemas.Message(
+                id = messageFrame.id,
+                nonce = null,
+                channel = channelId,
+                author = messageFrame.author,
+                content = messageFrame.content,
+                system = null,
+                attachments = messageFrame.attachments,
+                edited = messageFrame.edited,
+                embeds = messageFrame.embeds,
+                mentions = messageFrame.mentions,
+                replies = messageFrame.replies,
+                reactions = null,
+                interactions = null,
+                masquerade = messageFrame.masquerade,
+                webhook = null
+            )
 
-            val selfId = RevoltAPI.selfId ?: return
-            
-            val suppressEveryoneMentions = NotificationSettingsProvider.shouldSuppressEveryoneMentions(channelId, serverId)
-            val containsEveryone = messageFrame.content?.contains("@everyone") == true
-            val containsHere = messageFrame.content?.contains("@here") == true
-            
-            if (suppressEveryoneMentions && (containsEveryone || containsHere)) {
-                return
-            }
-            
-            val hasDirectMention = messageFrame.mentions?.contains(selfId) == true
-            val hasMassMention = containsEveryone || containsHere
-            
-        withContext(Dispatchers.Main) {
-                
-                var hasRoleMention = false
-                if (serverId != null && messageFrame.content != null) {
-                    val mentionedRoleIds = chat.revolt.internals.text.MessageProcessor.findMentionedRoleIDs(messageFrame.content)
-                    if (mentionedRoleIds.isNotEmpty()) {
-                        val member = RevoltAPI.members.getMember(serverId, selfId)
-                        val userRoles = member?.roles ?: emptyList()
-                        hasRoleMention = mentionedRoleIds.any { roleId -> userRoles.contains(roleId) }
-                    }
-                }
-                
-                val isMention = hasDirectMention || hasMassMention || hasRoleMention
+            val filterResult = NotificationMessageFilter.shouldNotifyMessage(message, channel)
 
-                if (shouldNotifyMessage(channelId, serverId, isMention)) {
-                    val author = RevoltAPI.userCache[messageFrame.author]
-                    val server = serverId?.let { RevoltAPI.serverCache[it] }
+            if (filterResult.shouldNotify) {
+                val author = RevoltAPI.userCache[messageFrame.author]
+                val server = serverId?.let { RevoltAPI.serverCache[it] }
 
-                    notificationHelper.showMessageNotification(
-                        messageFrame = messageFrame,
-                        author = author,
-                        channel = channel,
-                        server = server
-                    )
+                notificationHelper.showMessageNotification(
+                    messageFrame = messageFrame,
+                    author = author,
+                    channel = channel,
+                    server = server
+                )
 
-                    logcat(LogPriority.DEBUG) { "Showed notification for message ${messageFrame.id}" }
-                } else {
-                    logcat(LogPriority.DEBUG) { "Notification filtered out for channel $channelId" }
-                }
+                logcat(LogPriority.DEBUG) { "Showed notification for message ${messageFrame.id}" }
+            } else {
+                logcat(LogPriority.DEBUG) { "Notification filtered out for channel $channelId" }
             }
         } catch (e: Exception) {
             logcat(LogPriority.ERROR) { "Error handling message notification: ${e.message}" }
