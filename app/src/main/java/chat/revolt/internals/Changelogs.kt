@@ -91,7 +91,7 @@ class Changelogs(val context: Context, val kvStorage: KVStorage? = null) {
                     <h3>What's New:</h3>
                     <ul>
                         <li><strong>First pass at Stoat link updates</strong></li>
-                        <li><strong>Users can now generate invite links from the Server and Channel Context menus. (Long press to see!)</strong></li>
+                        <li><strong>Users can now generate invite links from the Server and Channel Context menus. (Long press a server or channel to see!)</strong></li>
                     </ul>
                 """.trimIndent()
                 1003007L -> """
