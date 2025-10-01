@@ -63,7 +63,7 @@ const val REVOLT_MARKETING = "https://stoat.chat"
 val REVOLT_FILES =
     if (USE_ALPHA_API) "https://alpha.revolt.chat/autumn" else "https://cdn.stoatusercontent.com"
 val REVOLT_JANUARY =
-    if (USE_ALPHA_API) "https://alpha.revolt.chat/january" else "https://jan.revolt.chat"
+    if (USE_ALPHA_API) "https://alpha.revolt.chat/january" else "https://proxy.stoatusercontent.com"
 const val REVOLT_APP = "https://stoat.chat"
 const val REVOLT_INVITES = "https://stt.gg"
 val REVOLT_WEBSOCKET =
