@@ -18,9 +18,6 @@ class NotificationServiceManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val kvStorage: KVStorage
 ) {
-    companion object {
-        private const val KEY_BACKGROUND_SERVICE_ENABLED = "notification_background_service_enabled"
-    }
 
     private fun hasNotificationPermission(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

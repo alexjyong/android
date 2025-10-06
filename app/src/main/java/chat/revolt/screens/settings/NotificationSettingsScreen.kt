@@ -75,9 +75,6 @@ class NotificationSettingsScreenViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val kvStorage: KVStorage
 ) : ViewModel() {
-    companion object {
-        private const val KEY_BACKGROUND_SERVICE_ENABLED = "notification_background_service_enabled"
-    }
 
     var isBatteryOptimizationDisabled by mutableStateOf(false)
         private set
@@ -105,9 +102,11 @@ class NotificationSettingsScreenViewModel @Inject constructor(
             if (hasNotificationPermission()) {
                 when (notificationMode) {
                     chat.revolt.services.NotificationMode.INSTANT -> {
+                        chat.revolt.services.NotificationPollingService.stop(context)
                         chat.revolt.services.NotificationForegroundService.start(context)
                     }
                     chat.revolt.services.NotificationMode.BATTERY_SAVER -> {
+                        chat.revolt.services.NotificationForegroundService.stop(context)
                         chat.revolt.services.NotificationPollingService.start(context, pollingInterval)
                     }
                     chat.revolt.services.NotificationMode.OFF -> {
@@ -184,7 +183,8 @@ class NotificationSettingsScreenViewModel @Inject constructor(
             chat.revolt.api.settings.NotificationSettingsProvider.setPollingInterval(intervalMinutes)
 
             if (notificationMode == chat.revolt.services.NotificationMode.BATTERY_SAVER) {
-                chat.revolt.services.NotificationPollingService.updateInterval(context, intervalMinutes)
+                chat.revolt.services.NotificationPollingService.stop(context)
+                chat.revolt.services.NotificationPollingService.start(context, intervalMinutes)
             }
         }
     }
