@@ -23,7 +23,7 @@ val accompanistVersion = "0.34.0"
 val okhttpVersion = "4.12.0"
 val navVersion = "2.9.0"
 val hiltVersion = "2.57"
-val glideVersion = "4.16.0"
+val glideVersion = "5.0.5"
 val ktorVersion = "3.0.0-beta-2"
 val media3Version = "1.7.1"
 val material3Version = "1.4.0-alpha15"
@@ -67,20 +67,21 @@ fun property(fileName: String, propertyName: String, fallbackEnv: String? = null
     }
 }
 
-// Calls property but with revoltbuild.properties as the first argument
+// Calls property but with stoatbuild.properties as the first argument
 fun buildproperty(propertyName: String, fallbackEnv: String? = null): String? {
-    return property("revoltbuild.properties", propertyName, fallbackEnv)
+    return property("stoatbuild.properties", propertyName, fallbackEnv)
 }
 
 android {
     compileSdk = 36
+    namespace = "chat.stoat"
 
     defaultConfig {
         applicationId = "chat.revolt"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
-        versionCode = Integer.parseInt("001_003_206".replace("_", ""), 10)
-        versionName = "1.3.6b"
+        versionCode = Integer.parseInt("001_003_207".replace("_", ""), 10)
+        versionName = "1.3.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -159,7 +160,6 @@ android {
     androidResources {
         generateLocaleConfig = true
     }
-    namespace = "chat.revolt"
     externalNativeBuild {
         cmake {
             path(file("src/main/cpp/CMakeLists.txt"))
@@ -241,6 +241,7 @@ dependencies {
     // Glide - Image Loading
     implementation("com.github.bumptech.glide:glide:$glideVersion")
     implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+    implementation("com.github.bumptech.glide:okhttp3-integration:5.0.5")
     ksp("com.github.bumptech.glide:ksp:$glideVersion")
 
     // AboutLibraries - automated OSS library attribution
@@ -313,9 +314,6 @@ dependencies {
     // Square Logcat
     implementation("com.squareup.logcat:logcat:0.1")
 
-    // Librevolt
-    implementation("librevolt:librevolt-jvm:0.1.0")
-
     // Testing
     androidTestImplementation("androidx.test:runner:$androidXTestVersion")
     androidTestImplementation("androidx.test:rules:$androidXTestVersion")
@@ -344,7 +342,7 @@ aboutLibraries {
 sqldelight {
     databases {
         create("Database") {
-            packageName.set("chat.revolt.persistence")
+            packageName.set("chat.stoat.persistence")
         }
     }
 }

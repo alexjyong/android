@@ -8,7 +8,7 @@ export default defineConfig({
     base: "/android",
     integrations: [
         starlight({
-            title: "Revolt on Android Technical Documentation",
+            title: "Stoat for Android Technical Documentation",
             social: {
                 github: "https://github.com/revoltchat/android",
             },

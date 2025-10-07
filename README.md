@@ -1,6 +1,6 @@
 <div align="center">
-    <h1>Revolt for Android</h1>
-    <p>Official <a href="https://revolt.chat">Revolt</a> Android app.</p>
+    <h1>Stoat for Android</h1>
+    <p>Official <a href="https://stoat.chat">Stoat</a> Android app.</p>
     <br/><br/>
     <div>
         <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" width="200">
@@ -12,7 +12,7 @@
 
 ## Description
 
-The codebase includes the app itself, as well as an internal library for interacting with the Revolt
+The codebase includes the app itself, as well as an internal library for interacting with the Stoat
 API. The app is written in Kotlin, and wholly
 uses [Jetpack Compose](https://developer.android.com/jetpack/compose).
 
@@ -28,20 +28,20 @@ uses [Jetpack Compose](https://developer.android.com/jetpack/compose).
 
 ## Resources
 
-### Revolt for Android
+### Stoat for Android
 
 - [Roadmap](https://op.revolt.wtf/projects/revolt-for-android/work_packages)
-- [Revolt for Android Technical Documentation](https://revoltchat.github.io/android/)
+- [Stoat for Android Technical Documentation](https://revoltchat.github.io/android/)
 - [Android-specific Contribution Guide](https://revoltchat.github.io/android/contributing/guidelines/)
   &mdash;**read carefully before contributing!**
 
-### Revolt
+### Stoat
 
-- [Revolt Project Board](https://github.com/revoltchat/revolt/discussions) (Submit feature requests
+- [Stoat Project Board](https://github.com/revoltchat/revolt/discussions) (Submit feature requests
   here)
-- [Revolt Development Server](https://app.revolt.chat/invite/API)
-- [Revolt Server](https://app.revolt.chat/invite/Testers)
-- [General Revolt Contribution Guide](https://developers.revolt.chat/contrib.html)
+- [Stoat Development Server](https://app.revolt.chat/invite/API)
+- [Stoat Server](https://app.revolt.chat/invite/Testers)
+- [General Stoat Contribution Guide](https://developers.revolt.chat/contrib.html)
 
 ## Quick Start
 
