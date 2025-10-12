@@ -41,6 +41,7 @@ import chat.stoat.StoatApplication
 import chat.stoat.api.settings.Experiments
 import chat.stoat.api.settings.FeatureFlags
 import chat.stoat.api.settings.LoadedSettings
+import chat.stoat.composables.markdown.RichMarkdown
 import chat.stoat.persistence.KVStorage
 import chat.stoat.settings.dsl.SettingsPage
 import chat.stoat.settings.dsl.SubcategoryContentInsets
@@ -306,7 +307,7 @@ fun ExperimentsSettingsScreen(
                 Text("Voice Chats 2.0")
             },
             supportingContent = {
-                Text("Enable voice chats support.")
+                RichMarkdown("Enable voice chats support.\n‼️ **Not available in this build!** ‼️")
             },
             trailingContent = {
                 Switch(
