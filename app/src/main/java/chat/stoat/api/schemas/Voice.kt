@@ -6,8 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ChannelVoiceState(
     val id: String,
-    val participants: List<UserVoiceState>,
-    val node: String,
+    val participants: List<UserVoiceState> = emptyList(),
 )
 
 @Serializable
@@ -17,4 +16,5 @@ data class UserVoiceState(
     @SerialName("is_publishing") val isPublishing: Boolean,
     val screensharing: Boolean,
     val camera: Boolean,
+    @SerialName(value = "joined_at") val joinedAt: String? = null,
 )

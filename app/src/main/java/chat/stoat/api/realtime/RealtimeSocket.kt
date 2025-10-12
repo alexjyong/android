@@ -244,6 +244,10 @@ object RealtimeSocket {
                 val emojiMap = readyFrame.emojis.associateBy { it.id!! }
                 StoatAPI.emojiCache.putAll(emojiMap)
 
+                logcat { "Adding voice states to cache." }
+                val voiceStateMap = readyFrame.voiceStates.associateBy { it.id }
+                StoatAPI.voiceStateCache.putAll(voiceStateMap)
+
                 Log.d("RealtimeSocket", "Registering push notification channels.")
                 channelRegistrator.register()
 

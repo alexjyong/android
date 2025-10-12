@@ -30,6 +30,7 @@ object Experiments {
     val usePolar = ExperimentInstance(false)
     val enableServerIdentityOptions = ExperimentInstance(false)
     val useFinalMarkdownRenderer = ExperimentInstance(false)
+    val useVoiceChats2p0 = ExperimentInstance(false)
 
     suspend fun hydrateWithKv() {
         val kvStorage = KVStorage(StoatApplication.instance)
@@ -51,6 +52,9 @@ object Experiments {
         )
         useFinalMarkdownRenderer.setEnabled(
             kvStorage.getBoolean("exp/useFinalMarkdownRenderer") == true
+        )
+        useVoiceChats2p0.setEnabled(
+            kvStorage.getBoolean("exp/useVoiceChats2p0") == true
         )
 
         if (useFinalMarkdownRenderer.isEnabled && useKotlinBasedMarkdownRenderer.isEnabled) {

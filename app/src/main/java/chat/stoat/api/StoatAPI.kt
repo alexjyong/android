@@ -13,6 +13,7 @@ import chat.stoat.api.realtime.RealtimeSocket
 import chat.stoat.api.routes.user.fetchSelf
 import chat.stoat.api.schemas.AutumnResource
 import chat.stoat.api.schemas.ChannelType
+import chat.stoat.api.schemas.ChannelVoiceState
 import chat.stoat.api.schemas.Emoji
 import chat.stoat.api.schemas.Message
 import chat.stoat.api.schemas.Server
@@ -155,6 +156,7 @@ object StoatAPI {
     val channelCache = mutableStateMapOf<String, ChannelSchema>()
     val emojiCache = mutableStateMapOf<String, Emoji>()
     val messageCache = mutableStateMapOf<String, Message>()
+    val voiceStateCache = mutableStateMapOf<String, ChannelVoiceState>()
 
     val members = Members()
 

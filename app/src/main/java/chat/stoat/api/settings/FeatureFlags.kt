@@ -43,19 +43,6 @@ sealed class MassMentionsVariates {
     object Disabled : MassMentionsVariates()
 }
 
-@FeatureFlag("VoiceChannels2_0")
-sealed class VoiceChannels2_0Variates {
-    @Treatment(
-        "Enable the new voice channels 2.0 for all users"
-    )
-    object Enabled : VoiceChannels2_0Variates()
-
-    @Treatment(
-        "Disable the new voice channels 2.0 for all users"
-    )
-    object Disabled : VoiceChannels2_0Variates()
-}
-
 @FeatureFlag("FinalMarkdown")
 sealed class FinalMarkdownVariates {
     @Treatment(
@@ -103,16 +90,6 @@ object FeatureFlags {
         get() = when (massMentions) {
             is MassMentionsVariates.Enabled -> true
             is MassMentionsVariates.Disabled -> false
-        }
-
-    @FeatureFlag("VoiceChannels2_0")
-    var voiceChannels2_0 by mutableStateOf<VoiceChannels2_0Variates>(
-        VoiceChannels2_0Variates.Disabled
-    )
-    val voiceChannels2_0Granted: Boolean
-        get() = when (voiceChannels2_0) {
-            is VoiceChannels2_0Variates.Enabled -> true
-            is VoiceChannels2_0Variates.Disabled -> false
         }
 
     @FeatureFlag("FinalMarkdown")

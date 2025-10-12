@@ -6,16 +6,21 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import chat.stoat.R
+import chat.stoat.api.StoatAPI
+import chat.stoat.api.schemas.User
 import chat.stoat.callbacks.Action
 import chat.stoat.callbacks.ActionChannel
 import chat.stoat.composables.screens.chat.StackedUserAvatars
@@ -24,6 +29,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun JoinVoiceChannelButton(channelId: String, modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
+    val voiceStatesForChannel = StoatAPI.voiceStateCache[channelId]
 
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -36,26 +42,47 @@ fun JoinVoiceChannelButton(channelId: String, modifier: Modifier = Modifier) {
             .padding(16.dp)
             .fillMaxWidth()
     ) {
-        StackedUserAvatars(
-            listOf(
-                "01FHGJ3NPP7XANQQH8C2BE44ZY",
-                "01F1WKM5TK2V6KCZWR6DGBJDTZ",
-                "01EX2NCWQ0CHS3QJF0FEQS1GR4"
-            ),
-            size = 24.dp,
-            offset = 12.dp,
-            amount = 3,
-            serverId = null
-        )
+        if (voiceStatesForChannel?.participants?.isNotEmpty() == true) {
+            StackedUserAvatars(
+                users = voiceStatesForChannel.participants.map { it.id },
+                size = 24.dp,
+                offset = 12.dp,
+                amount = voiceStatesForChannel.participants.size,
+                serverId = null
+            )
+        } else {
+            Icon(
+                painter = painterResource(R.drawable.icn_voice_chat_24dp),
+                contentDescription = null,
+                modifier = Modifier.size(24.dp)
+            )
+        }
         Text(
             stringResource(R.string.voice_join_offering),
             style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Start
         )
         Text(
-            stringResource(R.string.voice_join_offering_description_other, Integer.MAX_VALUE),
+            when {
+                voiceStatesForChannel == null || voiceStatesForChannel.participants.isEmpty() ->
+                    stringResource(R.string.voice_join_offering_description_zero)
+
+                voiceStatesForChannel.participants.size == 1 ->
+                    stringResource(
+                        R.string.voice_join_offering_description_one,
+                        voiceStatesForChannel.participants[0].id.let {
+                            StoatAPI.userCache[it]?.let { u -> User.resolveDefaultName(u) }
+                                ?: R.string.unknown
+                        })
+
+                else ->
+                    stringResource(
+                        R.string.voice_join_offering_description_other,
+                        voiceStatesForChannel.participants.size
+                    )
+            },
             style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Start
         )
     }
 }

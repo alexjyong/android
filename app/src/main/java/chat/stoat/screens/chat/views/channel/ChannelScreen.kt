@@ -118,7 +118,7 @@ import chat.stoat.api.routes.channel.react
 import chat.stoat.api.routes.microservices.autumn.FileArgs
 import chat.stoat.api.schemas.ChannelType
 import chat.stoat.api.schemas.Message
-import chat.stoat.api.settings.FeatureFlags
+import chat.stoat.api.settings.Experiments
 import chat.stoat.callbacks.Action
 import chat.stoat.callbacks.ActionChannel
 import chat.stoat.composables.chat.DateDivider
@@ -943,8 +943,9 @@ fun ChannelScreen(
                                     }
                                 }
 
-                                if (viewModel.channel?.channelType == ChannelType.VoiceChannel
-                                    && FeatureFlags.voiceChannels2_0Granted
+                                if (viewModel.channel?.voice != null &&
+                                    channelPermissions has PermissionBit.Connect &&
+                                    Experiments.useVoiceChats2p0.isEnabled
                                 ) {
                                     JoinVoiceChannelButton(channelId)
                                 }
