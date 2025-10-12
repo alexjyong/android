@@ -166,12 +166,16 @@ class ChatRouterViewModel @Inject constructor(
             val current = kvStorage.get("currentDestination")
             setSaveDestination(ChatRouterDestination.fromString(current ?: ""))
 
-            latestChangelogRead = changelogs.hasSeenCurrent()
-            latestChangelog = changelogs.getLatestChangelogCode()
-            latestChangelogBody =
-                changelogs.fetchChangelogByVersionCode(latestChangelog.toLong()).rendered
-            if (!latestChangelogRead) {
-                changelogs.markAsSeen()
+            try {
+                latestChangelogRead = changelogs.hasSeenCurrent()
+                latestChangelog = changelogs.getLatestChangelogCode()
+                latestChangelogBody =
+                    changelogs.fetchChangelogByVersionCode(latestChangelog.toLong()).rendered
+                if (!latestChangelogRead) {
+                    changelogs.markAsSeen()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
 
             val seenEarlyAccess = kvStorage.getBoolean("spark/earlyAccess/dismissed")

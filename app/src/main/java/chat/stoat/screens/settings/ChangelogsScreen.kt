@@ -61,16 +61,24 @@ class ChangelogsSettingsScreenViewModel @Inject constructor(
 
     suspend fun requestChangelog(version: String) {
         viewModelScope.launch {
-            renderedChangelog = Changelogs(
-                context,
-                kvStorage
-            ).fetchChangelogByVersionCode(version.toLong()).rendered
+            try {
+                renderedChangelog = Changelogs(
+                    context,
+                    kvStorage
+                ).fetchChangelogByVersionCode(version.toLong()).rendered
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
     suspend fun populate() {
         viewModelScope.launch {
-            index = Changelogs(context, kvStorage).fetchChangelogIndex()
+            try {
+                index = Changelogs(context, kvStorage).fetchChangelogIndex()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 }

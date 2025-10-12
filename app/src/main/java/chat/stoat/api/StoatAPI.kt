@@ -63,11 +63,11 @@ val STOAT_FILES =
     if (USE_ALPHA_API) "https://alpha.revolt.chat/autumn" else "https://cdn.stoatusercontent.com"
 val STOAT_PROXY =
     if (USE_ALPHA_API) "https://alpha.revolt.chat/january" else "https://proxy.stoatusercontent.com"
-const val STOAT_WEB_APP = "https://stoat.chat/app"
+const val STOAT_WEB_APP = "https://stoat.chat"
 const val STOAT_INVITES = "https://stt.gg"
 val STOAT_WEBSOCKET =
     if (USE_ALPHA_API) "wss://alpha.revolt.chat/ws" else "wss://events.stoat.chat"
-const val STOAT_KJBOOK = "https://revoltchat.github.io/android"
+const val STOAT_KJBOOK = "https://stoatchat.github.io/for-android"
 
 fun String.api(): String {
     return "$STOAT_BASE$this"
