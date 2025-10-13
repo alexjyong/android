@@ -19,5 +19,14 @@
           "kotlin.kotlin"
         ]
       }
+    },
+    "runArgs": [
+      "--memory=32gb",
+      "--cpus=8"
+    ],
+    "hostRequirements": {
+      "cpus": 8,
+      "memory": "32gb",
+      "storage": "64gb"
     }
   }
