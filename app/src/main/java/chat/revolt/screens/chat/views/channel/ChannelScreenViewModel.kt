@@ -887,7 +887,6 @@ class ChannelScreenViewModel @Inject constructor(
                         }
 
                         typingUsers.clear()
-                        listenToWsEvents()
                     }
                 }
             }.catch {
