@@ -93,7 +93,9 @@ object RealtimeSocket {
             RevoltHttp.ws(REVOLT_WEBSOCKET) {
                 socket = this
 
-                Log.d("RealtimeSocket", "WebSocket connection opened.")
+                Log.d("RealtimeSocket", "Connected to websocket.")
+                updateDisconnectionState(DisconnectionState.Connected)
+                pushReconnectEvent()
 
                 // Send authorization frame
                 val authFrame = AuthorizationFrame("Authenticate", token)
@@ -122,9 +124,11 @@ object RealtimeSocket {
                 }
             }
         } finally {
-            // Always set to disconnected when the websocket closes, regardless of reason
-            Log.d("RealtimeSocket", "WebSocket connection closed.")
-            updateDisconnectionState(DisconnectionState.Disconnected)
+            // When websocket closes (for any reason), mark as disconnected
+            Log.d("RealtimeSocket", "WebSocket connection closed, marking as disconnected.")
+            if (disconnectionState == DisconnectionState.Connected) {
+                updateDisconnectionState(DisconnectionState.Disconnected)
+            }
         }
     }
 
@@ -816,10 +820,6 @@ object RealtimeSocket {
             }
 
             "Authenticated" -> {
-                Log.d("RealtimeSocket", "Authentication successful. Now connected.")
-                updateDisconnectionState(DisconnectionState.Connected)
-                pushReconnectEvent()
-
                 SyncedSettings.fetch()
                 LoadedSettings.hydrateWithSettings(SyncedSettings)
             }
