@@ -89,37 +89,45 @@ object RealtimeSocket {
 
         socket?.close(CloseReason(CloseReason.Codes.NORMAL, "Reconnecting to websocket."))
 
-        RevoltHttp.ws(REVOLT_WEBSOCKET) {
-            socket = this
+        try {
+            RevoltHttp.ws(REVOLT_WEBSOCKET) {
+                socket = this
 
-            Log.d("RealtimeSocket", "Connected to websocket.")
-            updateDisconnectionState(DisconnectionState.Connected)
-            pushReconnectEvent()
+                Log.d("RealtimeSocket", "Connected to websocket.")
+                updateDisconnectionState(DisconnectionState.Connected)
+                pushReconnectEvent()
 
-            // Send authorization frame
-            val authFrame = AuthorizationFrame("Authenticate", token)
-            val authFrameString =
-                RevoltJson.encodeToString(AuthorizationFrame.serializer(), authFrame)
+                // Send authorization frame
+                val authFrame = AuthorizationFrame("Authenticate", token)
+                val authFrameString =
+                    RevoltJson.encodeToString(AuthorizationFrame.serializer(), authFrame)
 
-            Log.d(
-                "RealtimeSocket",
-                "Sending authorization frame: ${
-                    authFrameString.replace(
-                        token,
-                        "X".repeat(token.length)
-                    )
-                }"
-            )
-            send(RevoltJson.encodeToString(AuthorizationFrame.serializer(), authFrame))
+                Log.d(
+                    "RealtimeSocket",
+                    "Sending authorization frame: ${
+                        authFrameString.replace(
+                            token,
+                            "X".repeat(token.length)
+                        )
+                    }"
+                )
+                send(RevoltJson.encodeToString(AuthorizationFrame.serializer(), authFrame))
 
-            incoming.consumeEach { frame ->
-                if (frame is Frame.Text) {
-                    val frameString = frame.readText()
-                    val frameType =
-                        RevoltJson.decodeFromString(AnyFrame.serializer(), frameString).type
+                incoming.consumeEach { frame ->
+                    if (frame is Frame.Text) {
+                        val frameString = frame.readText()
+                        val frameType =
+                            RevoltJson.decodeFromString(AnyFrame.serializer(), frameString).type
 
-                    handleFrame(frameType, frameString)
+                        handleFrame(frameType, frameString)
+                    }
                 }
+            }
+        } finally {
+            // When websocket closes (for any reason), mark as disconnected
+            Log.d("RealtimeSocket", "WebSocket connection closed, marking as disconnected.")
+            if (disconnectionState == DisconnectionState.Connected) {
+                updateDisconnectionState(DisconnectionState.Disconnected)
             }
         }
     }
