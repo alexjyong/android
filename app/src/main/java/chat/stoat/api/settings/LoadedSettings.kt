@@ -25,7 +25,9 @@ object LoadedSettings {
     var poorlyFormedSettingsKeys by mutableStateOf(emptySet<String>())
 
     fun hydrateWithSettings(settings: SyncedSettings) {
-        this.theme = settings.android.theme?.let { Theme.valueOf(it) } ?: getDefaultTheme()
+        this.theme = settings.android.theme?.let {
+            if (it == "Revolt") Theme.Default else Theme.valueOf(it)
+        } ?: getDefaultTheme()
         this.messageReplyStyle =
             settings.android.messageReplyStyle?.let { MessageReplyStyle.valueOf(it) }
                 ?: MessageReplyStyle.SwipeFromEnd
