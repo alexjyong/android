@@ -628,6 +628,18 @@
     <string name="voice_error_no_nodes">All voice nodes are unavailable at the moment. Please try again later.</string>
     <string name="voice_error_generic">An error occurred. Please try again later.</string>
 
+    <string name="voice_muted">Muted</string>
+    <string name="voice_deafened">Deafened</string>
+    <string name="voice_screen_sharing">Sharing their screen</string>
+    <string name="voice_camera_on">Camera on</string>
+
+    <string name="voice_action_disconnect">Disconnect</string>
+
+    <string name="voice_status_connecting">Connecting…</string>
+    <string name="voice_status_reconnecting">Reconnecting…</string>
+    <string name="voice_status_connected">Connected</string>
+    <string name="voice_status_disconnected">No connection</string>
+
     <string name="spark_notifications_rationale">Stay in the loop</string>
     <string name="spark_notifications_rationale_description">Enable notifications to be kept up to date with messages and mentions.</string>
     <string name="spark_notifications_rationale_cta">Enable notifications</string>

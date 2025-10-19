@@ -513,11 +513,7 @@ class ChannelScreenViewModel @Inject constructor(
 
     suspend fun listenToWsEvents() {
         withContext(StoatAPI.realtimeContext) {
-            flow {
-                while (true) {
-                    emit(StoatAPI.wsFrameChannel.receive())
-                }
-            }.onEach {
+            StoatAPI.wsFrameChannel.onEach {
                 when (it) {
                     is MessageFrame -> {
                         if (it.channel != channel?.id) return@onEach

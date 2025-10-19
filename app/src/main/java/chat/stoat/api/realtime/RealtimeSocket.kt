@@ -29,8 +29,13 @@ import chat.stoat.api.realtime.frames.receivable.ServerMemberUpdateFrame
 import chat.stoat.api.realtime.frames.receivable.ServerRoleDeleteFrame
 import chat.stoat.api.realtime.frames.receivable.ServerRoleUpdateFrame
 import chat.stoat.api.realtime.frames.receivable.ServerUpdateFrame
+import chat.stoat.api.realtime.frames.receivable.UserMoveVoiceChannelFrame
 import chat.stoat.api.realtime.frames.receivable.UserRelationshipFrame
 import chat.stoat.api.realtime.frames.receivable.UserUpdateFrame
+import chat.stoat.api.realtime.frames.receivable.UserVoiceStateUpdateFrame
+import chat.stoat.api.realtime.frames.receivable.VoiceChannelJoinFrame
+import chat.stoat.api.realtime.frames.receivable.VoiceChannelLeaveFrame
+import chat.stoat.api.realtime.frames.receivable.VoiceChannelMoveFrame
 import chat.stoat.api.realtime.frames.sendable.AuthorizationFrame
 import chat.stoat.api.realtime.frames.sendable.BeginTypingFrame
 import chat.stoat.api.realtime.frames.sendable.EndTypingFrame
@@ -38,6 +43,7 @@ import chat.stoat.api.realtime.frames.sendable.PingFrame
 import chat.stoat.api.routes.server.fetchMember
 import chat.stoat.api.schemas.Channel
 import chat.stoat.api.schemas.ChannelType
+import chat.stoat.api.schemas.ChannelVoiceState
 import chat.stoat.api.schemas.Role
 import chat.stoat.api.settings.LoadedSettings
 import chat.stoat.api.settings.SyncedSettings
@@ -248,6 +254,8 @@ object RealtimeSocket {
                 val voiceStateMap = readyFrame.voiceStates.associateBy { it.id }
                 StoatAPI.voiceStateCache.putAll(voiceStateMap)
 
+                logcat { "New voice states: ${voiceStateMap}" }
+
                 Log.d("RealtimeSocket", "Registering push notification channels.")
                 channelRegistrator.register()
 
@@ -277,7 +285,7 @@ object RealtimeSocket {
                     StoatAPI.channelCache[it] =
                         StoatAPI.channelCache[it]!!.copy(lastMessageID = messageFrame.id)
 
-                    StoatAPI.wsFrameChannel.send(messageFrame)
+                    StoatAPI.wsFrameChannel.emit(messageFrame)
                 }
             }
 
@@ -305,7 +313,7 @@ object RealtimeSocket {
 
                 StoatAPI.messageCache[messageAppendFrame.id] = message!!
 
-                StoatAPI.wsFrameChannel.send(messageAppendFrame)
+                StoatAPI.wsFrameChannel.emit(messageAppendFrame)
             }
 
             "MessageUpdate" -> {
@@ -352,7 +360,7 @@ object RealtimeSocket {
                     }
                 }
 
-                StoatAPI.wsFrameChannel.send(messageUpdateFrame)
+                StoatAPI.wsFrameChannel.emit(messageUpdateFrame)
             }
 
             "MessageDelete" -> {
@@ -373,7 +381,7 @@ object RealtimeSocket {
                 }
 
                 StoatAPI.messageCache.remove(messageDeleteFrame.id)
-                StoatAPI.wsFrameChannel.send(messageDeleteFrame)
+                StoatAPI.wsFrameChannel.emit(messageDeleteFrame)
             }
 
             "MessageReact" -> {
@@ -402,7 +410,7 @@ object RealtimeSocket {
                 StoatAPI.messageCache[messageReactFrame.id] =
                     oldMessage.copy(reactions = reactions)
 
-                StoatAPI.wsFrameChannel.send(messageReactFrame)
+                StoatAPI.wsFrameChannel.emit(messageReactFrame)
             }
 
             "MessageUnreact" -> {
@@ -436,7 +444,7 @@ object RealtimeSocket {
                 StoatAPI.messageCache[messageUnreactFrame.id] =
                     oldMessage.copy(reactions = reactions)
 
-                StoatAPI.wsFrameChannel.send(messageUnreactFrame)
+                StoatAPI.wsFrameChannel.emit(messageUnreactFrame)
             }
 
             "UserUpdate" -> {
@@ -567,7 +575,7 @@ object RealtimeSocket {
                     )
                 }
 
-                StoatAPI.wsFrameChannel.send(channelDeleteFrame)
+                StoatAPI.wsFrameChannel.emit(channelDeleteFrame)
             }
 
             "ChannelAck" -> {
@@ -617,7 +625,7 @@ object RealtimeSocket {
                     "Received channel start typing frame for ${channelStartTypingFrame.id}."
                 )
 
-                StoatAPI.wsFrameChannel.send(channelStartTypingFrame)
+                StoatAPI.wsFrameChannel.emit(channelStartTypingFrame)
             }
 
             "ChannelStopTyping" -> {
@@ -628,7 +636,7 @@ object RealtimeSocket {
                     "Received channel stop typing frame for ${channelStopTypingFrame.id}."
                 )
 
-                StoatAPI.wsFrameChannel.send(channelStopTypingFrame)
+                StoatAPI.wsFrameChannel.emit(channelStopTypingFrame)
             }
 
             "ServerUpdate" -> {
@@ -812,6 +820,99 @@ object RealtimeSocket {
                     server.copy(roles = newRoles)
             }
 
+            "VoiceChannelJoin" -> {
+                val voiceChannelJoinFrame =
+                    StoatJson.decodeFromString(VoiceChannelJoinFrame.serializer(), rawFrame)
+
+                logcat { "Received voice channel join frame for channel ${voiceChannelJoinFrame.id}." }
+
+                val newParticipants =
+                    StoatAPI.voiceStateCache[voiceChannelJoinFrame.id]?.participants?.filter {
+                        it.id != voiceChannelJoinFrame.state.id
+                    }?.toMutableList() ?: mutableListOf()
+                newParticipants.add(voiceChannelJoinFrame.state)
+
+                StoatAPI.voiceStateCache[voiceChannelJoinFrame.id] =
+                    ChannelVoiceState(voiceChannelJoinFrame.id, newParticipants)
+            }
+
+            "VoiceChannelLeave" -> {
+                val voiceChannelLeaveFrame =
+                    StoatJson.decodeFromString(VoiceChannelLeaveFrame.serializer(), rawFrame)
+
+                logcat { "Received voice channel leave frame for channel ${voiceChannelLeaveFrame.id}." }
+
+                val existingChannelState =
+                    StoatAPI.voiceStateCache[voiceChannelLeaveFrame.id] ?: return
+
+                val newParticipants = existingChannelState.participants.filter {
+                    it.id != voiceChannelLeaveFrame.user
+                }
+
+                StoatAPI.voiceStateCache[voiceChannelLeaveFrame.id] =
+                    ChannelVoiceState(voiceChannelLeaveFrame.id, newParticipants)
+            }
+
+            "VoiceChannelMove" -> {
+                val voiceChannelMoveFrame =
+                    StoatJson.decodeFromString(VoiceChannelMoveFrame.serializer(), rawFrame)
+
+                logcat { "Received voice channel move frame from ${voiceChannelMoveFrame.from} to ${voiceChannelMoveFrame.to}." }
+
+                // Remove from old channel
+                val existingFromChannelState =
+                    StoatAPI.voiceStateCache[voiceChannelMoveFrame.from] ?: return
+
+                val newFromParticipants = existingFromChannelState.participants.filter {
+                    it.id != voiceChannelMoveFrame.state.id
+                }
+
+                StoatAPI.voiceStateCache[voiceChannelMoveFrame.from] =
+                    ChannelVoiceState(voiceChannelMoveFrame.from, newFromParticipants)
+
+                // Add to new channel
+                val existingToChannelState =
+                    StoatAPI.voiceStateCache[voiceChannelMoveFrame.to]
+
+                val newToParticipants =
+                    existingToChannelState?.participants?.toMutableList() ?: mutableListOf()
+                newToParticipants.add(voiceChannelMoveFrame.state)
+
+                StoatAPI.voiceStateCache[voiceChannelMoveFrame.to] =
+                    ChannelVoiceState(voiceChannelMoveFrame.to, newToParticipants)
+            }
+
+            "UserVoiceStateUpdate" -> {
+                val userVoiceStateUpdateFrame =
+                    StoatJson.decodeFromString(UserVoiceStateUpdateFrame.serializer(), rawFrame)
+
+                logcat { "Received user voice state update frame for user ${userVoiceStateUpdateFrame.id} in channel ${userVoiceStateUpdateFrame.id}." }
+
+                val existingChannelState =
+                    StoatAPI.voiceStateCache[userVoiceStateUpdateFrame.id] ?: return
+
+                val newParticipants = existingChannelState.participants.map {
+                    if (it.id == userVoiceStateUpdateFrame.id) {
+                        userVoiceStateUpdateFrame.data.overrideInto(it)
+                    } else {
+                        it
+                    }
+                }
+
+                StoatAPI.voiceStateCache[userVoiceStateUpdateFrame.id] =
+                    ChannelVoiceState(userVoiceStateUpdateFrame.id, newParticipants)
+            }
+
+            "UserMoveVoiceChannel" -> {
+                val userMoveVoiceChannelFrame =
+                    StoatJson.decodeFromString(UserMoveVoiceChannelFrame.serializer(), rawFrame)
+
+                logcat { "We got moved into a different channel on node ${userMoveVoiceChannelFrame.node}." }
+
+                // Send message to UI to handle the move
+                StoatAPI.wsFrameChannel.emit(userMoveVoiceChannelFrame)
+            }
+
             "Authenticated" -> {
                 SyncedSettings.fetch()
                 LoadedSettings.hydrateWithSettings(SyncedSettings)
@@ -824,7 +925,7 @@ object RealtimeSocket {
     }
 
     private suspend fun pushReconnectEvent() {
-        StoatAPI.wsFrameChannel.send(RealtimeSocketFrames.Reconnected)
+        StoatAPI.wsFrameChannel.emit(RealtimeSocketFrames.Reconnected)
     }
 
     suspend fun beginTyping(channelId: String) {

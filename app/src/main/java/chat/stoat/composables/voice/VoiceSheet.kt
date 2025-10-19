@@ -1,31 +1,51 @@
 package chat.stoat.composables.voice
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.HorizontalFloatingToolbar
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import chat.stoat.R
+import chat.stoat.api.StoatAPI
+import chat.stoat.api.routes.misc.Root
 import chat.stoat.api.routes.misc.getRootRoute
 import chat.stoat.api.routes.voice.joinCall
 import io.livekit.android.compose.local.RoomLocal
 import io.livekit.android.compose.local.RoomScope
 import io.livekit.android.compose.state.rememberTracks
 import io.livekit.android.compose.ui.VideoTrackView
+import io.livekit.android.room.Room
 import logcat.LogPriority
 import logcat.asLog
 import logcat.logcat
@@ -52,7 +72,17 @@ class VoiceSheetViewModel(private val state: SavedStateHandle) : ViewModel() {
         private set
 
     suspend fun getVoiceToken() {
-        val root = getRootRoute()
+        errorResource = null
+
+        val root: Root
+        try {
+            root = getRootRoute()
+        } catch (e: Exception) {
+            logcat(LogPriority.ERROR) { "Could not get root route\n" + e.asLog() }
+            errorResource = R.string.voice_error_generic
+            return
+        }
+
         val lk = root.features.livekit
 
         if (lk == null) {
@@ -82,6 +112,7 @@ class VoiceSheetViewModel(private val state: SavedStateHandle) : ViewModel() {
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun VoiceSheet(
     channelId: String,
@@ -105,44 +136,166 @@ fun VoiceSheet(
 
         Column {
             LazyColumn(modifier = Modifier.animateContentSize()) {
+                val voiceStates = StoatAPI.voiceStateCache[viewModel.channelId]
+                items(voiceStates?.participants?.size ?: 0) { index ->
+                    val participantState = voiceStates?.participants[index]
+                    participantState?.let {
+                        VoiceParticipant(
+                            state = participantState,
+                            channelId = viewModel.channelId,
+                            speaking = false
+                        )
+                    }
+                }
                 items(trackRefs.size) { index ->
                     VideoTrackView(
                         trackReference = trackRefs[index],
                         modifier = Modifier.fillParentMaxHeight(0.5f)
                     )
                 }
-                item(key = "stats") {
-                    Text("status = ${room.state.name}")
-                }
-                item(key = "controls") {
-                    Button(onClick = {
-                        room.setMicrophoneMute(true)
-                    }) {
-                        Text("mute 🎤🫷😤")
-                    }
-                    Button(onClick = {
-                        room.setMicrophoneMute(false)
-                    }) {
-                        Text("unmute 🗣️📢🔥")
+                item(key = "status") {
+                    AnimatedContent(
+                        room.state
+                    ) { roomState ->
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(
+                                8.dp,
+                                Alignment.CenterHorizontally
+                            ),
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                        ) {
+                            CompositionLocalProvider(
+                                LocalContentColor provides when (roomState) {
+                                    Room.State.CONNECTING, Room.State.RECONNECTING -> MaterialTheme.colorScheme.onSurfaceVariant
+                                    Room.State.CONNECTED -> MaterialTheme.colorScheme.primary
+                                    Room.State.DISCONNECTED -> MaterialTheme.colorScheme.error
+                                }
+                            ) {
+                                Icon(
+                                    painter = painterResource(
+                                        when (roomState) {
+                                            Room.State.CONNECTING -> R.drawable.icn_sprint_24dp
+                                            Room.State.CONNECTED -> R.drawable.icn_wifi_tethering_24dp
+                                            Room.State.DISCONNECTED -> R.drawable.icn_wifi_tethering_error_24dp
+                                            Room.State.RECONNECTING -> R.drawable.icn_sprint_24dp
+                                        }
+                                    ),
+                                    contentDescription = null
+                                )
+                                Text(
+                                    text = when (roomState) {
+                                        Room.State.CONNECTING -> stringResource(R.string.voice_status_connecting)
+                                        Room.State.CONNECTED -> stringResource(R.string.voice_status_connected)
+                                        Room.State.DISCONNECTED -> stringResource(R.string.voice_status_disconnected)
+                                        Room.State.RECONNECTING -> stringResource(R.string.voice_status_reconnecting)
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+
+            AnimatedVisibility(viewModel.errorResource != null) {
+                viewModel.errorResource?.let { resId ->
+                    Text(
+                        text = stringResource(resId),
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
+            HorizontalFloatingToolbar(
+                expanded = true,
+                modifier = Modifier.padding(
+                    start = 8.dp,
+                    end = 8.dp,
+                    bottom = 16.dp,
+                ),
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = 16.dp,
+                    bottom = 16.dp,
+                )
             ) {
                 Button(
-                    colors = ButtonDefaults.buttonColors().copy(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                        disabledContainerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
-                        disabledContentColor = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.5f)
+                    onClick = {
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                     ),
+                    shapes = ButtonDefaults.shapes(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(64.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.icn_mic_off_24dp),
+                        contentDescription = "TODO change this string to res"
+                    )
+                }
+                Spacer(Modifier.width(4.dp))
+                Button(
+                    onClick = {
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    ),
+                    shapes = ButtonDefaults.shapes(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(64.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.icn_videocam_off_24dp),
+                        contentDescription = "TODO change this string to res"
+                    )
+                }
+                Spacer(Modifier.width(4.dp))
+                Button(
+                    onClick = {
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    ),
+                    shapes = ButtonDefaults.shapes(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(64.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.icn_mobile_share_24px),
+                        contentDescription = "TODO change this string to res"
+                    )
+                }
+                Spacer(Modifier.width(4.dp))
+                Button(
                     onClick = {
                         room.disconnect()
                         onDisconnect()
                     },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer
+                    ),
+                    shapes = ButtonDefaults.shapes(),
+                    modifier = Modifier
+                        .weight(2f)
+                        .height(64.dp)
                 ) {
-                    Text("disconnect")
+                    Icon(
+                        painter = painterResource(R.drawable.icn_call_end_24dp__fill),
+                        contentDescription = stringResource(R.string.voice_action_disconnect)
+                    )
                 }
             }
         }

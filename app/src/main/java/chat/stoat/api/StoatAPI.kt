@@ -41,7 +41,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.runBlocking
@@ -171,7 +171,10 @@ object StoatAPI {
 
     @OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
     val realtimeContext = newSingleThreadContext("RealtimeContext")
-    val wsFrameChannel = Channel<Any>(Channel.UNLIMITED)
+    val wsFrameChannel = MutableSharedFlow<Any>(
+        replay = 0,
+        extraBufferCapacity = Int.MAX_VALUE,
+    )
 
     private var socketCoroutine: Job? = null
 

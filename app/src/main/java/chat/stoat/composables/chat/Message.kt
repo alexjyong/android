@@ -1,5 +1,6 @@
 package chat.stoat.composables.chat
 
+import android.R.id.message
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.icu.text.DateFormat
@@ -111,6 +112,20 @@ fun authorColour(message: MessageSchema): Brush {
         highestRole.colour?.let { BrushCompat.parseColour(it) }
             ?: defaultColour
     }
+}
+
+@Composable
+fun displayNameInChannel(userId: String, channelId: String): String {
+    val serverId =
+        StoatAPI.channelCache[channelId]?.server
+            ?: return StoatAPI.userCache[userId]?.let { User.resolveDefaultName(it) }
+                ?: stringResource(R.string.unknown)
+
+    val member = userId.let { StoatAPI.members.getMember(serverId, it) }
+        ?: return stringResource(R.string.unknown)
+    return member.nickname
+        ?: StoatAPI.userCache[userId]?.let { User.resolveDefaultName(it) }
+        ?: stringResource(R.string.unknown)
 }
 
 @Composable

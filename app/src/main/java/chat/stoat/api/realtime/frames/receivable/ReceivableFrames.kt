@@ -6,10 +6,12 @@ import chat.stoat.api.schemas.Embed
 import chat.stoat.api.schemas.Emoji
 import chat.stoat.api.schemas.Member
 import chat.stoat.api.schemas.Message
+import chat.stoat.api.schemas.PartialUserVoiceState
 import chat.stoat.api.schemas.Role
 import chat.stoat.api.schemas.Server
 import chat.stoat.api.schemas.ServerUserChoice
 import chat.stoat.api.schemas.User
+import chat.stoat.api.schemas.UserVoiceState
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
@@ -241,4 +243,40 @@ typealias EmojiCreateFrame = Emoji
 data class EmojiDeleteFrame(
     val type: String = "EmojiDelete",
     val id: String
+)
+
+@Serializable
+data class VoiceChannelJoinFrame(
+    val type: String = "VoiceChannelJoin",
+    val id: String,
+    val state: UserVoiceState
+)
+
+@Serializable
+data class VoiceChannelLeaveFrame(
+    val type: String = "VoiceChannelLeave",
+    val id: String,
+    val user: String
+)
+
+@Serializable
+data class VoiceChannelMoveFrame(
+    val type: String = "VoiceChannelMove",
+    val from: String,
+    val to: String,
+    val state: UserVoiceState
+)
+
+@Serializable
+data class UserVoiceStateUpdateFrame(
+    val type: String = "UserVoiceStateUpdate",
+    val id: String,
+    val data: PartialUserVoiceState
+)
+
+@Serializable
+data class UserMoveVoiceChannelFrame(
+    val type: String = "UserMoveVoiceChannel",
+    val node: String,
+    val token: String,
 )
