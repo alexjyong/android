@@ -125,6 +125,7 @@ import chat.stoat.composables.chat.DateDivider
 import chat.stoat.composables.chat.Message
 import chat.stoat.composables.chat.MessageField
 import chat.stoat.composables.chat.SystemMessage
+import chat.stoat.composables.chat.UnsupportedMessage
 import chat.stoat.composables.emoji.EmojiPicker
 import chat.stoat.composables.generic.GroupIcon
 import chat.stoat.composables.generic.PresenceBadge
@@ -726,6 +727,14 @@ fun ChannelScreen(
                                     }
                                     when (val item = viewModel.items[index]) {
                                         is ChannelScreenItem.RegularMessage -> {
+                                            if (item.message.content?.replace("\\s".toRegex(), "")
+                                                    ?.contains(">>>>>>>") == true
+                                            ) {
+                                                // FIXME Dirty hack to prevent a crash caused by malicious messages.
+                                                UnsupportedMessage()
+                                                return@items
+                                            }
+
                                             RegularMessage(
                                                 item.message,
                                                 viewModel.channel,

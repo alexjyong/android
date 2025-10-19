@@ -14,7 +14,6 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -58,7 +57,7 @@ fun SystemMessage(message: Message) {
         SystemMessageType.entries.firstOrNull { it.type == message.system.type }
 
     if (systemMessageType == null) {
-        Text(text = message.system.toString())
+        UnsupportedMessage(context = message.system.type)
         return
     }
 

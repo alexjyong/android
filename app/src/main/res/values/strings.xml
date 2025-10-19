@@ -255,6 +255,9 @@
     <string name="message_blocked">Blocked message</string>
     <string name="message_failed_to_send">Failed to send, long press for options</string>
 
+    <string name="message_not_supported">Message cannot be displayed.</string>
+    <string name="message_not_supported_with_context">Message cannot be displayed (%1$s).</string>
+
     <string name="message_embed_special_youtube_switch_alt">Tap to play video from YouTube</string>
 
     <string name="system_message_ownership_changed_alt">Ownership changed</string>
