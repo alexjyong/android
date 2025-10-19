@@ -1,18 +1,31 @@
 package chat.stoat.composables.voice
 
-import android.widget.Toast
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import chat.stoat.R
 import chat.stoat.api.routes.misc.getRootRoute
 import chat.stoat.api.routes.voice.joinCall
+import io.livekit.android.compose.local.RoomLocal
+import io.livekit.android.compose.local.RoomScope
+import io.livekit.android.compose.state.rememberTracks
+import io.livekit.android.compose.ui.VideoTrackView
 import logcat.LogPriority
 import logcat.asLog
 import logcat.logcat
@@ -80,16 +93,7 @@ fun VoiceSheet(
         viewModel.getVoiceToken()
     }
 
-    val context = LocalContext.current
-    LaunchedEffect(Unit) {
-        Toast.makeText(
-            context,
-            "Voice chat is not available.",
-            Toast.LENGTH_SHORT
-        ).show()
-        onDisconnect()
-    }
-    /*RoomScope(
+    RoomScope(
         url = viewModel.voiceLkNode,
         token = viewModel.voiceToken,
         audio = true,
@@ -142,5 +146,5 @@ fun VoiceSheet(
                 }
             }
         }
-    }*/
+    }
 }

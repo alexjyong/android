@@ -30,7 +30,7 @@ val material3Version = "1.4.0-alpha15"
 val androidXTestVersion = "1.6.1"
 
 object LivekitVersion {
-    val core = "2.20.3"
+    val core = "2.21.0"
     val componentsCompose = "1.4.0"
 }
 
@@ -297,9 +297,9 @@ dependencies {
     implementation("dev.snipme:highlights:1.0.0")
 
     // Livekit - Commented out for now to not inflate the app size.
-    /*implementation("io.livekit:livekit-android:${LivekitVersion.core}")
+    implementation("io.livekit:livekit-android:${LivekitVersion.core}")
     implementation("io.livekit:livekit-android-camerax:${LivekitVersion.core}")
-    implementation("io.livekit:livekit-android-compose-components:${LivekitVersion.componentsCompose}")*/
+    implementation("io.livekit:livekit-android-compose-components:${LivekitVersion.componentsCompose}")
 
     // Firebase - Cloud Messaging
     implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
