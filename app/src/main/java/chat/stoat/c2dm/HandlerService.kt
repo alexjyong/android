@@ -3,13 +3,18 @@ package chat.stoat.c2dm
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.Person
 import androidx.core.app.RemoteInput
+import androidx.core.content.LocusIdCompat
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
+import chat.stoat.BuildConfig
 import chat.stoat.R
 import chat.stoat.activities.MainActivity
 import chat.stoat.api.STOAT_BASE
@@ -18,7 +23,7 @@ import chat.stoat.api.internals.ULID
 import chat.stoat.api.routes.push.subscribePush
 import chat.stoat.api.schemas.Message
 import chat.stoat.api.schemas.User
-import chat.stoat.c2dm.ChannelRegistrator.Companion.CHANNEL_ID_GROUP_SOCIAL_FRIENDREQUESTS
+import chat.stoat.c2dm.ChannelRegistrator.Companion.CHANNEL_ID_GROUP_CONVERSATIONS_MESSAGES
 import chat.stoat.persistence.Database
 import chat.stoat.persistence.SqlStorage
 import com.bumptech.glide.Glide
@@ -127,6 +132,25 @@ class HandlerService : FirebaseMessagingService() {
             return
         }
 
+        val shortcutId = "${BuildConfig.APPLICATION_ID}.channel.${message.channel}"
+
+        val conversationIntent = Intent(this, MainActivity::class.java).apply {
+            action = Intent.ACTION_VIEW
+            putExtra("channelId", message.channel)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+
+        val shortcut = ShortcutInfoCompat.Builder(this, shortcutId)
+            .setShortLabel(channelName)
+            .setLongLabel(channelName)
+            .setIcon(IconCompat.createWithBitmap(bitmap))
+            .setIntent(conversationIntent)
+            .setLongLived(true)
+            .setPerson(author)
+            .build()
+
+        ShortcutManagerCompat.pushDynamicShortcut(this, shortcut)
+
         val remoteInput = RemoteInput.Builder("content").run {
             setLabel(getString(R.string.message_context_sheet_actions_reply))
             build()
@@ -139,17 +163,25 @@ class HandlerService : FirebaseMessagingService() {
                 PendingIntent.getActivity(
                     this,
                     0,
-                    Intent(this, MainActivity::class.java),
-                    PendingIntent.FLAG_MUTABLE
+                    conversationIntent,
+                    PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                 )
             )
                 .addRemoteInput(remoteInput)
                 .build()
 
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID_GROUP_SOCIAL_FRIENDREQUESTS)
+        val contentIntent = PendingIntent.getActivity(
+            this,
+            message.channel.hashCode(),
+            conversationIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID_GROUP_CONVERSATIONS_MESSAGES)
             .setSmallIcon(R.drawable.icn_chat_24dp)
             .setContentTitle(user.displayName ?: user.username)
             .setContentText(message.content)
+            .setContentIntent(contentIntent)
             .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setStyle(
                 NotificationCompat.MessagingStyle(author)
@@ -161,7 +193,32 @@ class HandlerService : FirebaseMessagingService() {
                     )
             )
             .addAction(action)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+
+        // Android 11 bubbles
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            builder.setShortcutId(shortcutId)
+            builder.setLocusId(LocusIdCompat(shortcutId))
+
+            val bubbleIntent = PendingIntent.getActivity(
+                this,
+                message.channel.hashCode(),
+                conversationIntent,
+                PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+
+            val bubbleMetadata = NotificationCompat.BubbleMetadata.Builder(
+                bubbleIntent,
+                IconCompat.createWithBitmap(bitmap)
+            )
+                .setDesiredHeight(600)
+                .setAutoExpandBubble(false)
+                .setSuppressNotification(false)
+                .build()
+
+            builder.setBubbleMetadata(bubbleMetadata)
+        }
 
         NotificationManagerCompat.from(this).apply {
             if (ActivityCompat.checkSelfPermission(

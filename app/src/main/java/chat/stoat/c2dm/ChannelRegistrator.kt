@@ -15,18 +15,18 @@ import chat.stoat.R
 
 class ChannelRegistrator(val context: Context) {
     companion object {
-        const val CHANNEL_ID_GROUP_CONVERSATIONS = "chat.revolt.c2dm.conversations"
+        const val CHANNEL_ID_GROUP_CONVERSATIONS = "chat.stoat.c2dm.conversations"
+        const val CHANNEL_ID_GROUP_CONVERSATIONS_MESSAGES =
+            "chat.stoat.c2dm.conversations.messages"
 
-        const val CHANNEL_ID_GROUP_SOCIAL = "chat.revolt.c2dm.social"
-        const val CHANNEL_ID_GROUP_SOCIAL_FRIENDREQUESTS = "chat.revolt.c2dm.social.friendrequests"
+        const val CHANNEL_ID_GROUP_SOCIAL = "chat.stoat.c2dm.social"
+        const val CHANNEL_ID_GROUP_SOCIAL_FRIENDREQUESTS = "chat.stoat.c2dm.social.friendrequests"
     }
 
     private val notificationManager =
         getSystemService(context, NotificationManager::class.java) as NotificationManager
 
     private fun registerGroups() {
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) return
-
         notificationManager.createNotificationChannelGroup(
             NotificationChannelGroup(
                 CHANNEL_ID_GROUP_CONVERSATIONS,
@@ -42,8 +42,6 @@ class ChannelRegistrator(val context: Context) {
     }
 
     private fun registerChannels() {
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) return
-
         notificationManager.createNotificationChannel(
             NotificationChannel(
                 CHANNEL_ID_GROUP_SOCIAL_FRIENDREQUESTS,
@@ -53,6 +51,17 @@ class ChannelRegistrator(val context: Context) {
                 group = CHANNEL_ID_GROUP_SOCIAL
                 description =
                     context.getString(R.string.notification_channel_friend_requests_description)
+            }
+        )
+        notificationManager.createNotificationChannel(
+            NotificationChannel(
+                CHANNEL_ID_GROUP_CONVERSATIONS_MESSAGES,
+                context.getString(R.string.notification_channel_messages),
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                group = CHANNEL_ID_GROUP_CONVERSATIONS
+                description =
+                    context.getString(R.string.notification_channel_messages_description)
             }
         )
     }
