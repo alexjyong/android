@@ -1,10 +1,10 @@
 ---
 title: Setting up your Development Environment
-description: A guide to setting up your development environment for Revolt on Android.
+description: A guide to setting up your development environment for Stoat for Android.
 template: doc
 ---
 
-This page contains the guidelines for setting up your development environment for Revolt on Android. These guidelines are important to ensure that your development environment is set up correctly and you can start contributing to the project.
+This page contains the guidelines for setting up your development environment for Stoat for Android. These guidelines are important to ensure that your development environment is set up correctly and you can start contributing to the project.
 
 If you want to compile the app yourself, you can follow these guidelines. You may not need Android Studio, as it’s possible to build the app from the command line. GitHub Codespaces automates most of the process for you if you want to go that route and this guide covers those steps, but won’t go into detail on other command-line methods.
 
@@ -87,7 +87,7 @@ import { Tabs, TabItem, Steps } from "@astrojs/starlight/components"
 4.  Clone the repository.
 
     ```sh
-    git clone --recursive https://github.com/revoltchat/android.git
+    git clone --recursive https://github.com/stoatchat/for-android.git
     ```
 
     Specify `--recursive` to ensure that submodules are cloned as well.
@@ -108,24 +108,25 @@ import { Tabs, TabItem, Steps } from "@astrojs/starlight/components"
     ```
 
     :::tip
-    You can run this script with the `-y` flag to skip confirmation prompts.
+    You can run this script with the `-y` flag to skip confirmation
+    prompts.
     :::
 
     :::note
-    This script will query the Revolt version control server for the latest version of the
+    This script will query the Stoat version control server for the latest version of the
     final-markdown native library and download it. If you do not wish to use pre-built libraries,
     you can build final-markdown yourself from the source code at https://git.revolt.chat/android/final-markdown,
     and copy the files to the `app/src/main/jniLibs` folder. Note the files that are downloaded are
     exactly the same as the ones we use for the app on Google Play, so you can be sure they are safe to use.
     :::
 
-8.  Copy the `revoltbuild.properties.example` file to `revoltbuild.properties` and fill in the required values.
+8.  Copy the `stoatbuild.properties.example` file to `stoatbuild.properties` and fill in the required values.
 
     ```sh
-    cp revoltbuild.properties.example revoltbuild.properties
+    cp stoatbuild.properties.example stoatbuild.properties
     ```
 
-    The `revoltbuild.properties` file contains the following properties:
+    The `stoatbuild.properties` file contains the following properties:
 
     | Property                 | Description                                    |
     | ------------------------ | ---------------------------------------------- |
@@ -171,6 +172,6 @@ import { Tabs, TabItem, Steps } from "@astrojs/starlight/components"
     If building within Github Codespaces, you can build a fresh debug apk by running `./gradlew assembledebug --no-daemon` from the root of the project. 
     Upon completion, the apk will be within `app/build/outputs/apk/debug/`
 
-12. **You're all set!** You can now start contributing to Revolt on Android.
+12. **You're all set!** You can now start contributing to Stoat for Android.
 
 </Steps>

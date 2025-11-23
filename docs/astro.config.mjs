@@ -1,6 +1,7 @@
 import { defineConfig } from "astro/config"
 import starlight from "@astrojs/starlight"
 import markdownIntegration from "@astropub/md"
+import starlightThemeNext from 'starlight-theme-next'
 
 // https://astro.build/config
 export default defineConfig({
@@ -8,10 +9,11 @@ export default defineConfig({
     base: "/for-android",
     integrations: [
         starlight({
+            plugins: [starlightThemeNext()],
             title: "Stoat for Android Technical Documentation",
-            social: {
-                github: "https://github.com/stoatchat/for-android",
-            },
+            social: [
+                { icon: "github", label: 'GitHub', href: "https://github.com/stoatchat/for-android" },
+            ],
             sidebar: [
                 {
                     label: "Contributing",
@@ -26,11 +28,11 @@ export default defineConfig({
                             link: "/contributing/setup",
                         }
                     ],
-                }
-                /* {
+                },
+                {
                     label: "Reference",
                     autogenerate: { directory: "reference" },
-                }, */
+                },
             ],
             customCss: ["./src/styles/custom.css"],
         }),
