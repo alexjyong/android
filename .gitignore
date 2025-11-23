@@ -24,3 +24,4 @@ app/src/main/assets/embedded
 /app/src/main/jniLibs/armeabi-v7a/
 /app/src/main/jniLibs/x86/
 /app/src/main/jniLibs/x86_64/
+copilot.data.migration*xml
