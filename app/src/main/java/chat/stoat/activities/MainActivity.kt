@@ -207,11 +207,11 @@ class MainActivityViewModel @Inject constructor(
 
             isConnected.emit(hasInternetConnection())
 
-            Log.d("MainActivity", "Checking if we can reach Revolt")
+            Log.d("MainActivity", "Checking if we can reach Stoat")
 
             if (!isConnected.value) return@launch startWithoutDestination()
 
-            Log.d("MainActivity", "We can reach Revolt, checking if we're logged in")
+            Log.d("MainActivity", "We can reach Stoat, checking if we're logged in")
 
             val token = kvStorage.get("sessionToken")
                 ?: return@launch startWithDestination("login/greeting")
