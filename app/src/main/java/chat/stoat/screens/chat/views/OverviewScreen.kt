@@ -233,7 +233,7 @@ fun OverviewScreen(
                         item(key = "unreads") {
                             OverviewScreenLink(
                                 onClick = {
-                                    navController.navigate("catchup")
+                                    if (hasUnreads) navController.navigate("catchup")
                                 },
                                 clickable = hasUnreads,
                                 backgroundColour = if (hasUnreads) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant,
