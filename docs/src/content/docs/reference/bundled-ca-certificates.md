@@ -20,6 +20,7 @@ The bundled CA certificates are the following:
 
 - [SSL.com TLS ECC Root CA 2022](https://crt.sh/?id=7439766705)
 - [Cloudflare TLS Issuing ECC CA 1](https://crt.sh/?id=11092622664)
+- [Google Trust Services WE1](https://crt.sh/?id=22705076793)
 
 ## Why not use the system CA store?
 
