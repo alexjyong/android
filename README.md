@@ -3,7 +3,7 @@
     <p>Official <a href="https://stoat.chat">Stoat</a> Android app.</p>
     <br/><br/>
     <div>
-        <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" width="200">
+        <a href="https://play.google.com/store/apps/details?id=chat.revolt"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" width="200"></a>
         <br/>
     </div>
     <small>Google Play is a trademark of Google LLC.</small>
