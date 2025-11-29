@@ -66,7 +66,7 @@ class SessionSettingsScreenViewModel : ViewModel() {
     fun fetchSessions() {
         viewModelScope.launch {
             sessions.addAll(fetchAllSessions())
-            currentSession = sessions.firstOrNull { it.isCurrent() }
+            currentSession = sessions.firstOrNull { it.id === StoatAPI.sessionId }
             Log.d(
                 "SessionSettingsScreen",
                 "Current session: $currentSession. Current session ID: ${StoatAPI.sessionId}"
@@ -260,7 +260,7 @@ fun SessionSettingsScreen(
                         items(viewModel.sessions.size) {
                             val item = viewModel.sessions[it]
 
-                            if (item.isCurrent()) {
+                            if (item.id == StoatAPI.sessionId) {
                                 return@items
                             }
 

@@ -4,34 +4,18 @@ import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.serialization")
-    id("org.jetbrains.kotlin.plugin.compose")
-    id("com.mikepenz.aboutlibraries.plugin")
-    id("com.google.dagger.hilt.android")
-    id("com.google.devtools.ksp")
-    id("io.sentry.android.gradle") version "4.12.0"
-    id("app.cash.sqldelight") version "2.0.1"
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.aboutlibraries)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.sentry.android)
+    alias(libs.plugins.sqldelight)
+    alias(libs.plugins.google.services)
     id("kotlin-kapt")
     id("kotlin-parcelize")
-    id("com.google.gms.google-services")
-}
-
-val composeBomVersion = "2025.03.00"
-val accompanistVersion = "0.34.0"
-val okhttpVersion = "4.12.0"
-val navVersion = "2.9.0"
-val hiltVersion = "2.57"
-val glideVersion = "5.0.5"
-val ktorVersion = "3.3.2"
-val media3Version = "1.7.1"
-val material3Version = "1.4.0-alpha15"
-val androidXTestVersion = "1.6.1"
-
-object LivekitVersion {
-    val core = "2.21.0"
-    val componentsCompose = "1.4.0"
 }
 
 fun property(fileName: String, propertyName: String, fallbackEnv: String? = null): String? {
@@ -187,138 +171,111 @@ sentry {
 }
 
 dependencies {
-    // Android/Kotlin Core
-    implementation("androidx.core:core-ktx:1.16.0")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.20")
+    implementation(project(":core:model"))
 
-    // Kotlinx - various first-party extensions for Kotlin
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.6.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-    implementation("androidx.profileinstaller:profileinstaller:1.4.1")
+    implementation(libs.android.core.ktx)
+    implementation(libs.kotlin.reflect)
 
-    // Compose BOM
-    val composeBom = platform("androidx.compose:compose-bom:$composeBomVersion")
+    implementation(libs.kotlin.serialization.json)
+    implementation(libs.kotlin.serialization.cbor)
+    implementation(libs.kotlin.datetime)
+
+    val composeBom = platform(libs.compose.bom)
     implementation(composeBom)
     testImplementation(composeBom)
     androidTestImplementation(composeBom)
 
-    // Jetpack Compose
-    implementation("androidx.compose.ui:ui:1.8.2")
-    implementation("androidx.compose.ui:ui-util")
-    implementation("androidx.compose.material3:material3:$material3Version")
-    implementation("androidx.compose.material3:material3-window-size-class:$material3Version")
-    implementation("androidx.compose.material:material-icons-core:1.7.8")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.runtime:runtime-livedata")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.1")
-    implementation("androidx.activity:activity-compose:1.10.1")
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.util)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.material3.windowsizeclass)
+    implementation(libs.compose.material.icons.core)
+    implementation(libs.compose.runtime.livedata)
+    implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.activity.compose)
 
-    // Accompanist - Jetpack Compose Extensions
-    implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
-    implementation("com.google.accompanist:accompanist-permissions:$accompanistVersion")
+    implementation(libs.accompanist.systemuicontroller)
+    implementation(libs.accompanist.permissions)
 
-    // KTOR - HTTP+WebSocket Library
-    implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-logging:$ktorVersion")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-    implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.contentnegotiation)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.serialization.kotlinx.json)
 
-    // Screen Navigation
-    implementation("androidx.navigation:navigation-compose:$navVersion")
+    implementation(libs.navigation.compose)
 
-    // Jetpack Compose Tooling
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    debugImplementation(libs.compose.ui.tooling)
+    debugImplementation(libs.compose.ui.test.manifest)
 
-    // Hilt - Dependency Injection
-    implementation("com.google.dagger:hilt-android:$hiltVersion")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-    kapt("com.google.dagger:hilt-compiler:$hiltVersion")
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
+    kapt(libs.hilt.compiler)
 
-    // Glide - Image Loading
-    implementation("com.github.bumptech.glide:glide:$glideVersion")
-    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
-    implementation("com.github.bumptech.glide:okhttp3-integration:5.0.5")
-    ksp("com.github.bumptech.glide:ksp:$glideVersion")
+    implementation(libs.glide)
+    implementation(libs.glide.compose)
+    ksp(libs.glide.ksp)
 
-    // AboutLibraries - automated OSS library attribution
-    implementation("com.mikepenz:aboutlibraries-core:11.3.0-rc02")
+    implementation(libs.aboutlibraries.core)
 
-    // Sentry - crash reporting
-    implementation("io.sentry:sentry-android:8.13.2")
-    implementation("io.sentry:sentry-compose-android:8.13.2")
+    implementation(libs.sentry.android)
+    implementation(libs.sentry.compose.android)
 
-    // Other AndroidX libraries
-    implementation("androidx.documentfile:documentfile:1.1.0")
-    implementation("androidx.browser:browser:1.8.0")
-    implementation("androidx.webkit:webkit:1.14.0")
-    implementation("androidx.core:core-splashscreen:1.2.0-beta02")
-    implementation("androidx.palette:palette-ktx:1.0.0")
-    implementation("androidx.core:core-telecom:1.0.0")
+    implementation(libs.android.profileinstaller)
+    implementation(libs.android.documentfile)
+    implementation(libs.android.browser)
+    implementation(libs.android.webkit)
+    implementation(libs.android.palette)
+    implementation(libs.android.core.telecom)
+    implementation(libs.android.core.splashscreen)
+    implementation(libs.android.constraintlayout)
+    implementation(libs.android.constraintlayout.compose)
+    implementation(libs.android.appcompat)
+    implementation(libs.android.material)
+    implementation(libs.android.datastore)
+    implementation(libs.android.datastore.preferences)
 
-    // Libraries used for legacy View-based UI
-    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
-    implementation("androidx.appcompat:appcompat:1.7.1")
-    implementation("com.google.android.material:material:1.12.0")
+    implementation(libs.hcaptcha)
 
-    // hCaptcha - captcha provider
-    implementation("com.github.hcaptcha:hcaptcha-android-sdk:3.8.1")
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 
-    // JDK Desugaring - polyfill for new Java APIs
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.exoplayer.hls)
+    implementation(libs.media3.okhttp)
+    implementation(libs.media3.ui)
 
-    // AndroidX Media3 w/ ExoPlayer
-    implementation("androidx.media3:media3-exoplayer:$media3Version")
-    implementation("androidx.media3:media3-exoplayer-hls:$media3Version")
-    implementation("androidx.media3:media3-datasource-okhttp:$media3Version")
-    implementation("androidx.media3:media3-ui:$media3Version")
+    implementation(libs.zoomable.image)
+    implementation(libs.zoomable.image.glide)
+    implementation(libs.haze)
+    implementation(libs.haze.materials)
 
-    // Compose libraries
-    implementation("me.saket.telephoto:zoomable-image:1.0.0-alpha02")
-    implementation("me.saket.telephoto:zoomable-image-glide:1.0.0-alpha02")
-    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.1")
-    implementation("dev.chrisbanes.haze:haze:1.6.4")
-    implementation("dev.chrisbanes.haze:haze-materials:1.6.4")
+    implementation(libs.zxing.core)
+    implementation(libs.quickie.bundled)
 
-    // QR code related
-    implementation("com.google.zxing:core:3.5.3")
-    implementation("io.github.g00fy2.quickie:quickie-bundled:1.11.0")
+    implementation(libs.sqldelight.android.driver)
 
-    // Persistence
-    implementation("app.cash.sqldelight:android-driver:2.0.1")
-    implementation("androidx.datastore:datastore:1.1.7")
-    implementation("androidx.datastore:datastore-preferences:1.1.7")
+    implementation(libs.jetbrains.markdown)
+    implementation(libs.highlights)
 
-    // Markup
-    implementation("org.jetbrains:markdown:0.7.3")
-    implementation("dev.snipme:highlights:1.0.0")
+    // implementation(libs.livekit.android)
+    // implementation(libs.livekit.android.camerax)
+    // implementation(libs.livekit.android.compose)
 
-    // Livekit
-    // implementation("io.livekit:livekit-android:${LivekitVersion.core}")
-    // implementation("io.livekit:livekit-android-camerax:${LivekitVersion.core}")
-    // implementation("io.livekit:livekit-android-compose-components:${LivekitVersion.componentsCompose}")
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
 
-    // Firebase - Cloud Messaging
-    implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
-    implementation("com.google.firebase:firebase-messaging")
+    implementation(libs.shimmer)
 
-    // Shimmer - loading animations
-    implementation("com.valentinilk.shimmer:compose-shimmer:1.3.1")
+    debugImplementation(libs.chucker)
+    releaseImplementation(libs.chucker.noop)
 
-    // Chucker - HTTP inspector
-    debugImplementation("com.github.chuckerteam.chucker:library:4.0.0")
-    releaseImplementation("com.github.chuckerteam.chucker:library-no-op:4.0.0")
+    implementation(libs.square.logcat)
 
-    // Square Logcat
-    implementation("com.squareup.logcat:logcat:0.1")
-
-    // Testing
-    androidTestImplementation("androidx.test:runner:$androidXTestVersion")
-    androidTestImplementation("androidx.test:rules:$androidXTestVersion")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    androidTestImplementation(libs.android.test.core)
+    androidTestImplementation(libs.android.test.rules)
+    androidTestImplementation(libs.compose.ui.test.junit4)
 }
 
 aboutLibraries {
