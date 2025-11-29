@@ -9,7 +9,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import chat.stoat.R
-import chat.stoat.api.schemas.ChannelType
+import chat.stoat.core.model.schemas.ChannelType
 
 @Composable
 fun ChannelIcon(channelType: ChannelType, modifier: Modifier = Modifier) {

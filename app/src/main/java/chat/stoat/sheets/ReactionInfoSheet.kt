@@ -49,11 +49,11 @@ import chat.stoat.api.StoatAPI
 import chat.stoat.api.internals.isUlid
 import chat.stoat.api.routes.custom.fetchEmoji
 import chat.stoat.api.routes.user.fetchUser
-import chat.stoat.api.schemas.Emoji
-import chat.stoat.api.schemas.User
 import chat.stoat.api.settings.LoadedSettings
 import chat.stoat.composables.chat.MemberListItem
 import chat.stoat.composables.generic.RemoteImage
+import chat.stoat.core.model.schemas.Emoji
+import chat.stoat.core.model.schemas.User
 import chat.stoat.internals.text.MessageProcessor
 import chat.stoat.persistence.KVStorage
 import kotlinx.coroutines.launch
@@ -288,8 +288,8 @@ fun ReactionInfoSheet(messageId: String, emoji: String, onDismiss: () -> Unit) {
                                 text = if (current.isUlid()) {
                                     val cached = extendedEmojiInfo.find { it.id == current }
                                     if (cached?.parent != null) {
-                                        when (cached.parent.type) {
-                                            "Server" -> StoatAPI.serverCache[cached.parent.id]?.name?.let {
+                                        when (cached.parent!!.type) {
+                                            "Server" -> StoatAPI.serverCache[cached.parent!!.id]?.name?.let {
                                                 stringResource(
                                                     id = R.string.emote_info_from_server,
                                                     it
@@ -320,7 +320,7 @@ fun ReactionInfoSheet(messageId: String, emoji: String, onDismiss: () -> Unit) {
             val userOrNull = StoatAPI.userCache[reaction]
             val user = userOrNull ?: User.getPlaceholder(reaction)
             val member = if (channel.server != null && user.id != null) {
-                StoatAPI.members.getMember(channel.server, user.id)
+                StoatAPI.members.getMember(channel.server!!, user.id!!)
             } else {
                 null
             }

@@ -15,7 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import chat.stoat.R
 import chat.stoat.api.internals.ULID
-import chat.stoat.api.schemas.Session
+import chat.stoat.core.model.schemas.Session
 
 @Composable
 fun SessionItem(

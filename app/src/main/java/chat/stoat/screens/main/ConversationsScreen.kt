@@ -31,8 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import chat.stoat.R
 import chat.stoat.api.StoatAPI
-import chat.stoat.api.schemas.ChannelType
-import chat.stoat.api.schemas.User
+import chat.stoat.core.model.schemas.ChannelType
+import chat.stoat.core.model.schemas.User
 import chat.stoat.api.settings.LoadedSettings
 import chat.stoat.composables.generic.UserAvatar
 import chat.stoat.internals.extensions.zero

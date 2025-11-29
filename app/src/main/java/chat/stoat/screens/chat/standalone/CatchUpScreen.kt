@@ -40,7 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import chat.stoat.R
 import chat.stoat.api.StoatAPI
-import chat.stoat.api.schemas.ChannelUnread
+import chat.stoat.core.model.schemas.ChannelUnread
 import logcat.LogPriority
 import logcat.logcat
 

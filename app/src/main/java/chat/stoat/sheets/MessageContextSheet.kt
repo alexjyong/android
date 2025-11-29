@@ -132,7 +132,7 @@ fun MessageContextSheet(
                             shareSheetState.hide()
                         }
                         coroutineScope.launch {
-                            clipboardManager.setText(AnnotatedString(message.content))
+                            clipboardManager.setText(AnnotatedString(message.content!!))
                             onHideSheet()
                         }
                     }
@@ -215,7 +215,7 @@ fun MessageContextSheet(
                     onClick = {
                         if (message.id == null) return@SheetButton
 
-                        clipboardManager.setText(AnnotatedString(message.id))
+                        clipboardManager.setText(AnnotatedString(message.id!!))
 
                         if (Platform.needsShowClipboardNotification()) {
                             Toast.makeText(

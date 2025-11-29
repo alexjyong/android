@@ -39,13 +39,13 @@ import chat.stoat.api.internals.Roles
 import chat.stoat.api.internals.hasPermission
 import chat.stoat.api.routes.channel.fetchGroupParticipants
 import chat.stoat.api.routes.server.fetchMembers
-import chat.stoat.api.schemas.Member
-import chat.stoat.api.schemas.User
 import chat.stoat.composables.chat.MemberListItem
 import chat.stoat.composables.generic.CountableListHeader
 import chat.stoat.composables.generic.Presence
 import chat.stoat.composables.generic.SheetHeaderPadding
 import chat.stoat.composables.generic.presenceFromStatus
+import chat.stoat.core.model.schemas.Member
+import chat.stoat.core.model.schemas.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -86,7 +86,7 @@ class MemberListSheetViewModel @Inject constructor(
                 val user = StoatAPI.userCache[member.id!!.user] ?: run {
                     Log.w(
                         "MemberListSheet",
-                        "User ${member.id.user} found in member list of server $serverId but not in user cache"
+                        "User ${member.id!!.user} found in member list of server $serverId but not in user cache"
                     )
                     return@forEach
                 }
@@ -98,7 +98,7 @@ class MemberListSheetViewModel @Inject constructor(
                 }
 
                 val highestHoistedRole =
-                    Roles.resolveHighestRole(serverId, member.id.user, hoisted = true)
+                    Roles.resolveHighestRole(serverId, member.id!!.user, hoisted = true)
 
                 val category = if (highestHoistedRole != null) {
                     highestHoistedRole.name ?: context.getString(R.string.unknown)
@@ -319,19 +319,19 @@ fun MemberListSheet(
 
                     is MemberListSheetItem.MemberItem -> item(key = item.member.id!!.user) {
                         MemberListItem(
-                            user = StoatAPI.userCache[item.member.id.user],
+                            user = StoatAPI.userCache[item.member.id!!.user],
                             member = item.member,
                             serverId = serverId,
-                            userId = item.member.id.user,
+                            userId = item.member.id!!.user,
                             modifier = Modifier
                                 .combinedClickable(
                                     onClick = {
-                                        userInfoSheetTarget = item.member.id.user
+                                        userInfoSheetTarget = item.member.id!!.user
                                         showUserInfoSheet = true
                                     },
                                     onClickLabel = stringResource(R.string.user_info_sheet_open),
                                     onLongClick = {
-                                        memberContextSheetTarget = item.member.id.user
+                                        memberContextSheetTarget = item.member.id!!.user
                                         showMemberContextSheet = true
                                     },
                                     onLongClickLabel = stringResource(R.string.member_context_sheet_open)
@@ -344,15 +344,15 @@ fun MemberListSheet(
                             user = item.user,
                             member = null,
                             serverId = serverId,
-                            userId = item.user.id,
+                            userId = item.user.id!!,
                             modifier = Modifier.combinedClickable(
                                 onClick = {
-                                    userInfoSheetTarget = item.user.id
+                                    userInfoSheetTarget = item.user.id!!
                                     showUserInfoSheet = true
                                 },
                                 onClickLabel = stringResource(R.string.user_info_sheet_open),
                                 onLongClick = {
-                                    memberContextSheetTarget = item.user.id
+                                    memberContextSheetTarget = item.user.id!!
                                     showMemberContextSheet = true
                                 },
                                 onLongClickLabel = stringResource(R.string.member_context_sheet_open)

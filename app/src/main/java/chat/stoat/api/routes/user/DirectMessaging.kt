@@ -4,7 +4,7 @@ import chat.stoat.api.StoatAPIError
 import chat.stoat.api.StoatHttp
 import chat.stoat.api.StoatJson
 import chat.stoat.api.api
-import chat.stoat.api.schemas.Channel
+import chat.stoat.core.model.schemas.Channel
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.SerializationException

@@ -5,9 +5,9 @@ import chat.stoat.api.StoatAPIError
 import chat.stoat.api.StoatHttp
 import chat.stoat.api.StoatJson
 import chat.stoat.api.api
-import chat.stoat.api.schemas.Member
-import chat.stoat.api.schemas.ServerWithChannelObjects
-import chat.stoat.api.schemas.User
+import chat.stoat.core.model.schemas.Member
+import chat.stoat.core.model.schemas.ServerWithChannelObjects
+import chat.stoat.core.model.schemas.User
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter

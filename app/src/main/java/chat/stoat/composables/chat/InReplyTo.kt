@@ -30,9 +30,9 @@ import chat.stoat.R
 import chat.stoat.api.StoatAPI
 import chat.stoat.api.internals.solidColor
 import chat.stoat.api.routes.channel.fetchSingleMessage
-import chat.stoat.api.schemas.User
 import chat.stoat.api.settings.Experiments
 import chat.stoat.composables.generic.UserAvatar
+import chat.stoat.core.model.schemas.User
 import chat.stoat.markdown.jbm.JBM
 import chat.stoat.markdown.jbm.JBMRenderer
 import chat.stoat.markdown.jbm.LocalJBMarkdownTreeState
@@ -142,11 +142,11 @@ fun InReplyTo(
                             LocalContentColor provides contentColor.copy(alpha = 0.7f),
                             LocalTextStyle provides LocalTextStyle.current.copy(fontSize = 12.sp)
                         ) {
-                            JBMRenderer(message.content)
+                            JBMRenderer(message.content!!)
                         }
                     } else {
                         Text(
-                            text = message.content,
+                            text = message.content!!,
                             fontSize = 12.sp,
                             color = contentColor.copy(alpha = 0.7f),
                             maxLines = 1,

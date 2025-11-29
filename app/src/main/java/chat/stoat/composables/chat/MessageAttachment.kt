@@ -34,9 +34,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import chat.stoat.R
 import chat.stoat.api.STOAT_FILES
-import chat.stoat.api.schemas.AutumnResource
 import chat.stoat.composables.generic.RemoteImage
 import chat.stoat.composables.media.AudioPlayer
+import chat.stoat.core.model.schemas.AutumnResource
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
@@ -95,7 +95,7 @@ fun ImageAttachment(attachment: AutumnResource) {
             modifier = Modifier
                 .width(attachment.metadata?.width?.toInt()?.dp ?: maxWidth)
                 .aspectRatio(
-                    attachment.metadata!!.width!!.toFloat() / attachment.metadata.height!!.toFloat()
+                    attachment.metadata!!.width!!.toFloat() / attachment.metadata!!.height!!.toFloat()
                 )
                 .then(
                     if (hazeState != null) Modifier.hazeSource(state = hazeState)
@@ -109,7 +109,7 @@ fun ImageAttachment(attachment: AutumnResource) {
                     .hazeEffect(state = hazeState, style = HazeMaterials.ultraThin())
                     .width(attachment.metadata?.width?.toInt()?.dp ?: maxWidth)
                     .aspectRatio(
-                        attachment.metadata!!.width!!.toFloat() / attachment.metadata.height!!.toFloat()
+                        attachment.metadata!!.width!!.toFloat() / attachment.metadata!!.height!!.toFloat()
                     )
                     .clickable { spoilerShown = true },
                 contentAlignment = Alignment.Center
@@ -157,7 +157,7 @@ fun VideoAttachment(attachment: AutumnResource) {
             modifier = Modifier
                 .width(attachment.metadata?.width?.toInt()?.dp ?: maxWidth)
                 .aspectRatio(
-                    attachment.metadata!!.width!!.toFloat() / attachment.metadata.height!!.toFloat()
+                    attachment.metadata!!.width!!.toFloat() / attachment.metadata!!.height!!.toFloat()
                 )
         ) {
             // Turns out that when you give Glide a video URL, you get a perfectly cromulent thumbnail.
@@ -167,7 +167,7 @@ fun VideoAttachment(attachment: AutumnResource) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(
-                        attachment.metadata.width!!.toFloat() / attachment.metadata.height.toFloat()
+                        attachment.metadata!!.width!!.toFloat() / attachment.metadata!!.height!!.toFloat()
                     ),
                 description = attachment.filename ?: "Video"
             )
@@ -205,7 +205,7 @@ fun MessageAttachment(attachment: AutumnResource, onAttachmentClick: (AutumnReso
             return
         }
 
-        when (attachment.metadata.type) {
+        when (attachment.metadata!!.type) {
             "Image" -> ImageAttachment(attachment)
             "Video" -> VideoAttachment(attachment)
             "Audio" -> AudioAttachment(attachment)

@@ -21,7 +21,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.webkit.WebViewAssetLoader
 import chat.stoat.activities.InviteActivity
 import chat.stoat.api.STOAT_WEB_APP
-import chat.stoat.api.schemas.isInviteUri
+import chat.stoat.core.model.schemas.isInviteUri
 
 internal fun Color.asHexString(includeAlphaComponent: Boolean = true): String {
     val argb = toArgb()

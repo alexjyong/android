@@ -84,8 +84,8 @@ import chat.stoat.activities.StoatTweenFloat
 import chat.stoat.activities.StoatTweenInt
 import chat.stoat.api.STOAT_FILES
 import chat.stoat.api.internals.BrushCompat
-import chat.stoat.api.schemas.ChannelType
-import chat.stoat.api.schemas.Member
+import chat.stoat.core.model.schemas.ChannelType
+import chat.stoat.core.model.schemas.Member
 import chat.stoat.composables.generic.RemoteImage
 import chat.stoat.composables.generic.UserAvatar
 import chat.stoat.composables.screens.chat.ChannelIcon
@@ -111,25 +111,25 @@ private fun CharSequence.lastWordStartsAt(): Int {
 
 sealed class AutocompleteSuggestion {
     data class User(
-        val user: chat.stoat.api.schemas.User,
+        val user: chat.stoat.core.model.schemas.User,
         val member: Member?,
         val query: String
     ) : AutocompleteSuggestion()
 
     data class Channel(
-        val channel: chat.stoat.api.schemas.Channel,
+        val channel: chat.stoat.core.model.schemas.Channel,
         val query: String
     ) : AutocompleteSuggestion()
 
     data class Emoji(
         val shortcode: String,
         val unicode: String?,
-        val custom: chat.stoat.api.schemas.Emoji?,
+        val custom: chat.stoat.core.model.schemas.Emoji?,
         val query: String
     ) : AutocompleteSuggestion()
 
     data class Role(
-        val role: chat.stoat.api.schemas.Role,
+        val role: chat.stoat.core.model.schemas.Role,
         val id: String,
         val query: String
     ) : AutocompleteSuggestion()

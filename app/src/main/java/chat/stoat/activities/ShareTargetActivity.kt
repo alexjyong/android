@@ -57,7 +57,7 @@ import chat.stoat.api.routes.channel.sendMessage
 import chat.stoat.api.routes.microservices.autumn.FileArgs
 import chat.stoat.api.routes.microservices.autumn.MAX_ATTACHMENTS_PER_MESSAGE
 import chat.stoat.api.routes.microservices.autumn.uploadToAutumn
-import chat.stoat.api.schemas.ChannelType
+import chat.stoat.core.model.schemas.ChannelType
 import chat.stoat.api.settings.LoadedSettings
 import chat.stoat.api.settings.SyncedSettings
 import chat.stoat.composables.chat.MessageField

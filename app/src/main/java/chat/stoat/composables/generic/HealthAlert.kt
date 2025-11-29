@@ -12,7 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import chat.stoat.R
-import chat.stoat.api.schemas.HealthNotice
+import chat.stoat.core.model.schemas.HealthNotice
 
 @Composable
 fun HealthAlert(notice: HealthNotice, onDismiss: () -> Unit) {

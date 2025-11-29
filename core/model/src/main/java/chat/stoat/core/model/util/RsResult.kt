@@ -1,4 +1,4 @@
-package chat.stoat.api.schemas
+package chat.stoat.core.model.util
 
 // Result class similar to Rust std::result::Result
 data class RsResult<V, E>(val value: V?, val error: E?) {

@@ -2,8 +2,8 @@ package chat.stoat.api.internals
 
 import chat.stoat.api.StoatAPI
 import chat.stoat.api.internals.SpecialUsers.PLATFORM_MODERATION_USER
-import chat.stoat.api.schemas.Channel
-import chat.stoat.api.schemas.ChannelType
+import chat.stoat.core.model.schemas.Channel
+import chat.stoat.core.model.schemas.ChannelType
 
 object DirectMessages {
     fun unreadDMs(): List<Channel> {

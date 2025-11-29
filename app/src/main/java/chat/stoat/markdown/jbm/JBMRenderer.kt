@@ -79,7 +79,7 @@ import chat.stoat.api.internals.BrushCompat
 import chat.stoat.api.internals.InstancedBrushCompat
 import chat.stoat.api.internals.isUlid
 import chat.stoat.api.routes.custom.fetchEmoji
-import chat.stoat.api.schemas.isInviteUri
+import chat.stoat.core.model.schemas.isInviteUri
 import chat.stoat.api.settings.LoadedSettings
 import chat.stoat.callbacks.Action
 import chat.stoat.callbacks.ActionChannel

@@ -22,7 +22,7 @@ import androidx.webkit.WebViewAssetLoader
 import chat.stoat.R
 import chat.stoat.activities.InviteActivity
 import chat.stoat.api.STOAT_WEB_APP
-import chat.stoat.api.schemas.isInviteUri
+import chat.stoat.core.model.schemas.isInviteUri
 import chat.stoat.databinding.SheetChangelogBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.color.MaterialColors

@@ -11,14 +11,14 @@ import chat.stoat.api.internals.Members
 import chat.stoat.api.realtime.DisconnectionState
 import chat.stoat.api.realtime.RealtimeSocket
 import chat.stoat.api.routes.user.fetchSelf
-import chat.stoat.api.schemas.AutumnResource
-import chat.stoat.api.schemas.ChannelType
-import chat.stoat.api.schemas.ChannelVoiceState
-import chat.stoat.api.schemas.Emoji
-import chat.stoat.api.schemas.Message
-import chat.stoat.api.schemas.Server
-import chat.stoat.api.schemas.User
+import chat.stoat.core.model.util.ChannelVoiceState
+import chat.stoat.core.model.schemas.Emoji
+import chat.stoat.core.model.schemas.Message
+import chat.stoat.core.model.schemas.Server
 import chat.stoat.api.unreads.Unreads
+import chat.stoat.core.model.schemas.AutumnResource
+import chat.stoat.core.model.schemas.ChannelType
+import chat.stoat.core.model.schemas.User
 import chat.stoat.persistence.Database
 import chat.stoat.persistence.SqlStorage
 import com.chuckerteam.chucker.api.ChuckerCollector
@@ -52,7 +52,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.json.Json
 import java.net.SocketException
-import chat.stoat.api.schemas.Channel as ChannelSchema
+import chat.stoat.core.model.schemas.Channel as ChannelSchema
 
 private const val USE_ALPHA_API = false
 

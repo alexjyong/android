@@ -116,8 +116,8 @@ import chat.stoat.api.internals.PermissionBit
 import chat.stoat.api.internals.has
 import chat.stoat.api.routes.channel.react
 import chat.stoat.api.routes.microservices.autumn.FileArgs
-import chat.stoat.api.schemas.ChannelType
-import chat.stoat.api.schemas.Message
+import chat.stoat.core.model.schemas.ChannelType
+import chat.stoat.core.model.schemas.Message
 import chat.stoat.api.settings.Experiments
 import chat.stoat.callbacks.Action
 import chat.stoat.callbacks.ActionChannel

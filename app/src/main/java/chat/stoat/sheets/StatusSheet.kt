@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import chat.stoat.R
 import chat.stoat.api.StoatAPI
 import chat.stoat.api.routes.user.patchSelf
-import chat.stoat.api.schemas.User
+import chat.stoat.core.model.schemas.User
 import chat.stoat.composables.generic.SheetButton
 import chat.stoat.composables.generic.asApiName
 import chat.stoat.composables.generic.presenceFromStatus

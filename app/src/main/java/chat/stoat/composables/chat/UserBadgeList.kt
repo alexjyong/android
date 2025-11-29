@@ -18,8 +18,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import chat.stoat.R
-import chat.stoat.api.schemas.UserBadges
-import chat.stoat.api.schemas.has
+import chat.stoat.core.model.schemas.UserBadges
+import chat.stoat.core.model.schemas.has
 
 @Composable
 fun BadgeListEntryTemplate(

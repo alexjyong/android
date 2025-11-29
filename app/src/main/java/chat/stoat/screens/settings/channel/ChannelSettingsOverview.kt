@@ -57,7 +57,7 @@ import chat.stoat.api.STOAT_FILES
 import chat.stoat.api.StoatAPI
 import chat.stoat.api.routes.channel.patchChannel
 import chat.stoat.api.routes.microservices.autumn.uploadToAutumn
-import chat.stoat.api.schemas.Channel
+import chat.stoat.core.model.schemas.Channel
 import chat.stoat.composables.generic.InlineMediaPicker
 import chat.stoat.composables.generic.ListHeader
 import dagger.hilt.android.lifecycle.HiltViewModel

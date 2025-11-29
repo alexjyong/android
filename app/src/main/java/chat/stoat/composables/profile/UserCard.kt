@@ -56,11 +56,10 @@ import chat.stoat.R
 import chat.stoat.api.internals.ResourceLocations
 import chat.stoat.api.internals.ULID
 import chat.stoat.api.internals.UserQR
-import chat.stoat.api.schemas.User
+import chat.stoat.core.model.schemas.User
 import chat.stoat.composables.generic.UserAvatar
 import chat.stoat.ui.theme.FragmentMono
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.GlideException
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter

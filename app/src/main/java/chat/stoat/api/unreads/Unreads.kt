@@ -8,8 +8,8 @@ import chat.stoat.api.internals.ULID
 import chat.stoat.api.routes.channel.ackChannel
 import chat.stoat.api.routes.server.ackServer
 import chat.stoat.api.routes.sync.syncUnreads
-import chat.stoat.api.schemas.ChannelType
-import chat.stoat.api.schemas.ChannelUnread
+import chat.stoat.core.model.schemas.ChannelType
+import chat.stoat.core.model.schemas.ChannelUnread
 import chat.stoat.api.settings.NotificationSettingsProvider
 
 class Unreads {

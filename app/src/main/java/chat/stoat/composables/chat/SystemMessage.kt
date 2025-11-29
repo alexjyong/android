@@ -28,8 +28,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import chat.stoat.R
-import chat.stoat.api.schemas.Message
 import chat.stoat.composables.markdown.RichMarkdown
+import chat.stoat.core.model.schemas.Message
 
 enum class SystemMessageType(val type: String) {
     CHANNEL_OWNERSHIP_CHANGED("channel_ownership_changed"),
@@ -54,10 +54,10 @@ fun SystemMessage(message: Message) {
     if (message.system == null) return
 
     val systemMessageType =
-        SystemMessageType.entries.firstOrNull { it.type == message.system.type }
+        SystemMessageType.entries.firstOrNull { it.type == message.system!!.type }
 
     if (systemMessageType == null) {
-        UnsupportedMessage(context = message.system.type)
+        UnsupportedMessage(context = message.system!!.type)
         return
     }
 
@@ -82,8 +82,8 @@ fun SystemMessage(message: Message) {
                     RichMarkdown(
                         stringResource(
                             R.string.system_message_ownership_changed,
-                            message.system.from.mention(),
-                            message.system.to.mention()
+                            message.system!!.from.mention(),
+                            message.system!!.to.mention()
                         )
                     )
                 }
@@ -92,7 +92,7 @@ fun SystemMessage(message: Message) {
                     RichMarkdown(
                         stringResource(
                             R.string.system_message_channel_icon_changed,
-                            message.system.by.mention()
+                            message.system!!.by.mention()
                         )
                     )
                 }
@@ -101,7 +101,7 @@ fun SystemMessage(message: Message) {
                     RichMarkdown(
                         stringResource(
                             R.string.system_message_channel_description_changed,
-                            message.system.by.mention()
+                            message.system!!.by.mention()
                         )
                     )
                 }
@@ -110,8 +110,8 @@ fun SystemMessage(message: Message) {
                     RichMarkdown(
                         stringResource(
                             R.string.system_message_channel_renamed,
-                            message.system.by.mention(),
-                            "**${message.system.name ?: stringResource(R.string.unknown)}**"
+                            message.system!!.by.mention(),
+                            "**${message.system!!.name ?: stringResource(R.string.unknown)}**"
                         )
                     )
                 }
@@ -120,8 +120,8 @@ fun SystemMessage(message: Message) {
                     RichMarkdown(
                         stringResource(
                             R.string.system_message_user_removed,
-                            message.system.by.mention(),
-                            message.system.id.mention()
+                            message.system!!.by.mention(),
+                            message.system!!.id.mention()
                         )
                     )
                 }
@@ -130,8 +130,8 @@ fun SystemMessage(message: Message) {
                     RichMarkdown(
                         stringResource(
                             R.string.system_message_user_added,
-                            message.system.by.mention(),
-                            message.system.id.mention()
+                            message.system!!.by.mention(),
+                            message.system!!.id.mention()
                         )
                     )
                 }
@@ -140,7 +140,7 @@ fun SystemMessage(message: Message) {
                     RichMarkdown(
                         stringResource(
                             R.string.system_message_user_banned,
-                            message.system.id.mention()
+                            message.system!!.id.mention()
                         )
                     )
                 }
@@ -149,7 +149,7 @@ fun SystemMessage(message: Message) {
                     RichMarkdown(
                         stringResource(
                             R.string.system_message_user_kicked,
-                            message.system.id.mention()
+                            message.system!!.id.mention()
                         )
                     )
                 }
@@ -158,7 +158,7 @@ fun SystemMessage(message: Message) {
                     RichMarkdown(
                         stringResource(
                             R.string.system_message_user_left,
-                            message.system.id.mention()
+                            message.system!!.id.mention()
                         )
                     )
                 }
@@ -167,13 +167,13 @@ fun SystemMessage(message: Message) {
                     RichMarkdown(
                         stringResource(
                             R.string.system_message_user_joined,
-                            message.system.id.mention()
+                            message.system!!.id.mention()
                         )
                     )
                 }
 
                 SystemMessageType.TEXT -> {
-                    message.system.content?.let { RichMarkdown(it) }
+                    message.system!!.content?.let { RichMarkdown(it) }
                 }
             }
         }

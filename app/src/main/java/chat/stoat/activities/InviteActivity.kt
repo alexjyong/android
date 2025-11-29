@@ -51,9 +51,9 @@ import chat.stoat.api.STOAT_FILES
 import chat.stoat.api.StoatAPIError
 import chat.stoat.api.routes.invites.fetchInviteByCode
 import chat.stoat.api.routes.invites.joinInviteByCode
-import chat.stoat.api.schemas.Invite
-import chat.stoat.api.schemas.InviteJoined
-import chat.stoat.api.schemas.RsResult
+import chat.stoat.core.model.schemas.Invite
+import chat.stoat.core.model.schemas.InviteJoined
+import chat.stoat.core.model.util.RsResult
 import chat.stoat.api.settings.LoadedSettings
 import chat.stoat.api.settings.SyncedSettings
 import chat.stoat.composables.generic.IconPlaceholder
@@ -206,7 +206,7 @@ fun InviteScreen(
                         ) {
                             if (invite?.serverIcon != null) {
                                 RemoteImage(
-                                    url = "$STOAT_FILES/icons/${invite.serverIcon.id}/${invite.serverIcon.filename}",
+                                    url = "$STOAT_FILES/icons/${invite.serverIcon!!.id}/${invite.serverIcon!!.filename}",
                                     allowAnimation = false,
                                     description = viewModel.inviteResult?.value?.serverName
                                         ?: stringResource(id = R.string.unknown),

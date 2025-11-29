@@ -82,7 +82,7 @@ import chat.stoat.api.api
 import chat.stoat.api.routes.microservices.geo.queryGeo
 import chat.stoat.api.routes.microservices.health.healthCheck
 import chat.stoat.api.routes.onboard.needsOnboarding
-import chat.stoat.api.schemas.HealthNotice
+import chat.stoat.core.model.schemas.HealthNotice
 import chat.stoat.api.settings.Experiments
 import chat.stoat.api.settings.GeoStateProvider
 import chat.stoat.api.settings.LoadedSettings

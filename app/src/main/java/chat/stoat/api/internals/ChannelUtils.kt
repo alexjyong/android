@@ -1,13 +1,16 @@
 package chat.stoat.api.internals
 
 import chat.stoat.api.StoatAPI
-import chat.stoat.api.schemas.Channel
-import chat.stoat.api.schemas.Server
-import chat.stoat.api.schemas.User
+import chat.stoat.core.model.schemas.Channel
+import chat.stoat.core.model.schemas.Server
+import chat.stoat.core.model.schemas.User
 
 sealed class CategorisedChannelList {
-    data class Channel(val channel: chat.stoat.api.schemas.Channel) : CategorisedChannelList()
-    data class Category(val category: chat.stoat.api.schemas.Category) : CategorisedChannelList()
+    data class Channel(val channel: chat.stoat.core.model.schemas.Channel) :
+        CategorisedChannelList()
+
+    data class Category(val category: chat.stoat.core.model.schemas.Category) :
+        CategorisedChannelList()
 }
 
 object ChannelUtils {

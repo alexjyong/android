@@ -3,7 +3,7 @@ package chat.stoat.api.routes.auth
 import chat.stoat.api.StoatHttp
 import chat.stoat.api.StoatJson
 import chat.stoat.api.api
-import chat.stoat.api.schemas.Session
+import chat.stoat.core.model.schemas.Session
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter

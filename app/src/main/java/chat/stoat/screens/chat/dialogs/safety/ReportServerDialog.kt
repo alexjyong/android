@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.sp
 import chat.stoat.R
 import chat.stoat.api.StoatAPI
 import chat.stoat.api.routes.safety.putServerReport
-import chat.stoat.api.schemas.ContentReportReason
+import chat.stoat.core.model.schemas.ContentReportReason
 import chat.stoat.composables.generic.FormTextField
 import chat.stoat.composables.screens.settings.ServerOverview
 import kotlinx.coroutines.launch

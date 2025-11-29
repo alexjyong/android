@@ -81,12 +81,6 @@ import chat.stoat.api.internals.CategorisedChannelList
 import chat.stoat.api.internals.ChannelUtils
 import chat.stoat.api.internals.DirectMessages
 import chat.stoat.api.internals.FriendRequests
-import chat.stoat.api.schemas.Category
-import chat.stoat.api.schemas.Channel
-import chat.stoat.api.schemas.ChannelType
-import chat.stoat.api.schemas.ServerFlags
-import chat.stoat.api.schemas.User
-import chat.stoat.api.schemas.has
 import chat.stoat.api.settings.GeoStateProvider
 import chat.stoat.api.settings.NotificationSettingsProvider
 import chat.stoat.api.settings.SyncedSettings
@@ -96,6 +90,12 @@ import chat.stoat.composables.generic.RemoteImage
 import chat.stoat.composables.generic.UserAvatar
 import chat.stoat.composables.generic.presenceFromStatus
 import chat.stoat.composables.screens.chat.ChannelIcon
+import chat.stoat.core.model.schemas.Category
+import chat.stoat.core.model.schemas.Channel
+import chat.stoat.core.model.schemas.ChannelType
+import chat.stoat.core.model.schemas.ServerFlags
+import chat.stoat.core.model.schemas.User
+import chat.stoat.core.model.schemas.has
 import chat.stoat.screens.chat.ChatRouterDestination
 import chat.stoat.screens.chat.LocalIsConnected
 import chat.stoat.sheets.ChannelContextSheet
@@ -476,7 +476,7 @@ fun ChannelSideDrawer(
             ) {
                 if (server?.banner != null) {
                     RemoteImage(
-                        url = "$STOAT_FILES/banners/${server.banner.id}",
+                        url = "$STOAT_FILES/banners/${server.banner!!.id}",
                         description = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier

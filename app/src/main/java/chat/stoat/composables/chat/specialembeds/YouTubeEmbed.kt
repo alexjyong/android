@@ -22,9 +22,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import chat.stoat.R
-import chat.stoat.api.schemas.Special
 import chat.stoat.composables.chat.VideoPlayButton
 import chat.stoat.composables.generic.RemoteImage
+import chat.stoat.core.model.schemas.Special
 import org.intellij.lang.annotations.Language
 
 @Language("HTML")
@@ -94,7 +94,7 @@ fun YouTubeEmbed(special: Special, modifier: Modifier = Modifier) {
             it.loadDataWithBaseURL(
                 null,
                 YOUTUBE_EMBED_TEMPLATE
-                    .replace("{{videoId}}", special.id)
+                    .replace("{{videoId}}", special.id!!)
                     .replace("{{useTimestamp}}", (special.timestamp != null).toString())
                     .replace("{{timestamp}}", special.timestamp ?: ""),
                 "text/html",

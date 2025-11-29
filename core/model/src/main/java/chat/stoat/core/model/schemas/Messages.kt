@@ -1,6 +1,5 @@
-package chat.stoat.api.schemas
+package chat.stoat.core.model.schemas
 
-import chat.stoat.api.StoatAPI
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -30,9 +29,6 @@ data class Message(
     val type: String? = null, // this is _only_ used for websocket events!
     val tail: Boolean? = null // this is used to determine if the message is the last in a message group
 ) {
-    fun getAuthor(): User? {
-        return author?.let { StoatAPI.userCache[it] }
-    }
 
     fun mergeWithPartial(partial: Message): Message {
         return Message(

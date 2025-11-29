@@ -52,7 +52,7 @@ import chat.stoat.api.StoatAPI
 import chat.stoat.api.routes.microservices.autumn.uploadToAutumn
 import chat.stoat.api.routes.user.fetchUserProfile
 import chat.stoat.api.routes.user.patchSelf
-import chat.stoat.api.schemas.Profile
+import chat.stoat.core.model.schemas.Profile
 import chat.stoat.composables.generic.InlineMediaPicker
 import chat.stoat.composables.screens.settings.RawUserOverview
 import dagger.hilt.android.lifecycle.HiltViewModel

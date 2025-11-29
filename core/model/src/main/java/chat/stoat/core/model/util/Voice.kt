@@ -1,4 +1,4 @@
-package chat.stoat.api.schemas
+package chat.stoat.core.model.util
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

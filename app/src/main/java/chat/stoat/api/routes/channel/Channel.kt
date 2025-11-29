@@ -6,10 +6,10 @@ import chat.stoat.api.StoatHttp
 import chat.stoat.api.StoatJson
 import chat.stoat.api.api
 import chat.stoat.api.internals.ULID
-import chat.stoat.api.schemas.Channel
-import chat.stoat.api.schemas.Message
-import chat.stoat.api.schemas.MessagesInChannel
-import chat.stoat.api.schemas.User
+import chat.stoat.core.model.schemas.Channel
+import chat.stoat.core.model.schemas.Message
+import chat.stoat.core.model.schemas.MessagesInChannel
+import chat.stoat.core.model.schemas.User
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.header

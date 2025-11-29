@@ -1,7 +1,7 @@
 package chat.stoat.internals.text
 
 import chat.stoat.api.StoatAPI
-import chat.stoat.api.schemas.ChannelType
+import chat.stoat.core.model.schemas.ChannelType
 import chat.stoat.internals.EmojiImpl
 
 object MessageProcessor {

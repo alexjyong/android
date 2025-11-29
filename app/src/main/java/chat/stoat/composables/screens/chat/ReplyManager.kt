@@ -29,18 +29,18 @@ import chat.stoat.R
 import chat.stoat.api.StoatAPI
 import chat.stoat.api.internals.ULID
 import chat.stoat.api.routes.channel.SendMessageReply
-import chat.stoat.api.schemas.Message
 import chat.stoat.composables.chat.authorAvatarUrl
 import chat.stoat.composables.chat.authorColour
 import chat.stoat.composables.chat.authorName
 import chat.stoat.composables.generic.UserAvatar
+import chat.stoat.core.model.schemas.Message
 
 @Composable
 fun replyContentText(message: Message): String {
     return if (message.content.isNullOrBlank()) {
         stringResource(id = R.string.reply_message_empty_has_attachments)
     } else {
-        message.content
+        message.content!!
     }
 }
 

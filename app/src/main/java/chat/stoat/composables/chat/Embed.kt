@@ -26,11 +26,11 @@ import androidx.compose.ui.unit.dp
 import chat.stoat.api.internals.BrushCompat
 import chat.stoat.api.internals.solidColor
 import chat.stoat.api.routes.microservices.january.asJanuaryProxyUrl
-import chat.stoat.api.schemas.Embed
 import chat.stoat.composables.chat.specialembeds.SpecialEmbedSwitch
 import chat.stoat.composables.generic.RemoteImage
 import chat.stoat.composables.markdown.RichMarkdown
-import chat.stoat.api.schemas.Embed as EmbedSchema
+import chat.stoat.core.model.schemas.Embed
+import chat.stoat.core.model.schemas.Embed as EmbedSchema
 
 @Composable
 fun RegularEmbed(
@@ -68,7 +68,7 @@ fun RegularEmbed(
                             if (embed.originalURL != null) {
                                 Modifier
                                     .clickable {
-                                        onLinkClick(embed.originalURL)
+                                        onLinkClick(embed.originalURL!!)
                                     }
                             } else {
                                 Modifier
@@ -106,11 +106,11 @@ fun RegularEmbed(
 
                 // Image
                 embed.image?.let {
-                    if (it.url == null || it.url.endsWith(".svg")) return@let
+                    if (it.url == null || it.url?.endsWith(".svg") == true) return@let
 
                     Spacer(modifier = Modifier.height(8.dp))
                     RemoteImage(
-                        url = asJanuaryProxyUrl(it.url),
+                        url = asJanuaryProxyUrl(it.url!!),
                         width = (it.width ?: 48).toInt(),
                         height = (it.height ?: 48).toInt(),
                         modifier = Modifier
@@ -118,7 +118,7 @@ fun RegularEmbed(
                             .then(
                                 if (embed.originalURL != null) {
                                     Modifier.clickable {
-                                        onLinkClick(embed.originalURL)
+                                        onLinkClick(embed.originalURL!!)
                                     }
                                 } else {
                                     Modifier

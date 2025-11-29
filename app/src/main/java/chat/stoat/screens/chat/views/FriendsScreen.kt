@@ -87,8 +87,8 @@ import chat.stoat.api.internals.UserQR
 import chat.stoat.api.internals.UserQRContents
 import chat.stoat.api.routes.user.friendUser
 import chat.stoat.api.routes.user.unfriendUser
-import chat.stoat.api.schemas.AutumnResource
-import chat.stoat.api.schemas.Metadata
+import chat.stoat.core.model.schemas.AutumnResource
+import chat.stoat.core.model.schemas.Metadata
 import chat.stoat.api.settings.LoadedSettings
 import chat.stoat.callbacks.Action
 import chat.stoat.callbacks.ActionChannel

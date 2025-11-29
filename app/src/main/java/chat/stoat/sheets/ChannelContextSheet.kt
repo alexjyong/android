@@ -58,7 +58,7 @@ fun ChannelContextSheet(channelId: String, onHideSheet: suspend () -> Unit) {
         onClick = {
             if (channel.id == null) return@SheetButton
 
-            clipboardManager.setText(AnnotatedString(channel.id))
+            clipboardManager.setText(AnnotatedString(channel.id!!))
 
             if (Platform.needsShowClipboardNotification()) {
                 Toast.makeText(

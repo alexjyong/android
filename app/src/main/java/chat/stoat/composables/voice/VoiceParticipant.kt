@@ -11,7 +11,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import chat.stoat.R
 import chat.stoat.api.StoatAPI
-import chat.stoat.api.schemas.UserVoiceState
+import chat.stoat.core.model.util.UserVoiceState
 import chat.stoat.composables.chat.displayNameInChannel
 import chat.stoat.composables.generic.UserAvatar
 import chat.stoat.internals.extensions.TransparentListItemColours

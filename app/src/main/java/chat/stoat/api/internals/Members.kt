@@ -1,6 +1,6 @@
 package chat.stoat.api.internals
 
-import chat.stoat.api.schemas.Member
+import chat.stoat.core.model.schemas.Member
 
 class Members {
     // memberCache (mapping of serverId to userId to member)
@@ -35,7 +35,7 @@ class Members {
      */
     fun markdownMemberMapFor(serverId: String): Map<String, String> {
         return memberCache[serverId]?.mapNotNull { (userId, member) ->
-            member.nickname?.let { userId to member.nickname }
+            member.nickname?.let { userId to it }
         }?.toMap() ?: emptyMap()
     }
 

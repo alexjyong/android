@@ -1,4 +1,4 @@
-package chat.stoat.api.schemas
+package chat.stoat.core.model.schemas
 
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
@@ -113,7 +113,7 @@ enum class ChannelType(val value: String) {
         override val descriptor: SerialDescriptor
             get() {
                 return PrimitiveSerialDescriptor(
-                    "chat.stoat.api.schemas.ChannelType",
+                    "chat.stoat.core.model.schemas.ChannelType",
                     PrimitiveKind.STRING
                 )
             }

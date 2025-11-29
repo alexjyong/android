@@ -5,7 +5,7 @@ import chat.stoat.R
 import chat.stoat.StoatApplication
 import chat.stoat.api.StoatAPI
 import chat.stoat.api.StoatJson
-import chat.stoat.api.schemas.Server
+import chat.stoat.core.model.schemas.Server
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 
@@ -58,7 +58,7 @@ sealed class EmojiPickerItem {
         val alternates: List<List<Long>>
     ) : EmojiPickerItem()
 
-    data class ServerEmote(val emote: chat.stoat.api.schemas.Emoji) : EmojiPickerItem()
+    data class ServerEmote(val emote: chat.stoat.core.model.schemas.Emoji) : EmojiPickerItem()
 }
 
 class EmojiImpl {

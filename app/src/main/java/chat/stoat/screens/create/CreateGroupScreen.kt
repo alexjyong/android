@@ -72,8 +72,8 @@ class CreateGroupScreenViewModel : ViewModel() {
                 return@filter false
             }
 
-            it.displayName.contains(friendSearchQuery, ignoreCase = true) ||
-                    it.username.contains(friendSearchQuery, ignoreCase = true)
+            it.displayName!!.contains(friendSearchQuery, ignoreCase = true) ||
+                    it.username!!.contains(friendSearchQuery, ignoreCase = true)
         }.map { it.id!! })
     }
 
@@ -203,7 +203,7 @@ fun CreateGroupScreen(
                                 viewModel.groupMembers.remove(friend.id)
                             } else {
                                 if (viewModel.groupMembers.size < MAX_ADDABLE_PEOPLE_IN_GROUP) {
-                                    viewModel.groupMembers.add(friend.id)
+                                    viewModel.groupMembers.add(friend.id!!)
                                 }
                             }
                         },

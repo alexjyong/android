@@ -1,6 +1,5 @@
 package chat.stoat.composables.chat
 
-import android.R.id.message
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.icu.text.DateFormat
@@ -75,8 +74,8 @@ import chat.stoat.api.internals.solidColor
 import chat.stoat.api.routes.channel.react
 import chat.stoat.api.routes.channel.unreact
 import chat.stoat.api.routes.microservices.january.asJanuaryProxyUrl
-import chat.stoat.api.schemas.AutumnResource
-import chat.stoat.api.schemas.User
+import chat.stoat.core.model.schemas.AutumnResource
+import chat.stoat.core.model.schemas.User
 import chat.stoat.api.settings.Experiments
 import chat.stoat.api.settings.LoadedSettings
 import chat.stoat.api.settings.MessageReplyStyle
@@ -94,12 +93,12 @@ import chat.stoat.markdown.jbm.JBMRenderer
 import chat.stoat.markdown.jbm.LocalJBMarkdownTreeState
 import chat.stoat.persistence.KVStorage
 import kotlinx.coroutines.launch
-import chat.stoat.api.schemas.Message as MessageSchema
+import chat.stoat.core.model.schemas.Message as MessageSchema
 
 @Composable
 fun authorColour(message: MessageSchema): Brush {
     return if (message.masquerade?.colour != null) {
-        BrushCompat.parseColour(message.masquerade.colour)
+        BrushCompat.parseColour(message.masquerade!!.colour!!)
     } else {
         val defaultColour = Brush.solidColor(LocalContentColor.current)
 
@@ -131,7 +130,7 @@ fun displayNameInChannel(userId: String, channelId: String): String {
 @Composable
 fun authorName(message: MessageSchema): String {
     if (message.masquerade?.name != null) {
-        return message.masquerade.name
+        return message.masquerade!!.name!!
     }
 
     val serverId =
@@ -149,7 +148,7 @@ fun authorName(message: MessageSchema): String {
 @Composable
 fun authorAvatarUrl(message: MessageSchema): String? {
     if (message.masquerade?.avatar != null) {
-        return asJanuaryProxyUrl(message.masquerade.avatar)
+        return asJanuaryProxyUrl(message.masquerade!!.avatar!!)
     }
 
     val serverId =
@@ -441,14 +440,14 @@ fun Message(
 
                         key(message.content) {
                             message.content?.let {
-                                if (message.content.isBlank()) return@let // if only an attachment is sent
+                                if (message.content!!.isBlank()) return@let // if only an attachment is sent
 
                                 if (Experiments.useKotlinBasedMarkdownRenderer.isEnabled) {
                                     CompositionLocalProvider(
                                         LocalJBMarkdownTreeState provides LocalJBMarkdownTreeState.current.copy(
                                             currentServer = StoatAPI.channelCache[message.channel]?.server,
                                             fontSizeMultiplier = Gigamoji.useGigamojiForMessage(
-                                                message.content
+                                                message.content!!
                                             )
                                                 .let {
                                                     if (it) 2f else 1f
@@ -456,14 +455,14 @@ fun Message(
                                         )
                                     ) {
                                         Spacer(modifier = Modifier.height(2.dp))
-                                        JBMRenderer(message.content)
+                                        JBMRenderer(message.content!!)
                                     }
                                 } else {
                                     CompositionLocalProvider(
                                         LocalMarkdownTreeConfig provides LocalMarkdownTreeConfig.current.copy(
                                             currentServer = StoatAPI.channelCache[message.channel]?.server,
                                             fontSizeMultiplier = Gigamoji.useGigamojiForMessage(
-                                                message.content
+                                                message.content!!
                                             )
                                                 .let {
                                                     if (it) 2f else 1f
@@ -471,14 +470,14 @@ fun Message(
                                         )
                                     ) {
                                         Spacer(modifier = Modifier.height(2.dp))
-                                        RichMarkdown(input = message.content)
+                                        RichMarkdown(input = message.content!!)
                                     }
                                 }
                             }
                         }
 
                         message.attachments?.let {
-                            message.attachments.forEach { attachment ->
+                            it.forEach { attachment ->
                                 Spacer(modifier = Modifier.height(2.dp))
                                 MessageAttachment(attachment) {
                                     when (attachment.metadata?.type) {
@@ -518,7 +517,7 @@ fun Message(
                         }
 
                         message.embeds?.let {
-                            message.embeds.forEach { embed ->
+                            it.forEach { embed ->
                                 when (embed.type) {
                                     "Website", "Text" -> {
                                         val embedIsEmpty =

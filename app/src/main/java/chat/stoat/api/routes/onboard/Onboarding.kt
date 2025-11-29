@@ -6,7 +6,7 @@ import chat.stoat.api.StoatAPIError
 import chat.stoat.api.StoatHttp
 import chat.stoat.api.StoatJson
 import chat.stoat.api.api
-import chat.stoat.api.schemas.RsResult
+import chat.stoat.core.model.util.RsResult
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post

@@ -39,9 +39,9 @@ import chat.stoat.api.routes.user.friendUser
 import chat.stoat.api.routes.user.openDM
 import chat.stoat.api.routes.user.unblockUser
 import chat.stoat.api.routes.user.unfriendUser
-import chat.stoat.api.schemas.User
 import chat.stoat.callbacks.Action
 import chat.stoat.callbacks.ActionChannel
+import chat.stoat.core.model.schemas.User
 import chat.stoat.internals.Platform
 import kotlinx.coroutines.launch
 import logcat.LogPriority
@@ -153,11 +153,11 @@ fun UserButtons(
                 FilledTonalButton(
                     onClick = {
                         scope.launch {
-                            val dm = openDM(user.id)
+                            val dm = openDM(user.id!!)
                             if (dm.id != null) {
                                 if (StoatAPI.channelCache[dm.id] == null)
-                                    StoatAPI.channelCache[dm.id] = dm
-                                ActionChannel.send(Action.SwitchChannel(dm.id))
+                                    StoatAPI.channelCache[dm.id!!] = dm
+                                ActionChannel.send(Action.SwitchChannel(dm.id!!))
                                 dismissSheet()
                             } else {
                                 Toast.makeText(
@@ -180,7 +180,7 @@ fun UserButtons(
                     onClick = {
                         scope.launch {
                             try {
-                                unfriendUser(user.id)
+                                unfriendUser(user.id!!)
                             } catch (e: Exception) {
                                 if (e.message == "NoEffect") return@launch
                                 logcat(LogPriority.ERROR) { e.asLog() }
@@ -198,7 +198,7 @@ fun UserButtons(
                     onClick = {
                         scope.launch {
                             try {
-                                acceptFriendRequest(user.id)
+                                acceptFriendRequest(user.id!!)
                             } catch (e: Exception) {
                                 if (e.message == "NoEffect") return@launch
                                 logcat(LogPriority.ERROR) { e.asLog() }
@@ -213,7 +213,7 @@ fun UserButtons(
                     onClick = {
                         scope.launch {
                             try {
-                                unfriendUser(user.id)
+                                unfriendUser(user.id!!)
                             } catch (e: Exception) {
                                 if (e.message == "NoEffect") return@launch
                                 logcat(LogPriority.ERROR) { e.asLog() }
@@ -235,7 +235,7 @@ fun UserButtons(
                     onClick = {
                         scope.launch {
                             try {
-                                unblockUser(user.id)
+                                unblockUser(user.id!!)
                             } catch (e: Exception) {
                                 if (e.message == "NoEffect") return@launch
                                 logcat(LogPriority.ERROR) { e.asLog() }
@@ -266,7 +266,7 @@ fun UserButtons(
                                 onClick = {
                                     scope.launch {
                                         try {
-                                            unfriendUser(user.id)
+                                            unfriendUser(user.id!!)
                                         } catch (e: Exception) {
                                             if (e.message == "NoEffect") return@launch
                                             logcat(LogPriority.ERROR) { e.asLog() }
@@ -287,7 +287,7 @@ fun UserButtons(
                             onClick = {
                                 scope.launch {
                                     try {
-                                        blockUser(user.id)
+                                        blockUser(user.id!!)
                                     } catch (e: Exception) {
                                         if (e.message == "NoEffect") return@launch
                                         logcat(LogPriority.ERROR) { e.asLog() }
@@ -303,7 +303,7 @@ fun UserButtons(
                         },
                         onClick = {
                             scope.launch {
-                                clipboard.setText(AnnotatedString(user.id))
+                                clipboard.setText(AnnotatedString(user.id!!))
                             }
                         }
                     )
@@ -314,7 +314,7 @@ fun UserButtons(
                         },
                         onClick = {
                             scope.launch {
-                                ActionChannel.send(Action.ReportUser(user.id))
+                                ActionChannel.send(Action.ReportUser(user.id!!))
 
                                 if (Platform.needsShowClipboardNotification()) {
                                     Toast.makeText(

@@ -21,8 +21,8 @@ import chat.stoat.api.STOAT_BASE
 import chat.stoat.api.StoatJson
 import chat.stoat.api.internals.ULID
 import chat.stoat.api.routes.push.subscribePush
-import chat.stoat.api.schemas.Message
-import chat.stoat.api.schemas.User
+import chat.stoat.core.model.schemas.Message
+import chat.stoat.core.model.schemas.User
 import chat.stoat.c2dm.ChannelRegistrator.Companion.CHANNEL_ID_GROUP_CONVERSATIONS_MESSAGES
 import chat.stoat.persistence.Database
 import chat.stoat.persistence.SqlStorage

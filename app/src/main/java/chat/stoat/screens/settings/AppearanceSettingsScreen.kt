@@ -72,12 +72,15 @@ import chat.stoat.api.settings.UserInterfaceFont
 import chat.stoat.composables.generic.ListHeader
 import chat.stoat.composables.screens.settings.appearance.ColourChip
 import chat.stoat.composables.screens.settings.appearance.CornerRadiusPicker
+import chat.stoat.core.model.data.OverridableColourScheme
 import chat.stoat.sheets.ColourPickerSheet
 import chat.stoat.ui.theme.GoogleSansFlex
 import chat.stoat.ui.theme.Inter
-import chat.stoat.ui.theme.OverridableColourScheme
 import chat.stoat.ui.theme.Theme
+import chat.stoat.ui.theme.applyFromKeyValueMap
 import chat.stoat.ui.theme.getFieldByName
+import chat.stoat.ui.theme.overridableColourSchemeFieldNameToResource
+import chat.stoat.ui.theme.overridableColourSchemeFieldNames
 import chat.stoat.ui.theme.systemSupportsDynamicColors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -167,7 +170,7 @@ class AppearanceSettingsScreenViewModel @Inject constructor(
             SyncedSettings.updateAndroid(
                 SyncedSettings.android.copy(
                     colourOverrides = existingOverrides
-                        .applyFromKeyValueMap(overrides.filterKeys { it in OverridableColourScheme.fieldNames })
+                        .applyFromKeyValueMap(overrides.filterKeys { it in overridableColourSchemeFieldNames })
                 )
             )
         }
@@ -544,14 +547,14 @@ fun AppearanceSettingsScreen(
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        OverridableColourScheme.fieldNames.forEach { fieldName ->
+                        overridableColourSchemeFieldNames.forEach { fieldName ->
                             val value =
                                 SyncedSettings.android.colourOverrides?.getFieldByName(fieldName)
                                     ?: MaterialTheme.colorScheme.getFieldByName(fieldName)
 
                             ColourChip(
                                 color = Color(value ?: 0),
-                                text = OverridableColourScheme.fieldNameToResource[fieldName]
+                                text = overridableColourSchemeFieldNameToResource[fieldName]
                                     ?.let { context.getString(it) }
                                     ?: fieldName,
                                 modifier = Modifier

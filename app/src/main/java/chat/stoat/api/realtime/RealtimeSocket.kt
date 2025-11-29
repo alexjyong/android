@@ -41,10 +41,10 @@ import chat.stoat.api.realtime.frames.sendable.BeginTypingFrame
 import chat.stoat.api.realtime.frames.sendable.EndTypingFrame
 import chat.stoat.api.realtime.frames.sendable.PingFrame
 import chat.stoat.api.routes.server.fetchMember
-import chat.stoat.api.schemas.Channel
-import chat.stoat.api.schemas.ChannelType
-import chat.stoat.api.schemas.ChannelVoiceState
-import chat.stoat.api.schemas.Role
+import chat.stoat.core.model.schemas.Channel
+import chat.stoat.core.model.schemas.ChannelType
+import chat.stoat.core.model.util.ChannelVoiceState
+import chat.stoat.core.model.schemas.Role
 import chat.stoat.api.settings.LoadedSettings
 import chat.stoat.api.settings.SyncedSettings
 import chat.stoat.c2dm.ChannelRegistrator
@@ -180,9 +180,9 @@ object RealtimeSocket {
                     }
 
                     database.serverQueries.upsert(
-                        it.id,
-                        it.owner,
-                        it.name,
+                        it.id!!,
+                        it.owner!!,
+                        it.name!!,
                         it.description,
                         it.icon?.id,
                         it.banner?.id,
@@ -216,7 +216,7 @@ object RealtimeSocket {
                     }
 
                     database.channelQueries.upsert(
-                        it.id,
+                        it.id!!,
                         it.channelType?.value ?: ChannelType.TextChannel.value,
                         it.user,
                         it.name,
@@ -274,7 +274,7 @@ object RealtimeSocket {
                     return
                 }
 
-                StoatAPI.messageCache[messageFrame.id] = messageFrame
+                StoatAPI.messageCache[messageFrame.id!!] = messageFrame
 
                 messageFrame.channel?.let {
                     if (StoatAPI.channelCache[it] == null) {
@@ -472,7 +472,7 @@ object RealtimeSocket {
                 val existing = StoatAPI.userCache[userRelationshipFrame.user.id]
 
                 if (existing == null && userRelationshipFrame.user.id != null) {
-                    StoatAPI.userCache[userRelationshipFrame.user.id] =
+                    StoatAPI.userCache[userRelationshipFrame.user.id!!] =
                         userRelationshipFrame.user.copy(
                             relationship = userRelationshipFrame.status ?: "None"
                         )
@@ -480,7 +480,7 @@ object RealtimeSocket {
                     val merged = existing.mergeWithPartial(userRelationshipFrame.user).copy(
                         relationship = userRelationshipFrame.status ?: "None"
                     )
-                    StoatAPI.userCache[userRelationshipFrame.user.id] = merged
+                    StoatAPI.userCache[userRelationshipFrame.user.id!!] = merged
                 } else {
                     Log.w("RealtimeSocket", "Invalid UserRelationship frame: $rawFrame")
                 }
@@ -523,7 +523,7 @@ object RealtimeSocket {
 
                 StoatAPI.channelCache[channelCreateFrame.id!!] = channelCreateFrame
                 database.channelQueries.upsert(
-                    channelCreateFrame.id,
+                    channelCreateFrame.id!!,
                     channelCreateFrame.channelType?.value ?: ChannelType.TextChannel.value,
                     channelCreateFrame.user,
                     channelCreateFrame.name,
@@ -569,7 +569,7 @@ object RealtimeSocket {
                         return
                     }
 
-                    StoatAPI.serverCache[currentChannel.server] = existingServer.copy(
+                    StoatAPI.serverCache[currentChannel.server!!] = existingServer.copy(
                         channels = existingServer.channels?.filter { it != channelDeleteFrame.id }
                             ?: emptyList()
                     )
@@ -601,14 +601,14 @@ object RealtimeSocket {
 
                 serverCreateFrame.channels.forEach { channel ->
                     if (channel.id == null) return@forEach
-                    StoatAPI.channelCache[channel.id] = channel
+                    StoatAPI.channelCache[channel.id!!] = channel
                 }
 
                 if (serverCreateFrame.server.owner != null && serverCreateFrame.server.name != null) {
                     database.serverQueries.upsert(
                         serverCreateFrame.id,
-                        serverCreateFrame.server.owner,
-                        serverCreateFrame.server.name,
+                        serverCreateFrame.server.owner!!,
+                        serverCreateFrame.server.name!!,
                         serverCreateFrame.server.description,
                         serverCreateFrame.server.icon?.id,
                         serverCreateFrame.server.banner?.id,
@@ -788,7 +788,7 @@ object RealtimeSocket {
                     )
                     val updatedRole = existingRole.mergeWithPartial(serverRoleUpdateFrame.data)
                     val newServer = server.copy(
-                        roles = server.roles.plus(
+                        roles = server.roles!!.plus(
                             Pair(serverRoleUpdateFrame.roleId, updatedRole)
                         )
                     )

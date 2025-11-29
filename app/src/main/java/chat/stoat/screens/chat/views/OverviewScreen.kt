@@ -61,7 +61,7 @@ import androidx.navigation.NavController
 import chat.stoat.R
 import chat.stoat.api.StoatAPI
 import chat.stoat.api.routes.user.fetchSelf
-import chat.stoat.api.schemas.User
+import chat.stoat.core.model.schemas.User
 import chat.stoat.composables.generic.NonIdealState
 import chat.stoat.composables.screens.settings.UserOverview
 import chat.stoat.composables.skeletons.UserOverviewSkeleton

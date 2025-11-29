@@ -401,7 +401,7 @@ fun EmojiPicker(
                             )
                         } else {
                             RemoteImage(
-                                url = "$STOAT_FILES/icons/${server.icon.id}",
+                                url = "$STOAT_FILES/icons/${server.icon!!.id}",
                                 allowAnimation = false,
                                 description = server.name,
                                 modifier = Modifier

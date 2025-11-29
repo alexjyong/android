@@ -161,7 +161,7 @@ fun ServerContextSheet(
             SelectionContainer {
                 RichMarkdown(
                     input = if (server.description?.isBlank() == false) {
-                        server.description
+                        server.description!!
                     } else {
                         stringResource(
                             R.string.server_context_sheet_description_empty
@@ -220,7 +220,7 @@ fun ServerContextSheet(
             onClick = {
                 if (server.id == null) return@SheetButton
 
-                clipboardManager.setText(AnnotatedString(server.id))
+                clipboardManager.setText(AnnotatedString(server.id!!))
 
                 if (Platform.needsShowClipboardNotification()) {
                     Toast.makeText(

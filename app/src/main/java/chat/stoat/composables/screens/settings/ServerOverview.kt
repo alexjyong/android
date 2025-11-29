@@ -28,9 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.stoat.R
 import chat.stoat.api.STOAT_FILES
-import chat.stoat.api.schemas.Server
-import chat.stoat.api.schemas.ServerFlags
-import chat.stoat.api.schemas.has
+import chat.stoat.core.model.schemas.Server
+import chat.stoat.core.model.schemas.ServerFlags
+import chat.stoat.core.model.schemas.has
 import chat.stoat.composables.generic.IconPlaceholder
 import chat.stoat.composables.generic.RemoteImage
 

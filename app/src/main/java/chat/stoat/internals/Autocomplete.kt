@@ -4,9 +4,9 @@ import chat.stoat.api.StoatAPI
 import chat.stoat.api.internals.PermissionBit
 import chat.stoat.api.internals.Roles
 import chat.stoat.api.internals.has
-import chat.stoat.api.schemas.ChannelType
 import chat.stoat.api.settings.FeatureFlags
 import chat.stoat.composables.chat.AutocompleteSuggestion
+import chat.stoat.core.model.schemas.ChannelType
 
 object Autocomplete {
     private val emojiImpl = EmojiImpl()
@@ -133,10 +133,10 @@ object Autocomplete {
                         ignoreCase = true
                     ) == true
                 }.mapNotNull {
-                    it.id?.let { _ ->
+                    it.id?.let { id ->
                         StoatAPI.members.getMember(
                             serverId,
-                            it.id
+                            id
                         ) to it
                     }
                 }.filter { (member, _) ->

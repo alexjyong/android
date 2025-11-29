@@ -34,8 +34,8 @@ import chat.stoat.R
 import chat.stoat.api.STOAT_FILES
 import chat.stoat.api.StoatAPI
 import chat.stoat.api.routes.custom.fetchEmoji
-import chat.stoat.api.schemas.Emoji
-import chat.stoat.api.schemas.Server
+import chat.stoat.core.model.schemas.Emoji
+import chat.stoat.core.model.schemas.Server
 import chat.stoat.composables.generic.RemoteImage
 import chat.stoat.composables.generic.SheetButton
 import chat.stoat.internals.Platform

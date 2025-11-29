@@ -39,7 +39,7 @@ import androidx.core.content.FileProvider
 import chat.stoat.BuildConfig
 import chat.stoat.R
 import chat.stoat.api.StoatAPI
-import chat.stoat.api.schemas.User
+import chat.stoat.core.model.schemas.User
 import chat.stoat.composables.profile.UserCard
 import chat.stoat.internals.Platform
 import kotlinx.coroutines.Dispatchers

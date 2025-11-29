@@ -38,7 +38,7 @@ import chat.stoat.activities.InviteActivity
 import chat.stoat.api.STOAT_FILES
 import chat.stoat.api.StoatAPI
 import chat.stoat.api.routes.custom.fetchEmoji
-import chat.stoat.api.schemas.isInviteUri
+import chat.stoat.core.model.schemas.isInviteUri
 import chat.stoat.callbacks.Action
 import chat.stoat.callbacks.ActionChannel
 import chat.stoat.composables.generic.RemoteImage

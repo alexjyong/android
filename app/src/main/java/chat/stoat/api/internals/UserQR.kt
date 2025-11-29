@@ -3,7 +3,7 @@ package chat.stoat.api.internals
 import androidx.core.net.toUri
 import chat.stoat.api.STOAT_MARKETING
 import chat.stoat.api.StoatCbor
-import chat.stoat.api.schemas.User
+import chat.stoat.core.model.schemas.User
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlin.io.encoding.Base64

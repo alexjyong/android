@@ -57,13 +57,13 @@ fun buildproperty(propertyName: String, fallbackEnv: String? = null): String? {
 }
 
 android {
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
     namespace = "chat.stoat"
 
     defaultConfig {
         applicationId = "chat.revolt"
-        minSdk = 26
-        targetSdk = 36
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = Integer.parseInt("001_003_409".replace("_", ""), 10)
         versionName = "1.3.9a"
 

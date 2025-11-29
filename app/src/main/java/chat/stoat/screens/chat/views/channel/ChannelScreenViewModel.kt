@@ -41,8 +41,8 @@ import chat.stoat.api.routes.microservices.autumn.uploadToAutumn
 import chat.stoat.api.routes.server.fetchMember
 import chat.stoat.api.routes.user.addUserIfUnknown
 import chat.stoat.api.routes.user.fetchUser
-import chat.stoat.api.schemas.Channel
-import chat.stoat.api.schemas.Message
+import chat.stoat.core.model.schemas.Channel
+import chat.stoat.core.model.schemas.Message
 import chat.stoat.api.settings.GeoStateProvider
 import chat.stoat.callbacks.Action
 import chat.stoat.callbacks.ActionChannel
@@ -58,7 +58,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -185,7 +184,7 @@ class ChannelScreenViewModel @Inject constructor(
                 try {
                     StoatAPI.members.getMember(serverId, selfUser.id!!) ?: fetchMember(
                         serverId,
-                        selfUser.id
+                        selfUser.id!!
                     )
                 } catch (e: Exception) {
                     Log.e("ChannelScreenViewModel", "Failed to fetch member", e)
@@ -436,7 +435,7 @@ class ChannelScreenViewModel @Inject constructor(
                     val messages = arrayListOf<Message>()
 
                     fetchMessagesFromChannel(channelId, amount, true, before, after, around).let {
-                        if (it.messages.isNullOrEmpty() || it.messages.size < 50) {
+                        if (it.messages.isNullOrEmpty() || it.messages!!.size < 50) {
                             endOfChannel = true
                         }
 
@@ -455,8 +454,8 @@ class ChannelScreenViewModel @Inject constructor(
                         }
 
                         it.members?.forEach { member ->
-                            if (!StoatAPI.members.hasMember(member.id!!.server, member.id.user)) {
-                                StoatAPI.members.setMember(member.id.server, member)
+                            if (!StoatAPI.members.hasMember(member.id!!.server, member.id!!.user)) {
+                                StoatAPI.members.setMember(member.id!!.server, member)
                             }
                         }
 
@@ -580,7 +579,7 @@ class ChannelScreenViewModel @Inject constructor(
                         if (currentMessage == null) return@onEach
 
                         if (messageFrame.author != null) {
-                            addUserIfUnknown(messageFrame.author)
+                            addUserIfUnknown(messageFrame.author!!)
                         }
 
                         updateItems(

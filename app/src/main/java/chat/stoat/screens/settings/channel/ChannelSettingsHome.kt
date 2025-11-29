@@ -41,7 +41,7 @@ import chat.stoat.api.StoatAPI
 import chat.stoat.api.internals.PermissionBit
 import chat.stoat.api.internals.hasPermission
 import chat.stoat.api.routes.channel.leaveDeleteOrCloseChannel
-import chat.stoat.api.schemas.ChannelType
+import chat.stoat.core.model.schemas.ChannelType
 import chat.stoat.api.settings.FeatureFlags
 import chat.stoat.internals.extensions.rememberChannelPermissions
 import chat.stoat.screens.settings.SettingsIcon

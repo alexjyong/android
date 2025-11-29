@@ -1,7 +1,7 @@
 package chat.stoat.api.internals
 
 import chat.stoat.api.StoatAPI
-import chat.stoat.api.schemas.User
+import chat.stoat.core.model.schemas.User
 
 object FriendRequests {
     fun getIncoming(): List<User> {

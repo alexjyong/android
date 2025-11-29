@@ -1,13 +1,13 @@
 package chat.stoat.api.internals
 
 import chat.stoat.api.StoatAPI
-import chat.stoat.api.schemas.Channel
-import chat.stoat.api.schemas.ChannelType
-import chat.stoat.api.schemas.Member
-import chat.stoat.api.schemas.PermissionDescription
-import chat.stoat.api.schemas.Role
-import chat.stoat.api.schemas.Server
-import chat.stoat.api.schemas.User
+import chat.stoat.core.model.schemas.Channel
+import chat.stoat.core.model.schemas.ChannelType
+import chat.stoat.core.model.schemas.Member
+import chat.stoat.core.model.schemas.PermissionDescription
+import chat.stoat.core.model.schemas.Role
+import chat.stoat.core.model.schemas.Server
+import chat.stoat.core.model.schemas.User
 import kotlinx.datetime.Clock
 
 object Roles {
@@ -95,11 +95,11 @@ object Roles {
 
                 if (channel.defaultPermissions != null) {
                     calculated =
-                        calculated or channel.defaultPermissions.a and channel.defaultPermissions.d.inv()
+                        calculated or channel.defaultPermissions!!.a and channel.defaultPermissions!!.d.inv()
                 }
 
                 if (chMember.roles?.isNotEmpty() == true) {
-                    chMember.roles.forEach { roleId ->
+                    chMember.roles!!.forEach { roleId ->
                         val override = channel.rolePermissions?.get(roleId) ?: return@forEach
                         calculated = calculated or override.a and override.d.inv()
                     }

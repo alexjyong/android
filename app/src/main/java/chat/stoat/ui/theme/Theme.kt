@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
 import chat.stoat.api.settings.UserInterfaceFont
+import chat.stoat.core.model.data.OverridableColourScheme
 
 val LightColorScheme = lightColorScheme(
     primary = Colour.PrimaryLight,

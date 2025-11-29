@@ -31,7 +31,7 @@ import chat.stoat.api.internals.ChannelUtils
 import chat.stoat.api.internals.PermissionBit
 import chat.stoat.api.internals.Roles
 import chat.stoat.api.internals.has
-import chat.stoat.api.schemas.ChannelType
+import chat.stoat.core.model.schemas.ChannelType
 import chat.stoat.callbacks.Action
 import chat.stoat.callbacks.ActionChannel
 import chat.stoat.composables.generic.SheetButton

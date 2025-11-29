@@ -1,4 +1,4 @@
-package chat.stoat.api.schemas
+package chat.stoat.core.model.schemas
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

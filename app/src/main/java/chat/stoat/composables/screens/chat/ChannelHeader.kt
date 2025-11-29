@@ -22,8 +22,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import chat.stoat.R
 import chat.stoat.api.internals.ChannelUtils
-import chat.stoat.api.schemas.Channel
-import chat.stoat.api.schemas.ChannelType
+import chat.stoat.core.model.schemas.Channel
+import chat.stoat.core.model.schemas.ChannelType
 
 @Composable
 fun ChannelHeader(

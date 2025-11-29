@@ -4,7 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import chat.stoat.api.schemas.AndroidSpecificSettingsSpecialEmbedSettings
+import chat.stoat.core.model.schemas.AndroidSpecificSettingsSpecialEmbedSettings
 import chat.stoat.ui.theme.Theme
 import chat.stoat.ui.theme.getDefaultTheme
 

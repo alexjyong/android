@@ -37,12 +37,12 @@ import chat.stoat.api.internals.SpecialUsers
 import chat.stoat.api.internals.ULID
 import chat.stoat.api.internals.solidColor
 import chat.stoat.api.routes.user.fetchUserProfile
-import chat.stoat.api.schemas.AutumnResource
-import chat.stoat.api.schemas.Profile
-import chat.stoat.api.schemas.User
 import chat.stoat.composables.generic.RemoteImage
 import chat.stoat.composables.generic.UserAvatar
 import chat.stoat.composables.generic.presenceFromStatus
+import chat.stoat.core.model.schemas.AutumnResource
+import chat.stoat.core.model.schemas.Profile
+import chat.stoat.core.model.schemas.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
@@ -168,7 +168,7 @@ fun RawUserOverview(
                     // make sure
                     // - the display name is not null or blank
                     // - the display name is not the same as the username; both trimmed
-                    if (!user.displayName.isNullOrBlank() && ((user.displayName.trim() == user.username?.trim()) == false)) {
+                    if (!user.displayName.isNullOrBlank() && user.displayName!!.trim() != user.username?.trim()) {
                         pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
                         append(user.displayName)
                         pop()

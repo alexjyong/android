@@ -44,7 +44,6 @@ import chat.stoat.api.internals.BrushCompat
 import chat.stoat.api.internals.ULID
 import chat.stoat.api.internals.solidColor
 import chat.stoat.api.routes.user.fetchUserProfile
-import chat.stoat.api.schemas.Profile
 import chat.stoat.api.settings.Experiments
 import chat.stoat.api.settings.FeatureFlags
 import chat.stoat.composables.chat.RoleListEntry
@@ -56,6 +55,7 @@ import chat.stoat.composables.markdown.RichMarkdown
 import chat.stoat.composables.screens.settings.RawUserOverview
 import chat.stoat.composables.screens.settings.UserButtons
 import chat.stoat.composables.sheets.SheetTile
+import chat.stoat.core.model.schemas.Profile
 import kotlinx.datetime.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -216,14 +216,14 @@ fun UserInfoSheet(
         }
         val accountAt = user.id?.let {
             DateUtils.getRelativeTimeSpanString(
-                ULID.asTimestamp(user.id),
+                ULID.asTimestamp(user.id!!),
                 System.currentTimeMillis(),
                 DateUtils.MINUTE_IN_MILLIS
             ).toString()
         }
         val joinedAt = member?.joinedAt?.let {
             DateUtils.getRelativeTimeSpanString(
-                Instant.parse(member.joinedAt).toEpochMilliseconds(),
+                Instant.parse(member.joinedAt!!).toEpochMilliseconds(),
                 System.currentTimeMillis(),
                 DateUtils.MINUTE_IN_MILLIS
             ).toString()
@@ -242,7 +242,7 @@ fun UserInfoSheet(
                         )
 
                         Text(
-                            text = server.name,
+                            text = server.name!!,
                             style = MaterialTheme.typography.labelMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -271,7 +271,7 @@ fun UserInfoSheet(
                     )
 
                     Text(
-                        text = server.name,
+                        text = server.name!!,
                         style = MaterialTheme.typography.labelMedium
                     )
 
@@ -315,7 +315,7 @@ fun UserInfoSheet(
                     },
                     contentPreview = {
                         Text(
-                            text = user.status.text,
+                            text = user.status!!.text!!,
                             fontSize = 14.sp,
                             maxLines = 5,
                             overflow = TextOverflow.Ellipsis
@@ -323,7 +323,7 @@ fun UserInfoSheet(
                     }
                 ) {
                     Text(
-                        text = user.status.text,
+                        text = user.status!!.text!!,
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -331,7 +331,7 @@ fun UserInfoSheet(
         }
 
         if (user.bot != null) {
-            val resolvedOwner = user.bot.owner?.let { StoatAPI.userCache[it] }
+            val resolvedOwner = user.bot!!.owner?.let { StoatAPI.userCache[it] }
 
             item(key = "bot-owner") {
                 SheetTile(

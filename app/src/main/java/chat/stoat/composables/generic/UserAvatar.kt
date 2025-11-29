@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import chat.stoat.R
 import chat.stoat.api.STOAT_BASE
 import chat.stoat.api.STOAT_FILES
-import chat.stoat.api.schemas.AutumnResource
+import chat.stoat.core.model.schemas.AutumnResource
 import chat.stoat.api.settings.LoadedSettings
 
 enum class Presence {

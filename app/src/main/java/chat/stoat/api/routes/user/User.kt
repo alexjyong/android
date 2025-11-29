@@ -5,9 +5,9 @@ import chat.stoat.api.StoatAPIError
 import chat.stoat.api.StoatHttp
 import chat.stoat.api.StoatJson
 import chat.stoat.api.api
-import chat.stoat.api.schemas.Profile
-import chat.stoat.api.schemas.Status
-import chat.stoat.api.schemas.User
+import chat.stoat.core.model.schemas.Profile
+import chat.stoat.core.model.schemas.Status
+import chat.stoat.core.model.schemas.User
 import io.ktor.client.request.get
 import io.ktor.client.request.patch
 import io.ktor.client.request.setBody
@@ -37,7 +37,7 @@ suspend fun fetchSelf(): User {
         throw Exception("Self user ID is null")
     }
 
-    StoatAPI.userCache[user.id] = user
+    StoatAPI.userCache[user.id!!] = user
     StoatAPI.selfId = user.id
 
     return user

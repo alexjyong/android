@@ -4,7 +4,7 @@ import chat.stoat.api.StoatAPIError
 import chat.stoat.api.StoatHttp
 import chat.stoat.api.StoatJson
 import chat.stoat.api.api
-import chat.stoat.api.schemas.Channel
+import chat.stoat.core.model.schemas.Channel
 import chat.stoat.screens.create.MAX_ADDABLE_PEOPLE_IN_GROUP
 import io.ktor.client.request.delete
 import io.ktor.client.request.post

@@ -43,8 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import chat.stoat.R
 import chat.stoat.api.StoatAPI
-import chat.stoat.api.schemas.Channel
-import chat.stoat.api.schemas.Message
+import chat.stoat.core.model.schemas.Channel
+import chat.stoat.core.model.schemas.Message
 import chat.stoat.api.settings.LoadedSettings
 import chat.stoat.api.settings.MessageReplyStyle
 import chat.stoat.callbacks.Action

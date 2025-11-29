@@ -21,7 +21,7 @@ import chat.stoat.api.STOAT_FILES
 import chat.stoat.api.STOAT_WEB_APP
 import chat.stoat.api.StoatAPI
 import chat.stoat.api.internals.ResourceLocations
-import chat.stoat.api.schemas.isInviteUri
+import chat.stoat.core.model.schemas.isInviteUri
 import chat.stoat.markdown.jbm.LocalJBMarkdownTreeState
 import chat.stoat.markdown.jbm.MentionResolver
 import chat.stoat.markdown.jbm.asHexString

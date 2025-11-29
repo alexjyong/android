@@ -1,6 +1,6 @@
-package chat.stoat.api.schemas
+package chat.stoat.core.model.schemas
 
-import chat.stoat.ui.theme.OverridableColourScheme
+import chat.stoat.core.model.data.OverridableColourScheme
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 

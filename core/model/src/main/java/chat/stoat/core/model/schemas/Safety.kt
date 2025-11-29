@@ -1,4 +1,4 @@
-package chat.stoat.api.schemas
+package chat.stoat.core.model.schemas
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -29,7 +29,7 @@ enum class ContentReportReason(val value: String) {
         override val descriptor: SerialDescriptor
             get() {
                 return PrimitiveSerialDescriptor(
-                    "chat.stoat.api.schemas.ContentReportReason",
+                    "chat.stoat.core.model.schemas.ContentReportReason",
                     PrimitiveKind.STRING
                 )
             }
@@ -73,7 +73,7 @@ enum class UserReportReason(val value: String) {
         override val descriptor: SerialDescriptor
             get() {
                 return PrimitiveSerialDescriptor(
-                    "chat.stoat.api.schemas.UserReportReason",
+                    "chat.stoat.core.model.schemas.UserReportReason",
                     PrimitiveKind.STRING
                 )
             }

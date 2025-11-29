@@ -2,7 +2,7 @@ package chat.stoat.composables.chat.specialembeds
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import chat.stoat.api.schemas.Special
+import chat.stoat.core.model.schemas.Special
 import chat.stoat.api.settings.LoadedSettings
 
 @Composable

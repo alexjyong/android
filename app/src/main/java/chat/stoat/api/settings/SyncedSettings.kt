@@ -5,10 +5,10 @@ import chat.stoat.api.StoatAPI
 import chat.stoat.api.StoatJson
 import chat.stoat.api.routes.sync.getKeys
 import chat.stoat.api.routes.sync.setKey
-import chat.stoat.api.schemas.AndroidSpecificSettings
-import chat.stoat.api.schemas.NotificationSettings
-import chat.stoat.api.schemas.OrderingSettings
-import chat.stoat.api.schemas._NotificationSettingsToParse
+import chat.stoat.core.model.schemas.AndroidSpecificSettings
+import chat.stoat.core.model.schemas.NotificationSettings
+import chat.stoat.core.model.schemas.OrderingSettings
+import chat.stoat.core.model.schemas._NotificationSettingsToParse
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonPrimitive
 import logcat.LogPriority

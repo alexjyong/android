@@ -34,7 +34,7 @@ import chat.stoat.R
 import chat.stoat.api.StoatAPI
 import chat.stoat.api.routes.safety.putUserReport
 import chat.stoat.api.routes.user.blockUser
-import chat.stoat.api.schemas.UserReportReason
+import chat.stoat.core.model.schemas.UserReportReason
 import chat.stoat.composables.generic.FormTextField
 import chat.stoat.composables.screens.settings.UserOverview
 import kotlinx.coroutines.launch
