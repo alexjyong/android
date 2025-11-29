@@ -117,12 +117,14 @@ fun ChannelScreenAgeGate(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().imePadding(),
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
     ) {
         Icon(
-            painter = painterResource(R.drawable.icn_eda_24dp),
+            painter = painterResource(R.drawable.icn_front_hand_24dp),
             contentDescription = null,
             modifier = Modifier.size(48.dp),
         )
