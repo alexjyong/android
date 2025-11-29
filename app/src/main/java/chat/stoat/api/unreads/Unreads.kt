@@ -94,6 +94,46 @@ class Unreads {
         }
     }
 
+    fun getAllUnreads(): List<ChannelUnread> {
+        if (!hasLoaded.value) return emptyList()
+        return channels.values.toList()
+    }
+
+    /**
+     * Returns true if there are any unreads in any of the channels that are not muted.
+     * **SLOW:** Run in a background coroutine.
+     */
+    fun hasAnyUnreads(): Boolean {
+        if (!hasLoaded.value) return false
+
+        for ((channelId, unread) in StoatAPI.channelCache) {
+            if (channelId !in channels) continue
+            if (NotificationSettingsProvider.isChannelMuted(channelId, unread.server)) continue
+            if (hasUnread(channelId, unread.lastMessageID ?: "", unread.server)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    /**
+     * Returns the count of channels with unreads that are not muted.
+     * **SLOW:** Run in a background coroutine.
+     */
+    fun countChannelsWithUnreads(): Int? {
+        if (!hasLoaded.value) return null
+
+        var count = 0
+        for ((channelId, unread) in StoatAPI.channelCache) {
+            if (channelId !in channels) continue
+            if (NotificationSettingsProvider.isChannelMuted(channelId, unread.server)) continue
+            if (hasUnread(channelId, unread.lastMessageID ?: "", unread.server)) {
+                count++
+            }
+        }
+        return count
+    }
+
     fun clear() {
         channels.clear()
         hasLoaded.value = false

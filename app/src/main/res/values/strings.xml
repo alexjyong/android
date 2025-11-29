@@ -156,6 +156,13 @@
     <string name="overview_screen_changelog_description">Stoat never sleeps, take a look to see what\'s been in the works</string>
     <string name="overview_screen_feedback">Provide Feedback</string>
     <string name="overview_screen_feedback_description">Got something to say? We\'re all ears</string>
+    <string name="overview_screen_catch_up">Catch Up</string>
+    <string name="overview_screen_catch_up_description">See what you\'ve missed while you were away</string>
+    <string name="overview_screen_catch_up_none">All caught up</string>
+    <string name="overview_screen_catch_up_none_description">You\'ve seen all new messages since your last visit.</string>
+    <string name="overview_screen_catch_up_amount_badge_loading">…</string>
+
+    <string name="catch_up">Catch Up</string>
 
     <string name="user_card_tap_to_copy">Tap to copy</string>
     <string name="user_card_error_sharing">An error occurred while sharing your user card.</string>

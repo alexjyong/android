@@ -97,6 +97,7 @@ import chat.stoat.screens.DefaultDestinationScreen
 import chat.stoat.screens.about.AboutScreen
 import chat.stoat.screens.about.AttributionScreen
 import chat.stoat.screens.chat.ChatRouterScreen
+import chat.stoat.screens.chat.standalone.CatchUpScreen
 import chat.stoat.screens.chat.views.channel.ChannelScreen
 import chat.stoat.screens.create.CreateGroupScreen
 import chat.stoat.screens.labs.LabsRootScreen
@@ -702,6 +703,8 @@ fun AppEntrypoint(
                             useChatUI = true
                         )
                     }
+
+                    composable("catchup") { CatchUpScreen(navController) }
 
                     composable("create/group") { CreateGroupScreen(navController) }
 
