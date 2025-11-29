@@ -296,10 +296,10 @@ dependencies {
     implementation("org.jetbrains:markdown:0.7.3")
     implementation("dev.snipme:highlights:1.0.0")
 
-    // Livekit - Commented out for now to not inflate the app size.
-    implementation("io.livekit:livekit-android:${LivekitVersion.core}")
-    implementation("io.livekit:livekit-android-camerax:${LivekitVersion.core}")
-    implementation("io.livekit:livekit-android-compose-components:${LivekitVersion.componentsCompose}")
+    // Livekit
+    // implementation("io.livekit:livekit-android:${LivekitVersion.core}")
+    // implementation("io.livekit:livekit-android-camerax:${LivekitVersion.core}")
+    // implementation("io.livekit:livekit-android-compose-components:${LivekitVersion.componentsCompose}")
 
     // Firebase - Cloud Messaging
     implementation(platform("com.google.firebase:firebase-bom:33.15.0"))

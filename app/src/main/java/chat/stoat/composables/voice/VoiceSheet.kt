@@ -1,5 +1,5 @@
 package chat.stoat.composables.voice
-
+/*
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -300,4 +300,4 @@ fun VoiceSheet(
             }
         }
     }
-}
+}*/

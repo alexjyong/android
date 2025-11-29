@@ -89,7 +89,6 @@ import chat.stoat.api.settings.LoadedSettings
 import chat.stoat.api.settings.SyncedSettings
 import chat.stoat.composables.generic.HealthAlert
 import chat.stoat.composables.voice.VoicePermissionSwitch
-import chat.stoat.composables.voice.VoiceSheet
 import chat.stoat.material.EasingTokens
 import chat.stoat.ndk.NativeLibraries
 import chat.stoat.persistence.KVStorage
@@ -785,14 +784,18 @@ fun AppEntrypoint(
                                 showVoiceUI = false
                             }
                         ) {
+                            LaunchedEffect(Unit) {
+                                showVoiceUI = false
+                                voiceChannelId = null
+                            }
                             voiceChannelId?.let {
-                                VoiceSheet(
+                                /*VoiceSheet(
                                     it,
                                     onDisconnect = {
                                         showVoiceUI = false
                                         voiceChannelId = null
                                     }
-                                )
+                                )*/
                             }
                         }
                     }
