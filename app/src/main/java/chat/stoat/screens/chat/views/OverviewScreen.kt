@@ -230,51 +230,53 @@ fun OverviewScreen(
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         state = lazyStaggeredGridState
                     ) {
-                        item(key = "unreads") {
-                            OverviewScreenLink(
-                                onClick = {
-                                    if (hasUnreads) navController.navigate("catchup")
-                                },
-                                clickable = hasUnreads,
-                                backgroundColour = if (hasUnreads) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-                                foregroundColour = if (hasUnreads) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
-                                title = {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        Icon(
-                                            painter = if (hasUnreads) painterResource(R.drawable.icn_move_to_inbox_24dp) else painterResource(
-                                                R.drawable.icn_inbox_24dp
-                                            ),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(22.dp)
-                                        )
-                                        Text(
-                                            if (hasUnreads) stringResource(R.string.overview_screen_catch_up) else stringResource(
-                                                R.string.overview_screen_catch_up_none
+                        if (false) { // TODO - implement catch up screen
+                            item(key = "catchup") {
+                                OverviewScreenLink(
+                                    onClick = {
+                                        if (hasUnreads) navController.navigate("catchup")
+                                    },
+                                    clickable = hasUnreads,
+                                    backgroundColour = if (hasUnreads) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                                    foregroundColour = if (hasUnreads) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    title = {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            Icon(
+                                                painter = if (hasUnreads) painterResource(R.drawable.icn_move_to_inbox_24dp) else painterResource(
+                                                    R.drawable.icn_inbox_24dp
+                                                ),
+                                                contentDescription = null,
+                                                modifier = Modifier.size(22.dp)
                                             )
-                                        )
-
-                                        if (hasUnreads) {
-                                            Spacer(Modifier.weight(1f))
-                                            Badge {
-                                                Text(
-                                                    countUnreads?.toString()
-                                                        ?: stringResource(R.string.overview_screen_catch_up_amount_badge_loading)
+                                            Text(
+                                                if (hasUnreads) stringResource(R.string.overview_screen_catch_up) else stringResource(
+                                                    R.string.overview_screen_catch_up_none
                                                 )
+                                            )
+
+                                            if (hasUnreads) {
+                                                Spacer(Modifier.weight(1f))
+                                                Badge {
+                                                    Text(
+                                                        countUnreads?.toString()
+                                                            ?: stringResource(R.string.overview_screen_catch_up_amount_badge_loading)
+                                                    )
+                                                }
                                             }
                                         }
-                                    }
-                                },
-                                body = {
-                                    Text(
-                                        if (hasUnreads) stringResource(R.string.overview_screen_catch_up_description) else stringResource(
-                                            R.string.overview_screen_catch_up_none_description
+                                    },
+                                    body = {
+                                        Text(
+                                            if (hasUnreads) stringResource(R.string.overview_screen_catch_up_description) else stringResource(
+                                                R.string.overview_screen_catch_up_none_description
+                                            )
                                         )
-                                    )
-                                }
-                            )
+                                    }
+                                )
+                            }
                         }
 
                         item(key = "settings") {
