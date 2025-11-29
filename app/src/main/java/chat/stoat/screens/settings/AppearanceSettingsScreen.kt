@@ -23,7 +23,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
@@ -32,6 +34,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -50,6 +53,9 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -62,10 +68,13 @@ import chat.stoat.api.StoatCbor
 import chat.stoat.api.StoatJson
 import chat.stoat.api.settings.LoadedSettings
 import chat.stoat.api.settings.SyncedSettings
+import chat.stoat.api.settings.UserInterfaceFont
 import chat.stoat.composables.generic.ListHeader
 import chat.stoat.composables.screens.settings.appearance.ColourChip
 import chat.stoat.composables.screens.settings.appearance.CornerRadiusPicker
 import chat.stoat.sheets.ColourPickerSheet
+import chat.stoat.ui.theme.GoogleSansFlex
+import chat.stoat.ui.theme.Inter
 import chat.stoat.ui.theme.OverridableColourScheme
 import chat.stoat.ui.theme.Theme
 import chat.stoat.ui.theme.getFieldByName
@@ -93,6 +102,13 @@ class AppearanceSettingsScreenViewModel @Inject constructor(
         LoadedSettings.theme = theme
         viewModelScope.launch {
             SyncedSettings.updateAndroid(SyncedSettings.android.copy(theme = theme.name))
+        }
+    }
+
+    fun saveNewFont(font: UserInterfaceFont) {
+        LoadedSettings.font = font
+        viewModelScope.launch {
+            SyncedSettings.updateAndroid(SyncedSettings.android.copy(font = font.name))
         }
     }
 
@@ -198,7 +214,10 @@ class AppearanceSettingsScreenViewModel @Inject constructor(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+@OptIn(
+    ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3ExpressiveApi::class
+)
 @Composable
 fun AppearanceSettingsScreen(
     navController: NavController,
@@ -388,6 +407,45 @@ fun AppearanceSettingsScreen(
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
+                    }
+                }
+
+                ListHeader {
+                    Text(stringResource(R.string.settings_appearance_typeface))
+                }
+
+                FlowRow(
+                    Modifier
+                        .padding(horizontal = 8.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    ToggleButton(
+                        checked = LoadedSettings.font == UserInterfaceFont.Default,
+                        onCheckedChange = { viewModel.saveNewFont(UserInterfaceFont.Default) },
+                        shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+                        modifier = Modifier
+                            .semantics { role = Role.RadioButton }
+                            .weight(1f),
+                    ) {
+                        Text(
+                            stringResource(R.string.settings_appearance_typeface_default),
+                            fontFamily = Inter
+                        )
+                    }
+                    ToggleButton(
+                        checked = LoadedSettings.font == UserInterfaceFont.GoogleSansFlex,
+                        onCheckedChange = { viewModel.saveNewFont(UserInterfaceFont.GoogleSansFlex) },
+                        shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
+                        modifier = Modifier
+                            .semantics { role = Role.RadioButton }
+                            .weight(1f),
+                    ) {
+                        Text(
+                            stringResource(R.string.settings_appearance_typeface_google_sans_flex),
+                            fontFamily = GoogleSansFlex
+                        )
                     }
                 }
 

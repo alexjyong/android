@@ -1,0 +1,16 @@
+{
+  "uniqueId": "com.google.fonts:googlesansflex:0.0.0",
+  "developers": [
+    {
+      "name": "Google",
+      "organisationUrl": "https://about.google/"
+    }
+  ],
+  "artifactVersion": "0.0.0",
+  "description": "Google Sans Flex is the next generation of Google’s brand typeface.",
+  "name": "Google Sans Flex",
+  "website": "https://fonts.google.com/specimen/Google+Sans+Flex",
+  "licenses": [
+    "OFL"
+  ]
+}

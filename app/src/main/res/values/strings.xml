@@ -708,6 +708,9 @@
     <string name="settings_appearance_theme_m3dynamic">Material You</string>
     <string name="settings_appearance_theme_m3dynamic_unsupported">Material You (unsupported)</string>
     <string name="settings_appearance_theme_m3dynamic_unsupported_toast">Material You is not supported on this device.</string>
+    <string name="settings_appearance_typeface">Font</string>
+    <string name="settings_appearance_typeface_default">Default</string>
+    <string name="settings_appearance_typeface_google_sans_flex" translatable="false">Google Sans Flex</string>
 
     <string name="settings_appearance_avatar_shape">Profile Picture Shape</string>
     <string name="settings_appearance_avatar_shape_description">Choose the rounding grade for profile pictures, including in chat and profiles. This applies to all users.</string>

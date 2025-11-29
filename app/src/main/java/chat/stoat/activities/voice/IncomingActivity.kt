@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.stoat.R
+import chat.stoat.api.settings.UserInterfaceFont
 import chat.stoat.composables.generic.Presence
 import chat.stoat.composables.generic.RemoteImage
 import chat.stoat.composables.generic.presenceColour
@@ -81,7 +82,8 @@ class IncomingActivity : ComponentActivity() {
 @Composable
 fun IncomingCall() {
     StoatTheme(
-        requestedTheme = if (isSystemInDarkTheme()) Theme.Default else Theme.Light
+        requestedTheme = if (isSystemInDarkTheme()) Theme.Default else Theme.Light,
+        requestedUserInterfaceFont = UserInterfaceFont.Default
     ) {
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onBackground) {
             IncomingCallInner()

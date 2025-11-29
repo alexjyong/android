@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
+import chat.stoat.api.settings.UserInterfaceFont
 
 val LightColorScheme = lightColorScheme(
     primary = Colour.PrimaryLight,
@@ -172,14 +173,19 @@ fun getColorScheme(
 @Composable
 fun StoatTheme(
     requestedTheme: Theme,
+    requestedUserInterfaceFont: UserInterfaceFont,
     colourOverrides: OverridableColourScheme? = null,
     content: @Composable () -> Unit
 ) {
     val colorScheme = getColorScheme(requestedTheme, colourOverrides)
+    val typography = when (requestedUserInterfaceFont) {
+        UserInterfaceFont.Default -> StoatTypography
+        UserInterfaceFont.GoogleSansFlex -> GoogleTypography
+    }
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = StoatTypography,
+        typography = typography,
         content = content
     )
 }

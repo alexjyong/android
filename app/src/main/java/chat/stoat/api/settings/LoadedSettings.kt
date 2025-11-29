@@ -14,6 +14,11 @@ enum class MessageReplyStyle {
     DoubleTap
 }
 
+enum class UserInterfaceFont {
+    Default,
+    GoogleSansFlex,
+}
+
 typealias SpecialEmbedSettings = AndroidSpecificSettingsSpecialEmbedSettings
 
 object LoadedSettings {
@@ -23,6 +28,7 @@ object LoadedSettings {
     var experimentsEnabled by mutableStateOf(false)
     var specialEmbedSettings by mutableStateOf(SpecialEmbedSettings())
     var poorlyFormedSettingsKeys by mutableStateOf(emptySet<String>())
+    var font by mutableStateOf(UserInterfaceFont.Default)
 
     fun hydrateWithSettings(settings: SyncedSettings) {
         this.theme = settings.android.theme?.let {
@@ -33,6 +39,13 @@ object LoadedSettings {
                 ?: MessageReplyStyle.SwipeFromEnd
         this.avatarRadius = settings.android.avatarRadius ?: 50
         this.specialEmbedSettings = settings.android.specialEmbedSettings ?: SpecialEmbedSettings()
+        this.font = settings.android.font?.let {
+            try {
+                UserInterfaceFont.valueOf(it)
+            } catch (e: Exception) {
+                null
+            }
+        } ?: UserInterfaceFont.Default
     }
 
     fun reset() {
@@ -41,5 +54,6 @@ object LoadedSettings {
         avatarRadius = 50
         specialEmbedSettings = SpecialEmbedSettings()
         poorlyFormedSettingsKeys = emptySet()
+        font = UserInterfaceFont.Default
     }
 }

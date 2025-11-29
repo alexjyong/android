@@ -184,6 +184,7 @@ fun ImageViewScreen(resource: AutumnResource, onClose: () -> Unit = {}) {
 
     StoatTheme(
         requestedTheme = LoadedSettings.theme,
+        requestedUserInterfaceFont = LoadedSettings.font,
         colourOverrides = SyncedSettings.android.colourOverrides
     ) {
         Scaffold(

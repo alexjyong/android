@@ -27,6 +27,7 @@ object SyncedSettings {
     private val _android = mutableStateOf(
         AndroidSpecificSettings(
             theme = "None",
+            font = "Default",
             colourOverrides = null,
             messageReplyStyle = "None"
         )
@@ -130,6 +131,7 @@ object SyncedSettings {
     suspend fun resetAndroid() {
         val default = AndroidSpecificSettings(
             theme = "None",
+            font = "Default",
             colourOverrides = null,
             messageReplyStyle = "None"
         )

@@ -481,6 +481,7 @@ fun AppEntrypoint(
 
     StoatTheme(
         requestedTheme = LoadedSettings.theme,
+        requestedUserInterfaceFont = LoadedSettings.font,
         colourOverrides = SyncedSettings.android.colourOverrides
     ) {
         Box(

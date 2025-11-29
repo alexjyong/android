@@ -146,6 +146,7 @@ fun InviteScreen(
 
     StoatTheme(
         requestedTheme = LoadedSettings.theme,
+        requestedUserInterfaceFont = LoadedSettings.font,
         colourOverrides = SyncedSettings.android.colourOverrides
     ) {
         Surface(

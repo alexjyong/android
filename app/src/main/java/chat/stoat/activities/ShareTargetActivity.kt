@@ -279,6 +279,7 @@ fun ShareTargetScreen(
 
     StoatTheme(
         requestedTheme = LoadedSettings.theme,
+        requestedUserInterfaceFont = LoadedSettings.font,
         colourOverrides = SyncedSettings.android.colourOverrides
     ) {
         Scaffold(
